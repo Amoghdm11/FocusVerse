@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FocusVerse // Pixel-Arcade &amp; Live-Code Character Productivity Platform</title>
+    <meta name="description" content="A pixel-arcade, live-code character productivity platform inspired by synergy.iiitb.ac.in and cosmic retro visualizers." />
+    
+    <!-- Google Fonts: Press Start 2P, Silkscreen, JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet" />
+
+    <!-- Inline critical background to prevent any white flash -->
+    <style>
+      html, body, #root {
+        background-color: #0B0914 !important;
+        color: #F0E8FF;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        width: 100%;
+        overflow-x: hidden;
+        font-family: 'JetBrains Mono', monospace;
+      }
+      /* Custom pixel scrollbars */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0B0914;
+        border-left: 1px solid #3E356B;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #3E356B;
+        border: 1px solid #000000;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #F5C242;
+      }
+    </style>
+  </head>
+  <body class="bg-void text-[#F0E8FF] selection:bg-arcade-gold selection:text-black">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

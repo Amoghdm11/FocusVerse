@@ -31,6 +31,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [261.63, 329.63, 392.00, 440.00, 523.25, 659.25], // C major pentatonic
     ambienceProfile: 'rain',
+    genderOrSpirit: 'boy',
   },
 
   // 2. Batman
@@ -62,6 +63,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [110.00, 130.81, 146.83, 164.81, 196.00, 220.00], // Low A minor
     ambienceProfile: 'sonar',
+    genderOrSpirit: 'boy',
   },
 
   // 3. Tony Stark
@@ -94,6 +96,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [220.00, 277.18, 329.63, 440.00, 554.37, 659.25], // A major / techno
     ambienceProfile: 'space',
+    genderOrSpirit: 'boy',
   },
 
   // 4. Miles Morales
@@ -126,6 +129,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [293.66, 349.23, 392.00, 440.00, 523.25, 587.33], // D minor soul
     ambienceProfile: 'lofi',
+    genderOrSpirit: 'boy',
   },
 
   // 5. Gwen Stacy
@@ -158,6 +162,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [329.63, 392.00, 440.00, 493.88, 587.33, 659.25], // E minor
     ambienceProfile: 'lofi',
+    genderOrSpirit: 'girl',
   },
 
   // 6. Naruto Uzumaki
@@ -188,6 +193,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [261.63, 293.66, 329.63, 392.00, 440.00, 523.25], // Pentatonic
     ambienceProfile: 'wind',
+    genderOrSpirit: 'boy',
   },
 
   // 7. Gojo Satoru
@@ -221,6 +227,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [392.00, 440.00, 523.25, 587.33, 659.25, 783.99], // High celestial
     ambienceProfile: 'space',
+    genderOrSpirit: 'boy',
   },
 
   // 8. Levi Ackerman
@@ -253,6 +260,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [220.00, 246.94, 261.63, 293.66, 329.63, 392.00], // Minimalist Aeolian
     ambienceProfile: 'wind',
+    genderOrSpirit: 'boy',
   },
 
   // 9. L Lawliet
@@ -285,6 +293,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [261.63, 311.13, 349.23, 392.00, 466.16, 523.25], // Dissonant mystery
     ambienceProfile: 'rain',
+    genderOrSpirit: 'boy',
   },
 
   // 10. Elsa
@@ -318,6 +327,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [329.63, 392.00, 493.88, 523.25, 659.25, 783.99], // Glacial sparkle
     ambienceProfile: 'wind',
+    genderOrSpirit: 'girl',
   },
 
   // 11. Rapunzel
@@ -349,6 +359,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [261.63, 329.63, 392.00, 440.00, 523.25, 587.33], // Warm hopeful
     ambienceProfile: 'fire',
+    genderOrSpirit: 'girl',
   },
 
   // 12. Moana
@@ -379,6 +390,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [293.66, 329.63, 392.00, 440.00, 587.33, 659.25], // Oceanic open
     ambienceProfile: 'rain',
+    genderOrSpirit: 'girl',
   },
 
   // 13. Hermione Granger
@@ -410,6 +422,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [246.94, 293.66, 349.23, 392.00, 440.00, 493.88], // Scholarly Dorian
     ambienceProfile: 'fire',
+    genderOrSpirit: 'girl',
   },
 
   // 14. Wednesday Addams
@@ -442,6 +455,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [130.81, 155.56, 174.61, 196.00, 233.08, 261.63], // Deep gothic cello
     ambienceProfile: 'sonar',
+    genderOrSpirit: 'girl',
   },
 
   // 15. Officer K
@@ -474,6 +488,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [146.83, 174.61, 220.00, 261.63, 293.66, 349.23], // Vangelis synth
     ambienceProfile: 'rain',
+    genderOrSpirit: 'boy',
   },
 
   // 16. Neo
@@ -507,6 +522,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [196.00, 246.94, 293.66, 329.63, 392.00, 493.88], // Phosphor cyber
     ambienceProfile: 'matrix',
+    genderOrSpirit: 'boy',
   },
 
   // 17. Cozy Study Girl
@@ -537,6 +553,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [261.63, 293.66, 329.63, 392.00, 440.00, 523.25], // Warm major 7th
     ambienceProfile: 'lofi',
+    genderOrSpirit: 'girl',
   },
 
   // 18. Late-Night Study Boy
@@ -570,6 +587,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [220.00, 261.63, 293.66, 349.23, 392.00, 440.00], // Nocturne blue
     ambienceProfile: 'lofi',
+    genderOrSpirit: 'boy',
   },
 
   // 19. Purring Window Cat
@@ -603,6 +621,7 @@ export const CHARACTERS: Character[] = [
     ],
     synthNotes: [329.63, 392.00, 440.00, 493.88, 587.33, 659.25], // Calming pentatonic
     ambienceProfile: 'purr',
+    genderOrSpirit: 'neutral',
   },
 
   // 20. Loyal Fireplace Dog
@@ -634,7 +653,8 @@ export const CHARACTERS: Character[] = [
       '    }',
       '}',
     ],
-    synthNotes: [261.63, 293.66, 329.63, 392.00, 440.00, 523.25], // Hearth chord
+    synthNotes: [261.63, 293.66, 329.63, 440.00, 523.25], // Hearth chord
     ambienceProfile: 'fire',
+    genderOrSpirit: 'neutral',
   },
 ];

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ChevronLeft, Maximize2, Minimize2, ShieldCheck, Sliders, Sparkles, Volume2, Music, Eye } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, Maximize2, Minimize2, ShieldCheck, Sliders, Sparkles, Volume2, VolumeX, Music, Eye } from 'lucide-react';
 import { Character } from '../types/character';
 import { CHARACTERS } from '../data/characters';
 import { EnvironmentFX } from '../components/EnvironmentFX';
@@ -7,8 +7,9 @@ import { PixelEmblem } from '../components/PixelEmblems';
 import { TimerWidget } from '../components/TimerWidget';
 import { TodoWidget } from '../components/TodoWidget';
 import { NotesWidget } from '../components/NotesWidget';
-import { AudioCodeFooter, UserFocusAction } from '../components/AudioCodeFooter';
+import { UserFocusAction } from '../components/AudioCodeFooter';
 import { audioEngine } from '../utils/audioEngine';
+import { Footer } from '../components/Footer';
 
 interface WorkspacePageProps {
   character: Character;
@@ -30,6 +31,56 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
   const [showDimmerSlider, setShowDimmerSlider] = useState(false);
   const [currentAction, setCurrentAction] = useState<UserFocusAction>('IDLE');
   const [timerModeReadout, setTimerModeReadout] = useState('POMODORO');
+
+  // Compact Header Audio Controls
+  const [showAudioPopover, setShowAudioPopover] = useState(false);
+  const [isAmbiencePlaying, setIsAmbiencePlaying] = useState(false);
+  const [isSynthPlaying, setIsSynthPlaying] = useState(false);
+  const [ambienceVol, setAmbienceVol] = useState(0.4);
+  const [synthVol, setSynthVol] = useState(0.3);
+  const [isMuted, setIsMuted] = useState(false);
+  const [activeProfile, setActiveProfile] = useState<string>(character.ambienceProfile);
+
+  useEffect(() => {
+    setActiveProfile(character.ambienceProfile);
+    audioEngine.setSynthNotes(character.synthNotes);
+    if (isAmbiencePlaying) {
+      audioEngine.setAmbienceProfile(character.ambienceProfile);
+    }
+  }, [character]);
+
+  const toggleAmbience = () => {
+    audioEngine.playClick();
+    const playing = audioEngine.toggleAmbience(activeProfile);
+    setIsAmbiencePlaying(playing);
+  };
+
+  const toggleSynth = () => {
+    audioEngine.playClick();
+    const playing = audioEngine.toggleSynth();
+    setIsSynthPlaying(playing);
+  };
+
+  const toggleMute = () => {
+    audioEngine.playClick();
+    const muted = audioEngine.toggleMute();
+    setIsMuted(muted);
+  };
+
+  const handleAmbienceVol = (v: number) => {
+    setAmbienceVol(v);
+    audioEngine.setAmbienceVolume(v);
+  };
+
+  const handleSynthVol = (v: number) => {
+    setSynthVol(v);
+    audioEngine.setSynthVolume(v);
+  };
+
+  const handleProfileSelect = (prof: string) => {
+    setActiveProfile(prof);
+    audioEngine.setAmbienceProfile(prof);
+  };
 
   const toggleZenMode = () => {
     audioEngine.playClick();
@@ -105,8 +156,133 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
             </div>
           )}
 
-          {/* Right: Controls (Zen Mode, Dimmer, Safe Mode) */}
+          {/* Right: Controls (Audio Pill, Zen Mode, Dimmer, Safe Mode) */}
           <div className="flex items-center gap-2">
+            {/* Audio Control Pill & Popover */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  audioEngine.playClick();
+                  setShowAudioPopover(!showAudioPopover);
+                }}
+                className={`px-2 py-1 border text-[10px] font-mono flex items-center gap-1.5 transition-all ${
+                  isAmbiencePlaying || isSynthPlaying
+                    ? 'border-arcade-cyan bg-cyan-950/60 text-arcade-cyan shadow-pixel-sm font-bold'
+                    : 'border-arcade-border text-gray-300 hover:text-white hover:border-arcade-gold'
+                }`}
+                title="Toggle Study Sounds & Music"
+              >
+                {isMuted ? (
+                  <VolumeX size={13} className="text-red-400" />
+                ) : isAmbiencePlaying || isSynthPlaying ? (
+                  <Volume2 size={13} className="text-arcade-cyan animate-pulse" />
+                ) : (
+                  <Volume2 size={13} className="text-gray-400" />
+                )}
+                <span>
+                  SOUND: {isMuted ? 'MUTED' : (isAmbiencePlaying || isSynthPlaying) ? 'ACTIVE' : 'OFF'}
+                </span>
+              </button>
+
+              {/* Audio Settings Popover */}
+              {showAudioPopover && (
+                <div className="absolute right-0 top-full mt-1.5 p-3.5 bg-void-darkest border-2 border-arcade-border shadow-[0_4px_20px_rgba(0,0,0,0.9)] z-50 w-72 text-xs font-mono">
+                  <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-arcade-border">
+                    <span className="font-silkscreen text-[11px] text-arcade-gold uppercase">
+                      STUDY AUDIO ENGINE
+                    </span>
+                    <button
+                      onClick={toggleMute}
+                      className={`px-1.5 py-0.5 border text-[9px] uppercase ${
+                        isMuted ? 'border-red-500 bg-red-950 text-red-300' : 'border-arcade-border text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      {isMuted ? 'UNMUTE' : 'MUTE ALL'}
+                    </button>
+                  </div>
+
+                  {/* 1. Procedural Ambience Generator */}
+                  <div className="space-y-1.5 mb-3">
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-gray-300 font-bold">AMBIENCE ({activeProfile.toUpperCase()})</span>
+                      <button
+                        onClick={toggleAmbience}
+                        className={`px-2 py-0.5 border text-[9px] uppercase font-bold transition-all ${
+                          isAmbiencePlaying
+                            ? 'border-green-400 bg-green-950/70 text-green-300'
+                            : 'border-arcade-border text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        {isAmbiencePlaying ? 'PAUSE' : 'PLAY'}
+                      </button>
+                    </div>
+
+                    {/* Ambience Profile Selector */}
+                    <div className="grid grid-cols-4 gap-1 text-[8px] pt-1">
+                      {['rain', 'fire', 'space', 'lofi', 'matrix', 'purr', 'sonar', 'wind'].map((prof) => (
+                        <button
+                          key={prof}
+                          onClick={() => {
+                            audioEngine.playClick();
+                            handleProfileSelect(prof);
+                          }}
+                          className={`py-0.5 border text-center uppercase ${
+                            activeProfile === prof
+                              ? 'border-arcade-gold bg-amber-950/80 text-arcade-gold font-bold'
+                              : 'border-arcade-border/60 text-gray-400 hover:text-white'
+                          }`}
+                        >
+                          {prof}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-1">
+                      <span className="text-[9px] text-gray-500">VOL:</span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.05"
+                        value={ambienceVol}
+                        onChange={(e) => handleAmbienceVol(parseFloat(e.target.value))}
+                        className="w-full accent-arcade-cyan h-1 bg-void"
+                      />
+                    </div>
+                  </div>
+
+                  {/* 2. Chiptune Synth Melody */}
+                  <div className="space-y-1.5 pt-2 border-t border-arcade-border/60">
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-gray-300 font-bold">8-BIT SYNTH MELODY</span>
+                      <button
+                        onClick={toggleSynth}
+                        className={`px-2 py-0.5 border text-[9px] uppercase font-bold transition-all ${
+                          isSynthPlaying
+                            ? 'border-arcade-pink bg-pink-950/70 text-pink-300'
+                            : 'border-arcade-border text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        {isSynthPlaying ? 'STOP' : 'PLAY'}
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[9px] text-gray-500">VOL:</span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.05"
+                        value={synthVol}
+                        onChange={(e) => handleSynthVol(parseFloat(e.target.value))}
+                        className="w-full accent-arcade-pink h-1 bg-void"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Background Dimmer Slider Toggle */}
             <div className="relative">
               <button
@@ -175,7 +351,7 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
       </header>
 
       {/* --- MAIN WORKSPACE BODY --- */}
-      <main className="relative z-10 flex-1 px-4 py-6 max-w-7xl mx-auto w-full pb-36">
+      <main className="relative z-10 flex-1 px-4 py-6 max-w-7xl mx-auto w-full pb-12">
         {/* Workspace Dialog Narrative Box */}
         {!zenMode && (
           <div className="flex flex-col items-center mb-6">
@@ -218,12 +394,8 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
         </div>
       </main>
 
-      {/* Bottom Persistent Live Rust Code Bar & Web Audio Synthesizer */}
-      <AudioCodeFooter
-        character={character}
-        currentAction={currentAction}
-        timerMode={timerModeReadout}
-      />
+      {/* Global Credits Footer */}
+      <Footer />
     </div>
   );
 };

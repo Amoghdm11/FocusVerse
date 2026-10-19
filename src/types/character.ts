@@ -72,4 +72,5 @@ export interface Character {
   codeSnippet: string[]; // 6 lines of character-themed Rust code
   synthNotes: number[]; // Frequencies for procedural chiptune arpeggios
   ambienceProfile: 'rain' | 'fire' | 'space' | 'matrix' | 'purr' | 'wind' | 'lofi' | 'sonar';
+  genderOrSpirit: 'girl' | 'boy' | 'neutral';
 }

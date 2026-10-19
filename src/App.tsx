@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { CHARACTERS } from './data/characters';
 import { Character } from './types/character';
 import { HomePage } from './pages/HomePage';
-import { SelectPage } from './pages/SelectPage';
+import { SelectPage, SpiritFilterType } from './pages/SelectPage';
 import { WorkspacePage } from './pages/WorkspacePage';
-import { AudioCodeFooter, UserFocusAction } from './components/AudioCodeFooter';
 
 type ViewMode = 'HOME' | 'SELECT' | 'WORKSPACE';
 
@@ -38,6 +37,7 @@ export const App: React.FC = () => {
   const { initialView, foundChar } = getInitialState();
   const [view, setView] = useState<ViewMode>(initialView);
   const [selectedCharacter, setSelectedCharacter] = useState<Character>(foundChar);
+  const [spiritFilter, setSpiritFilter] = useState<SpiritFilterType>('ALL');
 
   const [archetypeMode, setArchetypeMode] = useState<boolean>(() => {
     try {
@@ -46,8 +46,6 @@ export const App: React.FC = () => {
       return false;
     }
   });
-
-  const [homeAction, setHomeAction] = useState<UserFocusAction>('IDLE');
 
   // Sync hash when view or character changes
   useEffect(() => {
@@ -98,6 +96,21 @@ export const App: React.FC = () => {
     setView('WORKSPACE');
   };
 
+  const handleSelectSpirit = (spirit: 'girl' | 'boy') => {
+    setSpiritFilter(spirit);
+    const targetId = spirit === 'girl' ? 'cozy-study-girl' : 'late-night-study-boy';
+    const found = CHARACTERS.find((c) => c.id === targetId);
+    if (found) {
+      setSelectedCharacter(found);
+    }
+    setView('SELECT');
+  };
+
+  const handleOpenRoster = () => {
+    setSpiritFilter('ALL');
+    setView('SELECT');
+  };
+
   const handleToggleArchetypeMode = () => {
     setArchetypeMode((prev) => !prev);
   };
@@ -105,46 +118,35 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-void text-gray-100 font-mono flex flex-col relative selection:bg-arcade-gold selection:text-black">
       {view === 'HOME' && (
-        <>
-          <HomePage
-            onSelectCompanion={() => setView('SELECT')}
-            onLaunchQuickSession={handleLaunchQuickSession}
-            archetypeMode={archetypeMode}
-            onToggleArchetypeMode={handleToggleArchetypeMode}
-          />
-          {/* Bottom Persistent Bar on Home page */}
-          <AudioCodeFooter
-            character={selectedCharacter}
-            currentAction={homeAction}
-            timerMode="OVERVIEW"
-          />
-        </>
+        <HomePage
+          onSelectCompanion={handleOpenRoster}
+          onLaunchQuickSession={handleLaunchQuickSession}
+          onSelectSpirit={handleSelectSpirit}
+          archetypeMode={archetypeMode}
+          onToggleArchetypeMode={handleToggleArchetypeMode}
+        />
       )}
 
       {view === 'SELECT' && (
-        <>
-          <SelectPage
-            onSelectCharacter={handleSelectCharacter}
-            onBackToHome={() => setView('HOME')}
-            archetypeMode={archetypeMode}
-            onToggleArchetypeMode={handleToggleArchetypeMode}
-            initialCharacter={selectedCharacter}
-            onPreviewCharacterChange={(char) => setSelectedCharacter(char)}
-          />
-          {/* Bottom Persistent Bar on Select page */}
-          <AudioCodeFooter
-            character={selectedCharacter}
-            currentAction="IDLE"
-            timerMode="ROSTER SELECTION"
-          />
-        </>
+        <SelectPage
+          onSelectCharacter={handleSelectCharacter}
+          onBackToHome={() => setView('HOME')}
+          archetypeMode={archetypeMode}
+          onToggleArchetypeMode={handleToggleArchetypeMode}
+          initialCharacter={selectedCharacter}
+          initialSpirit={spiritFilter}
+          onPreviewCharacterChange={(char) => setSelectedCharacter(char)}
+        />
       )}
 
       {view === 'WORKSPACE' && (
         <WorkspacePage
           character={selectedCharacter}
           onSelectAnotherCharacter={(char) => setSelectedCharacter(char)}
-          onBackToRoster={() => setView('SELECT')}
+          onBackToRoster={() => {
+            setSpiritFilter('ALL');
+            setView('SELECT');
+          }}
           archetypeMode={archetypeMode}
           onToggleArchetypeMode={handleToggleArchetypeMode}
         />
@@ -154,3 +156,4 @@ export const App: React.FC = () => {
 };
 
 export default App;
+

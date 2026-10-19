@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ShieldCheck, Dices, Search, Star, Sparkles } from 'lucide-react';
+import { ChevronLeft, ShieldCheck, Dices, Search, Star, Sparkles, Filter } from 'lucide-react';
 import { CHARACTERS } from '../data/characters';
 import { Character, CharacterCategory } from '../types/character';
 import { CharacterVoxelStage } from '../components/CharacterVoxelStage';
 import { CharacterCarousel } from '../components/CharacterCarousel';
 import { CharacterInfoPanel } from '../components/CharacterInfoPanel';
+import { Footer } from '../components/Footer';
 import { audioEngine } from '../utils/audioEngine';
+
+export type SpiritFilterType = 'ALL' | 'girl' | 'boy' | 'neutral';
 
 interface SelectPageProps {
   onSelectCharacter: (character: Character) => void;
@@ -13,6 +16,7 @@ interface SelectPageProps {
   archetypeMode: boolean;
   onToggleArchetypeMode: () => void;
   initialCharacter?: Character;
+  initialSpirit?: SpiritFilterType;
   onPreviewCharacterChange?: (character: Character) => void;
 }
 
@@ -22,8 +26,11 @@ export const SelectPage: React.FC<SelectPageProps> = ({
   archetypeMode,
   onToggleArchetypeMode,
   initialCharacter,
+  initialSpirit = 'ALL',
   onPreviewCharacterChange,
 }) => {
+  const [selectedSpirit, setSelectedSpirit] = useState<SpiritFilterType>(initialSpirit);
+
   // Selected character in the dressing room (defaults to initialCharacter or saved character)
   const [selectedCharacter, setSelectedCharacter] = useState<Character>(() => {
     if (initialCharacter) return initialCharacter;
@@ -36,6 +43,13 @@ export const SelectPage: React.FC<SelectPageProps> = ({
     } catch (_) {}
     return CHARACTERS[0];
   });
+
+  // Keep spirit filter synced if parent initialSpirit changes
+  useEffect(() => {
+    if (initialSpirit) {
+      setSelectedSpirit(initialSpirit);
+    }
+  }, [initialSpirit]);
 
   // Keep selected character synced if parent initialCharacter changes
   useEffect(() => {
@@ -90,12 +104,19 @@ export const SelectPage: React.FC<SelectPageProps> = ({
 
   // Filter roster for the carousel
   const filteredCharacters = CHARACTERS.filter((char) => {
+    // 1. Spirit / Gender Filter
+    if (selectedSpirit === 'girl' && char.genderOrSpirit !== 'girl') return false;
+    if (selectedSpirit === 'boy' && char.genderOrSpirit !== 'boy') return false;
+    if (selectedSpirit === 'neutral' && char.genderOrSpirit !== 'neutral') return false;
+
+    // 2. Category Filter
     if (selectedCategory === '★ FAVORITES') {
       if (!favorites.includes(char.id)) return false;
     } else if (selectedCategory !== 'ALL') {
       if (char.category.toUpperCase() !== selectedCategory) return false;
     }
 
+    // 3. Search query
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchName = char.name.toLowerCase().includes(q);
@@ -108,6 +129,13 @@ export const SelectPage: React.FC<SelectPageProps> = ({
     return true;
   });
 
+  // Auto-switch to first matching companion if current selection is excluded by filter
+  useEffect(() => {
+    if (filteredCharacters.length > 0 && !filteredCharacters.some((c) => c.id === selectedCharacter.id)) {
+      handleSelectCompanion(filteredCharacters[0]);
+    }
+  }, [selectedSpirit, selectedCategory]);
+
   // Pick a random companion (Minecraft PE style)
   const pickRandomCompanion = () => {
     audioEngine.playClick();
@@ -117,7 +145,7 @@ export const SelectPage: React.FC<SelectPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen pb-48 pt-4 px-2 sm:px-6 w-full max-w-7xl mx-auto flex flex-col justify-start gap-4 select-none overflow-x-hidden">
+    <div className="min-h-screen pb-4 pt-3 px-2 sm:px-6 w-full max-w-7xl mx-auto flex flex-col justify-between gap-3 select-none overflow-x-hidden">
       {/* --- TOP TACTICAL HUD BAR --- */}
       <header className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 bg-void-darkest border-2 border-arcade-border text-xs font-mono shadow-pixel">
         {/* Left: Back Button & Roster Status */}
@@ -178,41 +206,92 @@ export const SelectPage: React.FC<SelectPageProps> = ({
         </div>
       </header>
 
-      {/* --- FILTER & SEARCH BAR (Compact strip) --- */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 bg-void-card pixel-border border-arcade-border px-3 py-1.5 shadow-pixel">
-        {/* Category Filter Tabs */}
-        <div className="flex flex-wrap gap-1 text-[9px] sm:text-[10px] font-mono">
-          {categories.map((cat) => {
-            const isActive = selectedCategory === cat;
-            return (
-              <button
-                key={cat}
-                onClick={() => {
-                  audioEngine.playClick();
-                  setSelectedCategory(cat);
-                }}
-                className={`px-2 py-0.5 border uppercase font-bold transition-all ${
-                  isActive
-                    ? 'border-arcade-gold bg-arcade-gold text-black shadow-pixel-sm'
-                    : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white'
-                }`}
-              >
-                {cat}
-              </button>
-            );
-          })}
+      {/* --- DUAL SPIRIT & CATEGORY FILTER BAR --- */}
+      <div className="flex flex-col gap-2 bg-void-card pixel-border border-arcade-border p-2.5 shadow-pixel">
+        {/* Row 1: Spirit / Gender Filter Pills */}
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-arcade-border/50 pb-2">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[10px] font-mono text-gray-400 font-bold uppercase mr-1 flex items-center gap-1">
+              <Filter size={11} className="text-arcade-gold" />
+              SPIRIT:
+            </span>
+            {(
+              [
+                { id: 'ALL' as const, label: '[ ALL SPIRITS ]' },
+                { id: 'girl' as const, label: '[ ♀ GIRL SPIRITS ]' },
+                { id: 'boy' as const, label: '[ ♂ BOY SPIRITS ]' },
+                { id: 'neutral' as const, label: '[ 🐾 PETS ]' },
+              ]
+            ).map((s) => {
+              const isActive = selectedSpirit === s.id;
+              let activeClass = 'border-arcade-gold bg-arcade-gold text-black shadow-pixel-sm font-bold';
+              if (s.id === 'girl') {
+                activeClass = 'border-[#E07A5F] bg-[#E07A5F] text-black shadow-pixel-sm font-bold';
+              } else if (s.id === 'boy') {
+                activeClass = 'border-arcade-cyan bg-arcade-cyan text-black shadow-pixel-sm font-bold';
+              } else if (s.id === 'neutral') {
+                activeClass = 'border-amber-400 bg-amber-400 text-black shadow-pixel-sm font-bold';
+              }
+
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => {
+                    audioEngine.playClick();
+                    setSelectedSpirit(s.id);
+                  }}
+                  className={`px-2.5 py-1 text-[9px] sm:text-[10px] font-pixel border transition-all ${
+                    isActive
+                      ? activeClass
+                      : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-arcade-gold'
+                  }`}
+                >
+                  {s.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="text-[10px] font-mono text-gray-400">
+            SHOWING: <strong className="text-arcade-gold">{filteredCharacters.length}</strong> / 20 COMPANIONS
+          </div>
         </div>
 
-        {/* Search Input */}
-        <div className="flex items-center gap-1.5 bg-void-darkest border border-arcade-border px-2 py-1 text-xs font-mono w-full md:w-56">
-          <Search size={12} className="text-arcade-gold shrink-0" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="> filter_companion..."
-            className="bg-transparent text-gray-200 placeholder-gray-600 outline-none w-full text-[11px]"
-          />
+        {/* Row 2: Universe Category Tabs & Search Bar */}
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 pt-0.5">
+          <div className="flex flex-wrap gap-1 text-[9px] sm:text-[10px] font-mono">
+            {categories.map((cat) => {
+              const isActive = selectedCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => {
+                    audioEngine.playClick();
+                    setSelectedCategory(cat);
+                  }}
+                  className={`px-2 py-0.5 border uppercase font-bold transition-all ${
+                    isActive
+                      ? 'border-arcade-gold bg-arcade-gold/20 text-arcade-gold border-arcade-gold shadow-pixel-sm'
+                      : 'border-arcade-border/80 bg-void-darkest text-gray-400 hover:text-white'
+                  }`}
+                >
+                  {cat}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Search Input */}
+          <div className="flex items-center gap-1.5 bg-void-darkest border border-arcade-border px-2 py-1 text-xs font-mono w-full md:w-56 shrink-0">
+            <Search size={12} className="text-arcade-gold shrink-0" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="> filter_companion..."
+              className="bg-transparent text-gray-200 placeholder-gray-600 outline-none w-full text-[11px]"
+            />
+          </div>
         </div>
       </div>
 
@@ -239,7 +318,7 @@ export const SelectPage: React.FC<SelectPageProps> = ({
       </div>
 
       {/* --- AREA B: CHARACTER SELECTION CAROUSEL STRIP (Minecraft PE Style) --- */}
-      <div className="w-full mt-1">
+      <div className="w-full mt-1 mb-2">
         {filteredCharacters.length === 0 ? (
           <div className="text-center py-4 bg-void-darkest border border-arcade-border text-xs font-mono text-gray-500">
             // No companions match the current filter or search parameters.
@@ -254,6 +333,10 @@ export const SelectPage: React.FC<SelectPageProps> = ({
           />
         )}
       </div>
+
+      {/* Global Credits Footer */}
+      <Footer />
     </div>
   );
 };
+

@@ -6,7 +6,26 @@ FocusVerse is an immersive, retro-futuristic productivity environment inspired b
 
 ## ✦ Key Architectural Systems
 
-### 1. Minecraft Bedrock / Pocket Edition Character Selection
+### 1. 2-Column Split Homepage & Interactive "LOCK IN" Gateway (`HomePage.tsx`)
+* **Left Column (Brand, Orbit & Telemetry):**
+  * Live quote banner, signature retro-arcade `FOCUSVERSE` logo, and cosmic subtitle.
+  * Interactive 3D rotating pixel globe (`CosmicGlobe.tsx`) with dynamic LO/HI boundary measurement guides.
+  * Segmented live counter blocks (`20 WORLDS ROSTER`, `4 FLOW TOOLS`, `100% SYNTH CHIPTUNE`, `0 DISTRACTIONS`).
+  * Direct session launcher (`[ ► LAUNCH QUICK SESSION ► ]`) and full companion directory links.
+* **Right Column ("LOCK IN" Gateway & 9:16 Spirit Cards):**
+  * **Initial State:** High-impact arcade gateway box with glowing golden-amber CTA button `[ 🔒 LOCK IN ► ]`.
+  * **Revealed State:** Smoothly reveals the `CHOOSE A COMPANION` heading with two adjacent portrait cards in strict `9:16` aspect ratio (`SpiritCard.tsx`):
+    1. **Cozy Study Girl Spirit (`aspect-[9/16]`):** Warm terracotta, sage green, autumn rain/leaves particles, steaming mug, and lo-fi attic headphones.
+    2. **Late-Night Study Boy Spirit (`aspect-[9/16]`):** Midnight navy, neon cyan/purple skyline, tungsten lamp, terminal debugger, and dark hoodie.
+  * Selecting either card instantly navigates to the 3D Dressing Room pre-filtered to that companion spirit!
+
+---
+
+### 2. Minecraft Bedrock / Pocket Edition Character Selection (`SelectPage.tsx`)
+* **Dual Spirit & Category Filtering Strip:**
+  * Spirit/Gender Pills: `[ ALL SPIRITS ]`, `[ ♀ GIRL SPIRITS ]`, `[ ♂ BOY SPIRITS ]`, `[ 🐾 PETS ]`.
+  * Universe Category Tabs: `ALL`, `SUPERHEROES`, `ANIME`, `ANIMATED & FANTASY`, `SCI-FI`, `COZY & EVERYDAY`, `★ FAVORITES`.
+  * Real-time search filter and instant random companion picker (`[ 🎲 RANDOM ]`).
 * **Central 3D Voxel Stage (`CharacterVoxelStage.tsx`):**
   * Powered by **Three.js** with high-performance WebGL rendering.
   * Articulated 3D humanoid voxel avatars (and custom quadrupeds for the Cat and Dog) with authentic hairstyles, headbands, blindfolds, cloaks, and weapons.
@@ -15,14 +34,6 @@ FocusVerse is an immersive, retro-futuristic productivity environment inspired b
   * Idle breathing and subtle arm swaying animations.
   * Minecraft Bedrock dressing room style obsidian & rune platform pedestal with dynamic lighting (directional key light, spotlight, character-tinted rim backlight, and cast shadows).
   * Auto-spin toggle (`[ ↻ SPIN ]`), front view reset (`[ ↺ FRONT ]`), and interactive zoom controls.
-* **Horizontal Roster Strip Carousel (`CharacterCarousel.tsx`):**
-  * Horizontally scrollable strip displaying all 20 companion cartridges.
-  * Auto-centers the selected character smoothly into view without vertical page displacement.
-  * Keyboard navigation (`ArrowLeft` / `ArrowRight` / `ArrowUp` / `ArrowDown`).
-  * Left and right step navigation buttons (`[ ◀ ]` and `[ ▶ ]`).
-  * Real-time category filtering (`ALL`, `SUPERHEROES`, `ANIME`, `ANIMATED & FANTASY`, `SCI-FI`, `COZY & EVERYDAY`, `★ FAVORITES`).
-  * Terminal search bar (`> filter_companion...`).
-  * Instant random companion selector (`[ 🎲 RANDOM ]`).
 * **Compact Information & Action Panel (`CharacterInfoPanel.tsx`):**
   * Displays companion identity, archetype name (with Copyright-Safe Mode support), universe, quote, and tagline.
   * Real-time Canvas FX mode and acoustic profile readouts.
@@ -31,35 +42,39 @@ FocusVerse is an immersive, retro-futuristic productivity environment inspired b
 
 ---
 
-### 2. Dual-Layer Web Audio Engine (`src/utils/audioEngine.ts`)
-* **100% Native Web Audio API (Zero external MP3s / Zero broken links):**
-  1. **Procedural Ambience Generator:** Generates pink noise rain, hearth fire crackle, deep space drone, 22Hz therapeutic cat purr, Matrix katakana bleeps, and 1480Hz bat sonar echoes.
-  2. **8-Bit Chiptune Synth Arpeggiator:** Plays non-intrusive polyphonic pentatonic chords tailored to each character with Triangle, Square, and Sine waveforms.
-  3. Master mute toggle, UI click blips, task completion chimes, and retro victory jingles.
-
----
-
-### 3. Study Workspaces (`src/pages/WorkspacePage.tsx`)
+### 3. Study Workspaces & Header Audio Engine (`WorkspacePage.tsx`)
+* **Clean Vertical Breathing Room:** Bottom drawers removed in favor of maximum vertical screen space.
+* **Top Header Audio Pill:** Compact `SOUND: [ACTIVE / OFF]` control in the top HUD that toggles a floating audio engine popover:
+  * Procedural Ambience Generator (`rain`, `fire`, `space`, `lofi`, `matrix`, `purr`, `sonar`, `wind`) with independent volume slider.
+  * 8-Bit Chiptune Synth Melody arpeggiator with volume slider.
+  * Master mute switch.
 * **Atmosphere Canvas Layer (`EnvironmentFX.tsx`):** 20 canvas particle modes (pixel rain, matrix code, radar grid, rising lanterns, snow crystals, embers) with background dimmer slider (20% to 95%).
-* **Multi-Mode Drift-Free Timer (`TimerWidget.tsx`):**
-  * Pomodoro, Stopwatch (with lap recording and centiseconds), and Countdown modes.
-  * `Date.now()` timestamp calculation preventing timer drift from background tab throttling.
-  * Binary search progress tracker and daily focus song melody generator.
-  * Retro 3-stripe sunset victory band (`#7A283B`, `#B85A32`, `#F2C14E`).
+* **Multi-Mode Drift-Free Timer (`TimerWidget.tsx`):** Pomodoro, Stopwatch (with lap recording and centiseconds), and Countdown modes with timestamp calculations preventing background tab throttling.
 * **Persistent Task Manager (`TodoWidget.tsx`):** Priority tagging (`HIGH`, `MED`, `LOW`), `localStorage` sync, and celebratory pixel-spark canvas bursts.
 * **Monospace Scratchpad (`NotesWidget.tsx`):** Real-time word and character counters with `.txt` file export.
 
 ---
 
-## ✦ Interface Previews
+### 4. Global Credits Footer (`Footer.tsx`)
+* Persistent dark pixel-arcade footer displayed across all pages:
+  * `FOCUSVERSE // PIXEL PRODUCTIVITY SANCTUARY`
+  * `Crafted with ♥ • Credits: AmorSin & Beezsy79`
 
-| Minecraft-Inspired 3D Dressing Room | Batman Batcave Sonar Stage |
-| :---: | :---: |
-| ![Dressing Room](docs/screenshots/select_dressing_room.png) | ![Batman 3D Stage](docs/screenshots/select_batman_final.png) |
+---
 
-| Gojo Satoru 3D Stage | Synergy-Inspired Cosmic Landing |
+## ✦ Interface Showcase
+
+| 2-Column Homepage (Interactive Lock In) | Revealed 9:16 Companion Spirit Cards |
 | :---: | :---: |
-| ![Gojo 3D Stage](docs/screenshots/select_gojo_final.png) | ![Home Full](docs/screenshots/home_full.png) |
+| ![Homepage 2-Column](docs/screenshots/home_full_lockin_initial.png) | ![9:16 Spirit Cards](docs/screenshots/home_spirit_revealed_full.png) |
+
+| 3D Dressing Room (Girl Spirits Filter) | 3D Dressing Room (Boy Spirits Filter) |
+| :---: | :---: |
+| ![Girl Spirits Roster](docs/screenshots/select_girl_spirit_roster.png) | ![Boy Spirits Roster](docs/screenshots/select_boy_spirit_roster.png) |
+
+| Workspace with Top Audio Engine Popover | Batman Batcave Sonar Stage |
+| :---: | :---: |
+| ![Workspace Header Audio](docs/screenshots/workspace_audio_popover_footer.png) | ![Batman 3D Stage](docs/screenshots/select_batman_final.png) |
 
 ---
 
@@ -78,3 +93,8 @@ Server boots at `http://localhost:5173/`.
 npm run build
 npm run preview
 ```
+
+---
+
+## ✦ Credits
+Crafted with ♥ • Credits: **AmorSin** & **Beezsy79**

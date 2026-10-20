@@ -59,45 +59,52 @@ async function runTest() {
     if (!rightCanvas) throw new Error('Full-body 64x96 pixel sprite canvas not found on right side!');
     console.log('  ✓ Right panel full-body 2D pixel sprite canvas verified.');
 
-    // 5. Test Gender Switching (Boy -> Girl -> Boy)
-    console.log('Step 5: Testing Gender Switching (Boy / Girl)...');
+    // 5. Verify Boy/Girl Base Selection is Removed and Direct Character Selection Works
+    console.log('Step 5: Verifying Boy/Girl general selection is removed and character cards work...');
+    const oldBoyBtn = await page.$('button ::-p-text(BOY TRAINER)');
+    const oldGirlBtn = await page.$('button ::-p-text(GIRL TRAINER)');
+    if (oldBoyBtn || oldGirlBtn) {
+      throw new Error('Generic Boy/Girl Trainer buttons should be completely removed from character customization!');
+    }
+    console.log('  ✓ Verified: Generic Boy/Girl buttons are removed.');
+
     const initialCanvasData = await page.evaluate(() => {
       const cvs = document.querySelector('canvas[width="64"][height="96"]');
       return cvs ? cvs.toDataURL() : '';
     });
 
-    // Click Girl Trainer
-    const girlBtn = await page.waitForSelector('button ::-p-text(GIRL TRAINER)', { timeout: 5000 });
-    await girlBtn.click();
+    // Test clicking Gwen Stacy character card
+    const gwenCard = await page.waitForSelector('[data-testid="character-card-gwen-stacy"]', { timeout: 5000 });
+    await gwenCard.click();
     await new Promise(r => setTimeout(r, 400));
 
-    const girlCanvasData = await page.evaluate(() => {
+    const gwenCanvasData = await page.evaluate(() => {
       const cvs = document.querySelector('canvas[width="64"][height="96"]');
       return cvs ? cvs.toDataURL() : '';
     });
 
-    if (initialCanvasData === girlCanvasData) {
-      throw new Error('Switching to Girl did not update the full-body sprite canvas!');
+    if (initialCanvasData === gwenCanvasData) {
+      throw new Error('Selecting Gwen Stacy did not update the full-body sprite canvas!');
     }
-    console.log('  ✓ Girl Trainer selection updated the full-body sprite canvas live.');
+    console.log('  ✓ Gwen Stacy selection updated the full-body sprite canvas live.');
 
-    // Switch back to Boy
-    const boyBtn = await page.waitForSelector('button ::-p-text(BOY TRAINER)', { timeout: 5000 });
-    await boyBtn.click();
+    // Test clicking Peter Parker character card
+    const peterCard = await page.waitForSelector('[data-testid="character-card-peter-parker"]', { timeout: 5000 });
+    await peterCard.click();
     await new Promise(r => setTimeout(r, 400));
-    console.log('  ✓ Switched back to Boy Trainer.');
+    console.log('  ✓ Switched to Peter Parker character card.');
 
     // 6. Test Live Customization modifying the sprite
     console.log('Step 6: Testing that customization options visibly modify the sprite...');
 
-    // 6a. Select another Outfit: ADVANCED ARACHNID SUIT
+    // 6a. Select another Outfit: CYBERNETIC RONIN
     const beforeSuitData = await page.evaluate(() => {
       const cvs = document.querySelector('canvas[width="64"][height="96"]');
       return cvs ? cvs.toDataURL() : '';
     });
 
-    const arachnidSuitBtn = await page.waitForSelector('button ::-p-text(ADVANCED ARACHNID SUIT)', { timeout: 5000 });
-    await arachnidSuitBtn.click();
+    const cyberRoninSuitBtn = await page.waitForSelector('button ::-p-text(CYBER-RONIN)', { timeout: 5000 });
+    await cyberRoninSuitBtn.click();
     await new Promise(r => setTimeout(r, 300));
 
     const afterSuitData = await page.evaluate(() => {
@@ -106,9 +113,9 @@ async function runTest() {
     });
 
     if (beforeSuitData === afterSuitData) {
-      throw new Error('Selecting Advanced Arachnid Suit did not modify the sprite pixels!');
+      throw new Error('Selecting Cyber-Ronin Suit did not modify the sprite pixels!');
     }
-    console.log('  ✓ Advanced Arachnid Suit equipped and visibly updated sprite pixels.');
+    console.log('  ✓ Cyber-Ronin Suit equipped and visibly updated sprite pixels.');
 
     // 6b. Select HAIRSTYLE tab and pick ANIME SPIKES
     const hairTab = await page.waitForSelector('button ::-p-text(HAIRSTYLE)', { timeout: 5000 });

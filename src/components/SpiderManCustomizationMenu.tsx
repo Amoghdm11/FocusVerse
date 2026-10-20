@@ -16,8 +16,9 @@ import {
   Sliders,
   Play
 } from 'lucide-react';
-import { Character } from '../types/character';
+import { Character, CharacterCategory } from '../types/character';
 import { CHARACTERS } from '../data/characters';
+import { PixelFaceAvatar } from './PixelFaceAvatar';
 import {
   CustomAppearanceState,
   DEFAULT_BOY_CUSTOM,
@@ -41,6 +42,15 @@ import { PixelTransitionOverlay } from './PixelTransitionOverlay';
 import { audioEngine } from '../utils/audioEngine';
 
 export type CustomizationTab = 'SUITS' | 'HAIR' | 'COLOR' | 'SKIN' | 'ACCESSORIES' | 'IDENTITY';
+
+const CATEGORY_FILTERS: { label: string; value: 'ALL' | CharacterCategory }[] = [
+  { label: 'ALL', value: 'ALL' },
+  { label: 'HEROES', value: 'Superheroes' },
+  { label: 'ANIME', value: 'Anime' },
+  { label: 'FANTASY', value: 'Animated & Fantasy' },
+  { label: 'SCI-FI', value: 'Sci-Fi' },
+  { label: 'COZY', value: 'Cozy & Everyday' },
+];
 
 export interface SpiderManCustomizationMenuProps {
   initialCharacter?: Character;
@@ -84,38 +94,114 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
   const [isSpriteShrinking, setIsSpriteShrinking] = useState<boolean>(false);
   const [speechBubble, setSpeechBubble] = useState<string | null>(null);
 
-  // Sync gender if initialGender changes
+  // Active FocusVerse character state
+  const [selectedCharacter, setSelectedCharacter] = useState<Character>(() => {
+    if (initialCharacter) return initialCharacter;
+    const targetId = initialGender === 'girl' ? 'cozy-study-girl' : 'late-night-study-boy';
+    return CHARACTERS.find((c) => c.id === targetId) || CHARACTERS[0];
+  });
+
+  const [characterCategoryFilter, setCharacterCategoryFilter] = useState<'ALL' | CharacterCategory>('ALL');
+
+  const filteredCharacters =
+    characterCategoryFilter === 'ALL'
+      ? CHARACTERS
+      : CHARACTERS.filter((c) => c.category === characterCategoryFilter);
+
+  // Sync if initialCharacter changes
   useEffect(() => {
-    if (initialGender && initialGender !== appearance.gender) {
-      handleGenderSwitch(initialGender);
+    if (initialCharacter && initialCharacter.id !== selectedCharacter.id) {
+      handleSelectCharacter(initialCharacter);
     }
-  }, [initialGender]);
+  }, [initialCharacter]);
 
   // Find current suit metadata
   const currentSuit: SuitMetadata =
     OUTFIT_CATALOG.find((s) => s.id === appearance.outfit) || OUTFIT_CATALOG[0];
 
-  // Map to matching FocusVerse base character
-  const matchingBaseCharacter: Character =
-    CHARACTERS.find((c) =>
-      appearance.gender === 'boy'
-        ? c.id === 'late-night-study-boy' || c.genderOrSpirit === 'boy'
-        : c.id === 'cozy-study-girl' || c.genderOrSpirit === 'girl'
-    ) || CHARACTERS[0];
-
-  // Switch between Boy and Girl base
-  const handleGenderSwitch = (newGender: CharacterGender) => {
+  // Select a character from the roster and adapt loadout
+  const handleSelectCharacter = (char: Character) => {
     audioEngine.playClick();
-    const defaults = newGender === 'girl' ? DEFAULT_GIRL_CUSTOM : DEFAULT_BOY_CUSTOM;
-    setAppearance((prev) => ({
-      ...prev,
-      gender: newGender,
-      hairStyle: defaults.hairStyle,
-      hairColor: prev.hairColor,
-      skinTone: prev.skinTone,
-      outfit: prev.outfit,
-      accessory: prev.accessory,
-    }));
+    audioEngine.playVictoryJingle(char.synthNotes);
+    setSelectedCharacter(char);
+
+    const charGender: CharacterGender = char.genderOrSpirit === 'girl' ? 'girl' : 'boy';
+    const defaults = charGender === 'girl' ? DEFAULT_GIRL_CUSTOM : DEFAULT_BOY_CUSTOM;
+
+    let outfit: OutfitId = defaults.outfit;
+    let hairStyle: HairStyleId = defaults.hairStyle;
+    let hairColor: HairColorId = defaults.hairColor;
+    let accessory: AccessoryId = defaults.accessory;
+
+    if (char.id === 'peter-parker' || char.id === 'miles-morales') {
+      outfit = 'arachnid-suit';
+      hairStyle = 'study-tousle';
+      hairColor = 'chestnut';
+    } else if (char.id === 'gwen-stacy') {
+      outfit = 'arachnid-suit';
+      hairStyle = 'cyber-bob';
+      hairColor = 'platinum';
+    } else if (char.id === 'bruce-wayne') {
+      outfit = 'stealth-ops';
+      hairStyle = 'sleek-undercut';
+      hairColor = 'black';
+      accessory = 'hero-mask';
+    } else if (char.id === 'tony-stark') {
+      outfit = 'cyber-ronin';
+      hairStyle = 'sleek-undercut';
+      hairColor = 'black';
+      accessory = 'cyber-visor';
+    } else if (char.id === 'gojo-satoru') {
+      outfit = 'cyber-ronin';
+      hairStyle = 'anime-spikes';
+      hairColor = 'platinum';
+      accessory = 'cyber-visor';
+    } else if (char.id === 'naruto-uzumaki' || char.id === 'son-goku') {
+      outfit = 'retro-arcade';
+      hairStyle = 'anime-spikes';
+      hairColor = char.id === 'naruto-uzumaki' ? 'blonde' : 'black';
+    } else if (char.id === 'neo' || char.id === 'officer-k') {
+      outfit = 'stealth-ops';
+      hairStyle = 'sleek-undercut';
+      hairColor = 'black';
+      accessory = 'cyber-visor';
+    } else if (char.id === 'elsa') {
+      outfit = 'scholar-blazer';
+      hairStyle = 'high-ponytail';
+      hairColor = 'platinum';
+    } else if (char.id === 'wednesday-addams') {
+      outfit = 'scholar-blazer';
+      hairStyle = 'cascading-waves';
+      hairColor = 'black';
+    } else if (char.id === 'hermione-granger') {
+      outfit = 'scholar-blazer';
+      hairStyle = 'cascading-waves';
+      hairColor = 'chestnut';
+    } else if (char.id === 'cozy-study-girl') {
+      outfit = 'study-hoodie';
+      hairStyle = 'cozy-buns';
+      hairColor = 'chestnut';
+      accessory = 'headphones';
+    } else if (char.id === 'late-night-study-boy') {
+      outfit = 'study-hoodie';
+      hairStyle = 'study-tousle';
+      hairColor = 'black';
+      accessory = 'headphones';
+    }
+
+    setAppearance({
+      gender: charGender,
+      outfit,
+      hairStyle,
+      hairColor,
+      skinTone: 'fair',
+      accessory,
+      playerName,
+    });
+
+    const charShortName = char.name.split('(')[0].trim();
+    setSpeechBubble(`Character ${charShortName} selected!`);
+    setTimeout(() => setSpeechBubble(null), 2500);
   };
 
   // Option handlers
@@ -174,20 +260,20 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
     setTimeout(() => setSpeechBubble(null), 2500);
   };
 
-  // Reset to default preset
+  // Reset to character signature preset
   const handleReset = () => {
     audioEngine.playClick();
-    const defaults = appearance.gender === 'girl' ? DEFAULT_GIRL_CUSTOM : DEFAULT_BOY_CUSTOM;
-    setAppearance({ ...defaults, playerName });
-    setSpeechBubble('Suit specs restored to factory defaults.');
+    handleSelectCharacter(selectedCharacter);
+    setSpeechBubble('Suit specs restored to character defaults.');
     setTimeout(() => setSpeechBubble(null), 2500);
   };
 
   // Character sprite click
   const handleSpriteClick = () => {
     audioEngine.playClick();
-    audioEngine.playVictoryJingle(matchingBaseCharacter.synthNotes);
+    audioEngine.playVictoryJingle(selectedCharacter.synthNotes);
     const quotes = [
+      `"${selectedCharacter.quote}"`,
       'Suit systems nominal. Ready to lock in!',
       'Flow state calibrated. Let’s do this.',
       'Distraction dampers active.',
@@ -202,7 +288,7 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
   const handleConfirmAndEnter = () => {
     if (isTransitionActive) return; // Guard against double clicks
     audioEngine.playClick();
-    audioEngine.playVictoryJingle(matchingBaseCharacter.synthNotes);
+    audioEngine.playVictoryJingle(selectedCharacter.synthNotes);
 
     const finalName = playerName.trim() || 'TRAINER';
 
@@ -211,10 +297,7 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
       const finalAppearance = { ...appearance, playerName: finalName };
       localStorage.setItem('focusverse_player_name', finalName);
       localStorage.setItem('focusverse_custom_appearance', JSON.stringify(finalAppearance));
-      localStorage.setItem(
-        'focusverse_selected_char',
-        appearance.gender === 'boy' ? 'late-night-study-boy' : 'cozy-study-girl'
-      );
+      localStorage.setItem('focusverse_selected_char', selectedCharacter.id);
     } catch (_) {}
 
     // Trigger shrink and mosaic dissolve wipe
@@ -226,7 +309,7 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
 
   const handleTransitionComplete = () => {
     const finalName = playerName.trim() || 'TRAINER';
-    onConfirmAppearance(matchingBaseCharacter, appearance, finalName);
+    onConfirmAppearance(selectedCharacter, appearance, finalName);
   };
 
   const availableHairStyles =
@@ -310,83 +393,82 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
         {/* ======================================================================= */}
         <div className="lg:col-span-5 flex flex-col border-r-0 lg:border-r-2 border-[#241E3E] bg-[#0E0B1C]/85 backdrop-blur-md overflow-hidden h-full">
           
-          {/* 1. TOP CHARACTER SELECTOR: BOY vs GIRL CARDS */}
-          <div className="p-3.5 border-b border-[#241E3E] bg-[#120E24]">
-            <div className="text-[10px] font-pixel text-arcade-gold uppercase mb-2 flex items-center justify-between">
-              <span>1. SELECT CHARACTER BASE</span>
-              <span className="text-gray-400 font-mono text-[9px]">GENDER / PROFILE</span>
+          {/* 1. TOP CHARACTER SELECTOR: FOCUSVERSE ROSTER */}
+          <div className="p-3 border-b border-[#241E3E] bg-[#120E24]">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-pixel text-arcade-gold uppercase">
+                  1. SELECT CHARACTER
+                </span>
+                <span className="text-[9px] font-mono px-1.5 py-0.5 bg-black/40 border border-white/10 text-gray-400">
+                  {selectedCharacter.index}
+                </span>
+              </div>
+              <span className="text-arcade-cyan font-mono text-[9px] truncate max-w-[160px] text-right font-bold">
+                {selectedCharacter.name.split('(')[0].trim().toUpperCase()}
+              </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              {/* BOY OPTION CARD */}
-              <button
-                onClick={() => handleGenderSwitch('boy')}
-                className={`p-2.5 flex items-center gap-2.5 border transition-all text-left relative ${
-                  appearance.gender === 'boy'
-                    ? 'border-arcade-cyan bg-cyan-950/40 shadow-[0_0_15px_rgba(92,225,230,0.25)]'
-                    : 'border-arcade-border/70 bg-void-darkest hover:border-arcade-cyan/50 text-gray-400'
-                }`}
-              >
-                <div
-                  className={`w-8 h-8 flex items-center justify-center font-pixel text-sm border ${
-                    appearance.gender === 'boy'
-                      ? 'border-arcade-cyan text-arcade-cyan bg-cyan-900/40'
-                      : 'border-gray-700 text-gray-500'
+            {/* Category Filter Pills */}
+            <div className="flex items-center gap-1 mb-2.5 overflow-x-auto no-scrollbar pb-0.5">
+              {CATEGORY_FILTERS.map((cat) => (
+                <button
+                  key={cat.value}
+                  onClick={() => {
+                    audioEngine.playClick();
+                    setCharacterCategoryFilter(cat.value);
+                  }}
+                  className={`px-2 py-0.5 text-[8px] font-mono uppercase tracking-wider border shrink-0 transition-all ${
+                    characterCategoryFilter === cat.value
+                      ? 'border-arcade-cyan bg-cyan-950/60 text-white font-bold shadow-[0_0_8px_rgba(92,225,230,0.3)]'
+                      : 'border-white/10 bg-void-darkest text-gray-400 hover:text-gray-200 hover:border-white/20'
                   }`}
                 >
-                  ♂
-                </div>
-                <div className="flex-1 truncate">
-                  <div
-                    className={`font-pixel text-[11px] truncate uppercase ${
-                      appearance.gender === 'boy' ? 'text-white' : 'text-gray-400'
-                    }`}
-                  >
-                    BOY TRAINER
-                  </div>
-                  <div className="text-[9px] font-mono text-gray-500 truncate">
-                    LATE-NIGHT SCHOLAR
-                  </div>
-                </div>
-                {appearance.gender === 'boy' && (
-                  <Check size={14} className="text-arcade-cyan shrink-0" />
-                )}
-              </button>
+                  {cat.label}
+                </button>
+              ))}
+            </div>
 
-              {/* GIRL OPTION CARD */}
-              <button
-                onClick={() => handleGenderSwitch('girl')}
-                className={`p-2.5 flex items-center gap-2.5 border transition-all text-left relative ${
-                  appearance.gender === 'girl'
-                    ? 'border-arcade-gold bg-amber-950/40 shadow-[0_0_15px_rgba(245,194,66,0.25)]'
-                    : 'border-arcade-border/70 bg-void-darkest hover:border-arcade-gold/50 text-gray-400'
-                }`}
-              >
-                <div
-                  className={`w-8 h-8 flex items-center justify-center font-pixel text-sm border ${
-                    appearance.gender === 'girl'
-                      ? 'border-arcade-gold text-arcade-gold bg-amber-900/40'
-                      : 'border-gray-700 text-gray-500'
-                  }`}
-                >
-                  ♀
-                </div>
-                <div className="flex-1 truncate">
-                  <div
-                    className={`font-pixel text-[11px] truncate uppercase ${
-                      appearance.gender === 'girl' ? 'text-white' : 'text-gray-400'
+            {/* Horizontal Scrollable Character Roster Carousel */}
+            <div className="flex gap-2 overflow-x-auto pb-1.5 scrollbar-thin">
+              {filteredCharacters.map((char) => {
+                const isSelected = selectedCharacter.id === char.id;
+                const shortName = char.name.split('(')[0].trim();
+                return (
+                  <button
+                    key={char.id}
+                    data-testid={`character-card-${char.id}`}
+                    onClick={() => handleSelectCharacter(char)}
+                    className={`min-w-[175px] max-w-[195px] p-2 flex items-center gap-2 border transition-all text-left relative shrink-0 ${
+                      isSelected
+                        ? 'border-arcade-gold bg-amber-950/40 shadow-[0_0_12px_rgba(245,194,66,0.3)]'
+                        : 'border-arcade-border/70 bg-void-darkest hover:border-arcade-cyan/50 text-gray-400 hover:bg-[#16122C]'
                     }`}
                   >
-                    GIRL TRAINER
-                  </div>
-                  <div className="text-[9px] font-mono text-gray-500 truncate">
-                    COZY STUDY SPIRIT
-                  </div>
-                </div>
-                {appearance.gender === 'girl' && (
-                  <Check size={14} className="text-arcade-gold shrink-0" />
-                )}
-              </button>
+                    <div className="shrink-0 border border-white/10 relative">
+                      <PixelFaceAvatar characterId={char.id} size={34} />
+                      {isSelected && (
+                        <div className="absolute inset-0 border border-arcade-gold pointer-events-none" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div
+                        className={`font-pixel text-[9px] truncate uppercase leading-tight ${
+                          isSelected ? 'text-white' : 'text-gray-300'
+                        }`}
+                      >
+                        {shortName}
+                      </div>
+                      <div className="text-[8px] font-mono text-gray-500 truncate mt-0.5">
+                        {char.universe.split('//')[0].trim()}
+                      </div>
+                    </div>
+                    {isSelected && (
+                      <Check size={12} className="text-arcade-gold shrink-0 ml-auto" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -806,8 +888,8 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
                 isTransitionActive ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              <Zap size={14} className="text-black" />
-              <span>[ ⚡ LOCK IN APPEARANCE & ENTER WORKSPACE ▶ ]</span>
+              <Zap size={15} className="text-black" />
+              <span>[ LOCK IN APPEARANCE & ENTER WORKSPACE ▶ ]</span>
             </button>
           </div>
         </div>
@@ -829,9 +911,17 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
               <span className="text-gray-300 font-mono text-[9px]">{currentSuit.focusMod}</span>
             </div>
 
-            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 bg-[#0E0B1C]/80 border border-white/10 text-gray-400">
-              <span>CALLSIGN:</span>
-              <span className="font-pixel text-arcade-cyan uppercase">{playerName || 'TRAINER'}</span>
+            <div className="hidden sm:flex items-center gap-3 px-2.5 py-1 bg-[#0E0B1C]/80 border border-white/10 text-gray-400">
+              <div className="flex items-center gap-1.5">
+                <span>OPERATIVE:</span>
+                <span className="font-pixel text-arcade-gold uppercase">{selectedCharacter.name.split('(')[0].trim()}</span>
+                <span className="text-gray-500 text-[9px]">({selectedCharacter.index})</span>
+              </div>
+              <span className="text-gray-600">|</span>
+              <div className="flex items-center gap-1.5">
+                <span>CALLSIGN:</span>
+                <span className="font-pixel text-arcade-cyan uppercase">{playerName || 'TRAINER'}</span>
+              </div>
             </div>
           </div>
 

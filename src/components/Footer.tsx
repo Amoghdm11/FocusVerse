@@ -13,7 +13,7 @@ export const Footer: React.FC = () => {
         <span className="text-[11px] text-gray-400">PIXEL PRODUCTIVITY SANCTUARY</span>
       </div>
 
-      <div className="flex items-center gap-1.5 text-[11px]">
+      <div className="flex items-center gap-1.5 text-[11px] flex-wrap justify-center">
         <span>Crafted with</span>
         <Heart size={12} className="text-arcade-pink fill-arcade-pink inline animate-pulse" />
         <span className="text-gray-600">•</span>
@@ -21,9 +21,13 @@ export const Footer: React.FC = () => {
         <strong className="text-arcade-gold font-bold hover:text-white transition-colors cursor-default">
           AmorSin
         </strong>
-        <span className="text-arcade-cyan font-bold">&amp;</span>
+        <span className="text-gray-500">,</span>
         <strong className="text-arcade-cyan font-bold hover:text-white transition-colors cursor-default">
           Beezsy79
+        </strong>
+        <span className="text-arcade-gold font-bold">&amp;</span>
+        <strong className="text-arcade-gold font-bold hover:text-white transition-colors cursor-default">
+          02Yuzu02
         </strong>
       </div>
     </footer>

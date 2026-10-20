@@ -48,6 +48,7 @@ export const SelectPage: React.FC<SelectPageProps> = ({
 
   // Sub-toggle inside the allowed pool: Default is gender-only
   const [spiritToggle, setSpiritToggle] = useState<SpiritToggleOption>('gender-only');
+  const [mobileTab, setMobileTab] = useState<'roster' | 'details'>('roster');
 
   // Selected companion on dressing stage
   const [selectedCharacter, setSelectedCharacter] = useState<Character>(() => {
@@ -191,8 +192,9 @@ export const SelectPage: React.FC<SelectPageProps> = ({
 
       {/* ========================================================================= */}
       {/* LAYER 1 (z-20): TOP FLOATING TACTICAL HUD BAR                             */}
+      {/* Stretches full-width across the viewport without max-w constraints       */}
       {/* ========================================================================= */}
-      <header className="fixed top-3 left-3 right-3 sm:left-6 sm:right-6 max-w-7xl mx-auto z-20 flex items-center justify-between gap-2 px-3 py-2 backdrop-blur-md bg-[#0E0B1C]/85 border-2 border-[#3E356B] text-xs font-mono shadow-[6px_6px_0px_rgba(0,0,0,0.65)]">
+      <header className="fixed top-2 left-2 right-2 z-20 flex items-center justify-between gap-2 px-3 py-1.5 backdrop-blur-md bg-[#0E0B1C]/85 border-2 border-[#3E356B] text-xs font-mono shadow-[6px_6px_0px_rgba(0,0,0,0.65)]">
         {/* Left: Return Home & Dressing Room Status */}
         <div className="flex items-center gap-2 sm:gap-3">
           <button
@@ -222,8 +224,24 @@ export const SelectPage: React.FC<SelectPageProps> = ({
           </div>
         </div>
 
-        {/* Right: Quick Secondary Controls */}
+        {/* Right: Quick Secondary Controls + Mobile Tab Switcher */}
         <div className="flex items-center gap-2">
+          {/* Mobile View Switcher (lg:hidden) */}
+          <div className="flex lg:hidden items-center border border-arcade-border bg-void-darkest text-[9px] font-mono p-0.5">
+            <button
+              onClick={() => setMobileTab('roster')}
+              className={`px-1.5 py-0.5 ${mobileTab === 'roster' ? 'bg-arcade-gold text-black font-bold' : 'text-gray-400'}`}
+            >
+              ROSTER
+            </button>
+            <button
+              onClick={() => setMobileTab('details')}
+              className={`px-1.5 py-0.5 ${mobileTab === 'details' ? 'bg-arcade-gold text-black font-bold' : 'text-gray-400'}`}
+            >
+              DETAILS
+            </button>
+          </div>
+
           {/* Random Companion Button */}
           <button
             onClick={pickRandomCompanion}
@@ -254,19 +272,19 @@ export const SelectPage: React.FC<SelectPageProps> = ({
       </header>
 
       {/* ========================================================================= */}
-      {/* LAYER 2 (z-10): FLOATING HUD WINDOWS OVER 3D PLANE                        */}
-      {/* Leftmost Roster Window + Center-Left Description Window                   */}
-      {/* Right side is completely unobstructed for the 3D model!                  */}
+      {/* LAYER 2 (z-20): FLOATING POP-UPS ANCHORED FLUSH TO FAR-LEFT EDGE          */}
+      {/* 1. Leftmost Roster Pop-Up at left-2 (w-[340px])                           */}
+      {/* 2. Details Pop-Up immediately to right at left-[352px] (w-[350px])       */}
+      {/* Entire center and right side is free for the 3D plane!                   */}
       {/* ========================================================================= */}
-      <main className="fixed top-16 bottom-11 left-3 right-3 sm:left-6 sm:right-6 max-w-7xl mx-auto z-10 pointer-events-none flex flex-col lg:flex-row items-stretch lg:items-start gap-4">
-        
-        {/* ===================================================================== */}
-        {/* 1. LEFTMOST POP-UP WINDOW: CHARACTER CHOOSING ROSTER                 */}
-        {/* ===================================================================== */}
-        <section
-          aria-label="Companion Roster Window"
-          className="w-full lg:w-[370px] max-h-[46vh] lg:max-h-[calc(100vh-120px)] flex flex-col backdrop-blur-md bg-[#0E0B1C]/92 border-2 border-[#3E356B] shadow-[8px_8px_0px_rgba(0,0,0,0.7)] pointer-events-auto p-3 shrink-0"
-        >
+      
+      {/* 1. LEFTMOST POP-UP WINDOW: CHARACTER CHOOSING ROSTER */}
+      <section
+        aria-label="Companion Roster Window"
+        className={`fixed left-2 top-14 bottom-11 w-[340px] z-20 flex-col backdrop-blur-md bg-[#0E0B1C]/92 border-2 border-[#3E356B] shadow-[8px_8px_0px_rgba(0,0,0,0.7)] pointer-events-auto p-2.5 ${
+          mobileTab === 'roster' ? 'flex' : 'hidden lg:flex'
+        }`}
+      >
           {/* Top of Leftmost Pop-up: Spirit / Pet Toggle */}
           <div className="pb-2.5 border-b border-[#241E3E] space-y-2">
             <div className="flex items-center justify-between text-[10px] font-mono">
@@ -424,6 +442,9 @@ export const SelectPage: React.FC<SelectPageProps> = ({
                       onClick={() => {
                         audioEngine.playClick();
                         handleSelectCompanion(char);
+                        if (window.innerWidth < 1024) {
+                          setMobileTab('details');
+                        }
                       }}
                       className={`p-2 flex flex-col items-center text-center transition-all border relative select-none ${
                         isSelected
@@ -439,11 +460,11 @@ export const SelectPage: React.FC<SelectPageProps> = ({
                         {isFav && <span className="text-arcade-gold">★</span>}
                       </div>
 
-                      {/* 16x16 Pixel Art Character Face */}
+                      {/* 32x32 Pixel Art Character Face (Displayed at 56x56px) */}
                       <div className="my-1">
                         <PixelFaceAvatar
                           characterId={char.id}
-                          size={40}
+                          size={56}
                           className={`border ${
                             isSelected ? 'border-arcade-gold shadow-pixel-sm' : 'border-[#3E356B]'
                           }`}
@@ -479,11 +500,14 @@ export const SelectPage: React.FC<SelectPageProps> = ({
 
         {/* ===================================================================== */}
         {/* 2. CENTER-LEFT FLOATING POP-UP: CHARACTER DESCRIPTION & LAUNCH CARD   */}
+        {/* Docked immediately to the right of Roster at left-[352px]            */}
         {/* ===================================================================== */}
         <section
           key={selectedCharacter.id}
           aria-label="Companion Details Window"
-          className="w-full lg:w-[360px] max-h-[46vh] lg:max-h-[calc(100vh-120px)] flex flex-col pointer-events-auto overflow-y-auto animate-fadeIn shrink-0"
+          className={`fixed left-2 lg:left-[352px] top-14 bottom-11 w-[calc(100vw-16px)] sm:w-[350px] z-20 flex-col pointer-events-auto overflow-y-auto custom-scrollbar animate-fadeIn shrink-0 ${
+            mobileTab === 'details' ? 'flex' : 'hidden lg:flex'
+          }`}
         >
           <CharacterInfoPanel
             character={selectedCharacter}
@@ -493,7 +517,6 @@ export const SelectPage: React.FC<SelectPageProps> = ({
             archetypeMode={archetypeMode}
           />
         </section>
-      </main>
 
       {/* ========================================================================= */}
       {/* LAYER 3 (z-20): GLOBAL CREDITS FOOTER                                     */}

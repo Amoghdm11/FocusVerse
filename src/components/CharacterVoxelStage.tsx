@@ -72,8 +72,8 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
 
     // 2. Camera: Framed with golden ratio padding
     const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100);
-    camera.position.set(0, 1.8, 12.5);
-    camera.lookAt(0, 1.6, 0);
+    camera.position.set(0, 1.25, 12.0);
+    camera.lookAt(0, 1.10, 0);
     cameraRef.current = camera;
 
     // 3. Renderer
@@ -92,7 +92,7 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
     const computeTargetX = (w: number, h: number) => {
       if (!fullScreen || w < 1024) return 0;
       const aspect = w / h;
-      const visibleHalfWidth = Math.tan((36 * Math.PI) / 360) * 12.5 * aspect;
+      const visibleHalfWidth = Math.tan((36 * Math.PI) / 360) * 12.0 * aspect;
       return visibleHalfWidth * 0.36; // ~68% screen horizontal position
     };
 
@@ -102,7 +102,7 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
     const mainStageGroup = new THREE.Group();
     mainStageGroup.position.x = initialTargetX;
     if (fullScreen) {
-      mainStageGroup.scale.set(1.05, 1.05, 1.05);
+      mainStageGroup.scale.set(0.74, 0.74, 0.74);
     }
     scene.add(mainStageGroup);
     mainStageGroupRef.current = mainStageGroup;
@@ -124,8 +124,8 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
 
     // Top dramatic spotlight on character
     const spotlight = new THREE.SpotLight('#FFF8E7', 3.5);
-    spotlight.position.set(initialTargetX, 9, 3);
-    spotlight.target.position.set(initialTargetX, 1.55, 0);
+    spotlight.position.set(initialTargetX, 7.5, 3);
+    spotlight.target.position.set(initialTargetX, 1.10, 0);
     scene.add(spotlight.target);
     spotlight.angle = Math.PI / 5;
     spotlight.penumbra = 0.8;
@@ -220,7 +220,7 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
       }
       if (spotlightRef.current) {
         spotlightRef.current.position.x = tx;
-        spotlightRef.current.target.position.set(tx, 1.55, 0);
+        spotlightRef.current.target.position.set(tx, 1.10, 0);
         spotlightRef.current.target.updateMatrixWorld();
       }
       if (rimLightRef.current) {
@@ -319,7 +319,7 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
   // Adjust Camera Zoom
   useEffect(() => {
     if (cameraRef.current) {
-      const baseZ = fullScreen ? 12.5 : 7.5;
+      const baseZ = fullScreen ? 12.0 : 7.5;
       cameraRef.current.position.z = baseZ / zoomLevel;
     }
   }, [zoomLevel, fullScreen]);

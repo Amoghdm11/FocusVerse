@@ -1,686 +1,1068 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
-interface PixelFaceData {
+export interface PixelPortraitData {
   palette: Record<string, string>;
   rows: string[];
 }
 
-// 16x16 Pixel Art Matrices for all 20 Characters
-export const CHARACTER_FACES: Record<string, PixelFaceData> = {
-  // 1. Peter Parker (Spider-Man)
-  'peter-parker': {
-    palette: {
-      '.': 'transparent',
-      'R': '#D90429', // Spidey red
-      'D': '#9E1A1A', // Dark red shadow
-      'B': '#111827', // Black web line
-      'W': '#FFFFFF', // Lens white
-      'C': '#BAE6FD', // Lens cyan tint
+export const CHARACTER_PORTRAITS_32: Record<string, PixelPortraitData> = {
+  "peter-parker": {
+    "palette": {
+      ".": "transparent",
+      "R": "#D90429",
+      "D": "#9E1A1A",
+      "H": "#EF233C",
+      "B": "#111827",
+      "W": "#FFFFFF",
+      "C": "#BAE6FD",
+      "S": "#0D1B2A"
     },
-    rows: [
-      '....RRRRRRRR....',
-      '...RDBBRRBBRD...',
-      '..RDBRRRRRRBRD..',
-      '..RBRRRBBRRRBR..',
-      '.RDBRRB..BRRBRD.',
-      '.RBBRBWWWWBRBBR.',
-      '.RBRBWWWWWCBRBR.',
-      '.RBRWWWWWCCCBBR.',
-      '.RBRWWWWCCCCBBR.',
-      '.RBRBWWWWCCBBRD.',
-      '.RDBRBWWWWBRBBD.',
-      '..RBRRB..BRRBR..',
-      '..RDBRRBBRRRBD..',
-      '...RDBRRRRRBD...',
-      '....RDBBBBRD....',
-      '.....RDDDDDD....',
-    ],
+    "rows": [
+      "................................",
+      "...........RRRRRRRRRR...........",
+      ".........RRRDBBRRRRBBRRR........",
+      ".......RRRDBRRRBRRRRRBRRR.......",
+      "......RRDBRRRRRRBRRRRRBRRD......",
+      ".....RRDBRRRRRRRBRRRRRRRBRD.....",
+      "....RRDBRRRRBBRRRBBRRRRRRBRD....",
+      "...RRDBRRRRB..BRB..BRRRRRRBRD...",
+      "...RDBRRRRB....B....BRRRRRRBD...",
+      "..RRDBRRRRB....B....BRRRRRRBRD..",
+      "..RDBRRRRRB....B....BRRRRRRRBD..",
+      "..RDBRRRBBBBBBBBBBBBBBBBRRRRBD..",
+      "..RDBRRBWWWWWWBBWWWWWWBRRRRBD...",
+      "..RDBRBWWWWWWWBBWWWWWWWBRRRBD...",
+      "..RDBRBWWWWWWWCBBWWWWWWWCBRBD...",
+      "..RDBRBWWWWWWCCCBBWWWWWWCCCBD...",
+      "..RDBRBWWWWWCCCCBBWWWWWCCCCBD...",
+      "..RDBRBWWWWCCCCBBBWWWWCCCCBBD...",
+      "..RDBRBBWWCCCCBB.BBWWCCCCBBRD...",
+      "..RRDBRBBBBBBBB...BBBBBBBBBRD...",
+      "...RDBRRRRRBB.......BBRRRRRBD...",
+      "...RRDBRRRRRBR.....RBRRRRRBRD...",
+      "....RRDBRRRRRBR...RBRRRRRBRD....",
+      ".....RRDBRRRRRBR.RBRRRRRBRD.....",
+      "......RRDBRRRRRBBBBRRRRBRD......",
+      ".......RRDBRRRRRRRRRRRBRD.......",
+      "........RRRDBBRRRRRRBBRD........",
+      ".........RRRRDBBBBBBRD..........",
+      "......SSSSRRRRDDDDDDRRRRSSSS....",
+      "....SSSSSSSRRRRRRRRRRRSSSSSSS...",
+      "...SSSSSSSSSSRRRRRRRRSSSSSSSSS..",
+      "..SSSSSSSSSSSSRRRRRRSSSSSSSSSSS."
+    ]
   },
-
-  // 2. Batman (Bruce Wayne)
-  'bruce-wayne': {
-    palette: {
-      '.': 'transparent',
-      'C': '#181C24', // Cowl dark
-      'H': '#2A303C', // Cowl highlight
-      'S': '#F6D0B1', // Skin jaw
-      'D': '#DDB194', // Skin shadow
-      'W': '#FFFFFF', // Eye white
-      'L': '#7C5E48', // Mouth
-      'B': '#0E1116', // Ear pitch
+  "bruce-wayne": {
+    "palette": {
+      ".": "transparent",
+      "C": "#181C24",
+      "H": "#2A303C",
+      "D": "#11141A",
+      "S": "#F6D0B1",
+      "J": "#DDB194",
+      "W": "#FFFFFF",
+      "L": "#8E6E53",
+      "B": "#0E1116",
+      "A": "#1E232D"
     },
-    rows: [
-      '..B..........B..',
-      '..CC........CC..',
-      '..CCC......CCC..',
-      '...CCHHHHHHCC...',
-      '..CCHHHHHHHHCC..',
-      '..CHHHHHHHHHHC..',
-      '.CCHHHCCCHHHHCC.',
-      '.CCHWWCCCWWCHCC.',
-      '.CCHWWCCCWWCHCC.',
-      '.CCHCCCCCCCCHCC.',
-      '..CCCCDDDDCCCC..',
-      '..CCCDSSSSDDCC..',
-      '..CCDDSSSSDDCC..',
-      '...CDDDLLDDDC...',
-      '...CCDDDDDDCC...',
-      '....CCCCCCCC....',
-    ],
+    "rows": [
+      "..BB........................BB..",
+      "..CC........................CC..",
+      "..CCC......................CCC..",
+      "..CCCC....................CCCC..",
+      "..CCCCC..................CCCCC..",
+      "...CCDDC................CDDCC...",
+      "...CCDDCC..............CCDDCC...",
+      "...CCDDHHHHHHHHHHHHHHHHHHDDCC...",
+      "..CCDDHHHHHHHHHHHHHHHHHHHHDDCC..",
+      "..CCDHHHHHHHHHHHHHHHHHHHHHHDCC..",
+      "..CDDHHHHHHHHHHHHHHHHHHHHHHDDC..",
+      "..CDDHHHHHHHHHHHHHHHHHHHHHHDDC..",
+      "..CDDHHHHCCDDHHHHCCDDHHHHHHDDC..",
+      "..CDDHHCCDDDDHHCCDDDDHHHHHHDDC..",
+      "..CDDHHCCWWDDHHCCWWDDHHHHHHDDC..",
+      "..CDDHHCCWWDDHHCCWWDDHHHHHHDDC..",
+      "..CDDHHCCDDDDHHCCDDDDHHHHHHDDC..",
+      "..CDDHHHHCCDDDDDDCCDDHHHHHHDDC..",
+      "..CDDHHHHHHCCDDDDCCDDHHHHHHDDC..",
+      "..CDDHHHHHHHCDDDDCCHHHHHHHHDDC..",
+      "..CCDDHHHHHHHCDDCCHHHHHHHHHDCC..",
+      "...CCDDDDDDJJJJJJJJDDDDDDDDCC...",
+      "...CCDDDDDJJSSSSSSJJDDDDDDCC....",
+      "....CCDDDJJSSSSSSSSJJDDDDCC.....",
+      ".....CCDDJJSSLLLLSSJJDDCC.......",
+      "......CCDJJSSSSSSSSJJDDCC.......",
+      ".......CCDJJSSSSSSJJDDCC........",
+      "........CCDDJJJJJJDDCC..........",
+      "....AAAAACCCCDDDDDDCCCCAAAAA....",
+      "..AAAAAAAAAAACCDDDCCAAAAAAAAAA..",
+      ".AAAAAAAAAAAAACCCCCAAAAAAAAAAAA.",
+      ".AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA."
+    ]
   },
-
-  // 3. Tony Stark (Iron Man)
-  'tony-stark': {
-    palette: {
-      '.': 'transparent',
-      'R': '#B91C1C', // Dark Crimson helmet
-      'M': '#DC2626', // Helmet red
-      'G': '#F59E0B', // Faceplate gold
-      'Y': '#FCD34D', // Gold highlight
-      'C': '#06B6D4', // Arc eye cyan
-      'W': '#FFFFFF', // Eye white
-      'B': '#78350F', // Faceplate line
+  "tony-stark": {
+    "palette": {
+      ".": "transparent",
+      "R": "#B91C1C",
+      "M": "#DC2626",
+      "D": "#7F1D1D",
+      "G": "#F59E0B",
+      "Y": "#FCD34D",
+      "O": "#D97706",
+      "C": "#00F5D4",
+      "W": "#FFFFFF",
+      "B": "#78350F",
+      "S": "#450A0A"
     },
-    rows: [
-      '....MMMMMMMM....',
-      '...MMMMMMMMMM...',
-      '..MMRMMMMMMRMM..',
-      '..MRRGGGGGGFRM..',
-      '.MMRGGYYYYGGFRM.',
-      '.MMGYYYYYYYYFRM.',
-      '.MMGYYYYYYYYFRM.',
-      '.MMGYYBCCBBYGMM.',
-      '.MMGYYCWWCGYGMM.',
-      '.MMGYYBCCBBYGMM.',
-      '.MMGYYYYYYYYGMM.',
-      '..MGYYGBBGGYGM..',
-      '..MGYYGGGGGYGM..',
-      '...MMGGYYGGMM...',
-      '....MMRRRRMM....',
-      '.....MMMMMM.....',
-    ],
+    "rows": [
+      "...........MMMMMMMMMM...........",
+      ".........MMMMMMMMMMMMMM.........",
+      ".......MMMMMRMMMMMMRMMMMM.......",
+      "......MMMMRRRRMMMMRRRRMMMM......",
+      ".....MMMMRRRDDMMMMDDRRRMMMM.....",
+      "....MMMRRRDDDDMMMMDDDDRRRMMM....",
+      "...MMRRRDDGGGGGGGGGGDDDRRMMM....",
+      "..MMRRRDDGGYYYYYYYYGGDDDRRMMM...",
+      "..MRRRDDGGYYYYYYYYYYGGDDDRRMM...",
+      "..MRRRDDGYYYYYYYYYYYYGDDDRRMM...",
+      "..MRRRDDGYYYYYYYYYYYYGDDDRRMM...",
+      "..MRRRDDGYYBBBBBBBBBYGDDDRRMM...",
+      "..MRRRDDGYBCCCCCCCCBYGDDDRRMM...",
+      "..MRRRDDGYBCWWCCWWCBYGDDDRRMM...",
+      "..MRRRDDGYBCCCCCCCCBYGDDDRRMM...",
+      "..MRRRDDGYYBBBBBBBBBYGDDDRRMM...",
+      "..MRRRDDGYYYYYYYYYYYYGDDDRRMM...",
+      "..MRRRDDGYYYYYYYYYYYYGDDDRRMM...",
+      "..MRRRDDGOOOOOOOOOOOOGDDDRRMM...",
+      "..MRRRDDGGGGYYYYYYGGGGDDDRRMM...",
+      "..MMRRRDDGGGYBBBBBYGGGDDDRRMM...",
+      "...MRRRDDGGYYYYYYYYGGGDDDRRMM...",
+      "...MMRRRDDGGYYYYYYGGGDDDRRMM....",
+      "....MMRRRDDGGGGGGGGDDDRRMMM.....",
+      ".....MMMRRRDDDDDDDDRRRMMMM......",
+      "......MMMMRRRRRRRRRRMMMMM.......",
+      ".......MMMMMMMMMMMMMMMMM........",
+      "........MMMMMMMMMMMMMMM.........",
+      "....SSSSSSRRMMMMMMRRSSSSSS......",
+      "..SSSSSSSSSRRMMMMRRSSSSSSSSS....",
+      ".SSSSSSSSSSSSRRRRSSSSSSSSSSSS...",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSS..."
+    ]
   },
-
-  // 4. Miles Morales
-  'miles-morales': {
-    palette: {
-      '.': 'transparent',
-      'K': '#111827', // Pitch mask
-      'G': '#1F2937', // Charcoal mask
-      'R': '#EF4444', // Neon red lens frame
-      'P': '#F43F5E', // Pink-red
-      'W': '#FFFFFF', // Lens white
-      'S': '#7F1D1D', // Dark web
+  "miles-morales": {
+    "palette": {
+      ".": "transparent",
+      "K": "#111827",
+      "G": "#1F2937",
+      "D": "#030712",
+      "R": "#EF4444",
+      "P": "#FF1E56",
+      "W": "#FFFFFF",
+      "C": "#FECDD3",
+      "S": "#0F172A"
     },
-    rows: [
-      '....GGKKKKGG....',
-      '...GKKSSSKKGG...',
-      '..GKKSSSSSSKKG..',
-      '..GKKKSSSSKKKG..',
-      '.GGKKR...RKKKGG.',
-      '.GKKRWWWWWRKKKG.',
-      '.GKKRWPPPWWRKKG.',
-      '.GKRWWPPPPWWRKG.',
-      '.GKRWWPPPPWWRKG.',
-      '.GKKRWPPPWWRKKG.',
-      '.GGKKRWWWWWRKGG.',
-      '..GKKKR...RKKKG..',
-      '..GKKKSSSSSKKKG..',
-      '...GKKKKKKKKGG...',
-      '....GGKKKKGG....',
-      '.....GGGGGG.....',
-    ],
+    "rows": [
+      "...........GGKKKKKKGG...........",
+      ".........GGKKKRRRRKKKGG.........",
+      ".......GGKKKRRDDDDRRKKKGG.......",
+      "......GGKKRRDDDDDDDDRRKKGG......",
+      ".....GGKKRRDDDDDDDDDDRRKKGG.....",
+      "....GGKKRRDDDDDDDDDDDDRRKKGG....",
+      "...GGKKRRDDDRRRRRRRDDDDDRRKKGG..",
+      "..GGKKRRDDDDR.....RDDDDDDRRKKG..",
+      "..GKKRRDDDDDR.....RDDDDDDDRRKG..",
+      "..GKKRDDDDDDR.....RDDDDDDDRRKG..",
+      "..GKKRDDDDDDR.....RDDDDDDDRRKG..",
+      "..GKKRDDDDPPPPPPPPPPDDDDDDRRKG..",
+      "..GKKRDDDPWWWWWWWWWWPDDDDDRRKG..",
+      "..GKKRDDDPWWWWWWWWWWPDDDDDRRKG..",
+      "..GKKRDDDPWWWWWWWWCCPDDDDDRRKG..",
+      "..GKKRDDDPWWWWWWWCCCPDDDDDRRKG..",
+      "..GKKRDDDPWWWWWWCCCCPDDDDDRRKG..",
+      "..GKKRDDDPPWWWWCCCCPPDDDDDRRKG..",
+      "..GKKRDDDDDPPWWCCCPPDDDDDDRRKG..",
+      "..GGKKRDDDDDDPPPPPDDDDDDDRRKKG..",
+      "...GKKRRDDDDDDR.RDDDDDDDRRKKG...",
+      "...GGKKRRDDDDDR.RDDDDDDRRKKGG...",
+      "....GGKKRRDDDDR.RDDDDDRRKKGG....",
+      ".....GGKKRRDDDR.RDDDDRRKKGG.....",
+      "......GGKKRRDDDRRDDDRRKKGG......",
+      ".......GGKKRRRRRRRRRRKKGG.......",
+      "........GGKKKKKKKKKKKKGG........",
+      ".........GGKKKKKKKKKKGG.........",
+      "....SSSSSSGGKKKKKKGGSSSSSS......",
+      "..SSSSSSSSSRRKKKKRRSSSSSSSSS....",
+      ".SSSSSSSSSSSRRRRRRSSSSSSSSSSS...",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSS..."
+    ]
   },
-
-  // 5. Gwen Stacy (Spider-Gwen)
-  'gwen-stacy': {
-    palette: {
-      '.': 'transparent',
-      'W': '#FFFFFF', // White hood outer
-      'H': '#F1F5F9', // Hood shading
-      'S': '#CBD5E1', // Hood deep shadow
-      'M': '#831843', // Interior magenta lining
-      'K': '#0F172A', // Mask dark
-      'T': '#06B6D4', // Teal eye lens
-      'P': '#EC4899', // Pink eye accent
+  "gwen-stacy": {
+    "palette": {
+      ".": "transparent",
+      "W": "#FFFFFF",
+      "H": "#F1F5F9",
+      "S": "#CBD5E1",
+      "M": "#831843",
+      "P": "#BE185D",
+      "K": "#0F172A",
+      "T": "#06B6D4",
+      "E": "#EC4899",
+      "L": "#FFFFFF",
+      "C": "#4ECDC4"
     },
-    rows: [
-      '....HHHHHHHH....',
-      '...HWWWWWWWWH...',
-      '..HWWWWWWWWWWH..',
-      '..HWWMMMMMMWWH..',
-      '.HWWMMKKKKMMWWH.',
-      '.HWSMKKKKKKMSWH.',
-      '.HWSMKTKKTMMSWH.',
-      '.HWSMKTPPTKMSWH.',
-      '.HWSMKTPPTKMSWH.',
-      '.HWSMKTKKTMMSWH.',
-      '.HWSMKKKKKKMSWH.',
-      '..HSMMKKKKMMSH..',
-      '..HSSMMMMMMSSH..',
-      '...HSSWWWWSSH...',
-      '....SSSSSSSS....',
-      '.....SSSSSS.....',
-    ],
+    "rows": [
+      "..............WW................",
+      "............WWWWWW..............",
+      "..........WWWHHHHHWW............",
+      "........WWWHHHHHHHHHWW..........",
+      ".......WWHHHHHHHHHHHHHWW........",
+      "......WWHHHSSSSSSSSSHHHWW.......",
+      ".....WWHHHSSMMMMMMMSSSHHWW......",
+      "....WWHHSSMMMMMMMMMMMSSHHWW.....",
+      "...WWHHSSMMMMKKKKMMMMMSSHHWW....",
+      "..WWHHSSMMKKKKKKKKKKMMSSHHWW....",
+      "..WWHHSSMMKKKKKKKKKKMMSSHHWW....",
+      "..WWHSSMMKKKKKKKKKKKKMMSSHHW....",
+      "..WWHSSMMKKEEEEEEEEKMMMSSHHW....",
+      "..WWHSSMMKKETTTTTTEKMMMSSHHW....",
+      "..WWHSSMMKKETLLLLTEKMMMSSHHW....",
+      "..WWHSSMMKKETLLLLTEKMMMSSHHW....",
+      "..WWHSSMMKKETLLLLTEKMMMSSHHW....",
+      "..WWHSSMMKKETTTTTTEKMMMSSHHW....",
+      "..WWHSSMMKKEEEEEEEEKMMMSSHHW....",
+      "..WWHSSMMKKKKKKKKKKKKMMSSHHW....",
+      "..WWHHSSMMKKKKKKKKKKMMSSHHWW....",
+      "...WWHHSSMMKKKKKKKKMMSSHHWW.....",
+      "...WWHHSSMMMKKKKKKMMMSSHHWW.....",
+      "....WWHHSSMMMMMMMMMMSSHHWW......",
+      ".....WWHHSSSSSSSSSSSSHHWW.......",
+      "......WWHHHHHHHHHHHHHHHWW.......",
+      ".......WWWHHHHHHHHHHHWWW........",
+      "........WWWWWWWWWWWWWWW.........",
+      "....CCWWWWWWWWWWWWWWWWWCC.......",
+      "..CCCCCCWWWHHHHHHHWWWCCCCCCC....",
+      ".CCCCCCCCCWHHHHHHHWCCCCCCCCC....",
+      ".CCCCCCCCCWWWWWWWWWCCCCCCCCC...."
+    ]
   },
-
-  // 6. Naruto Uzumaki
-  'naruto-uzumaki': {
-    palette: {
-      '.': 'transparent',
-      'Y': '#FBBF24', // Spiky yellow hair
-      'O': '#D97706', // Hair shadow
-      'B': '#1E3A8A', // Blue headband
-      'M': '#94A3B8', // Metal plate
-      'P': '#CBD5E1', // Metal highlight
-      'S': '#FDBA74', // Skin tone
-      'W': '#78350F', // Whiskers / eyes
-      'E': '#0284C7', // Blue eyes
-      'L': '#EA580C', // Mouth
+  "naruto-uzumaki": {
+    "palette": {
+      ".": "transparent",
+      "Y": "#FBBF24",
+      "O": "#D97706",
+      "B": "#1E3A8A",
+      "M": "#94A3B8",
+      "P": "#F1F5F9",
+      "S": "#FDBA74",
+      "D": "#FB923C",
+      "W": "#78350F",
+      "E": "#0284C7",
+      "L": "#FFFFFF",
+      "A": "#EA580C",
+      "K": "#FFFFFF"
     },
-    rows: [
-      '.Y.Y..YY..Y.Y...',
-      'YYYYYYYYYYYYYYY.',
-      'YYYYYYYYYYYYYYYY',
-      '.OYYBOOOOOBYYYYO',
-      '..BBMMMMMMMMBB..',
-      '..BBMPPMPPPMBB..',
-      '..SSSSSSSSSSSS..',
-      '.YSSWESSSEWSSY..',
-      '.YSSWWSSSWWSSY..',
-      '..SWWSWSSWWSW...',
-      '..SSSSSSSSSSSS..',
-      '..SWWSSSSSSWWS..',
-      '...SSSSLLSSSS...',
-      '...SSSSSSSSSS...',
-      '....SSSSSSSS....',
-      '.....SSSSSS.....',
-    ],
+    "rows": [
+      "...Y...YY...YYYY...YY...Y.......",
+      "..YYY.YYYY.YYYYYY.YYYY.YYY......",
+      ".YYYYYYYYYYYYYYYYYYYYYYYYYY.....",
+      "YYYYYYYYYYYYYYYYYYYYYYYYYYYY....",
+      ".OYYYYYYYYYYYYYYYYYYYYYYYYYO....",
+      "..OOYYYYYYYYYYYYYYYYYYYYYOO.....",
+      "..BBBBBBBBBBBBBBBBBBBBBBBBBB....",
+      "..BBBBMMMMMMMMMMMMMMMMBBBBBB....",
+      "..BBBBMPPPMPPPPMPPPPPMBBBBBB....",
+      "..BBBBMPPMPPPMPPPMPPPMBBBBBB....",
+      "..BBBBMMMMMMMMMMMMMMMMBBBBBB....",
+      "..BBBBBBBBBBBBBBBBBBBBBBBBBB....",
+      "..SSDDSSSSSSSSSSSSSSSSDDSSSS....",
+      ".YSSDWWSSSSSSSSSSSSSSSWWDSSY....",
+      ".YSSDWLEESSSSSSSSSSSSWLEEDSY....",
+      "..SSDWLEESSSSSSSSSSSSWLEEDSS....",
+      "..SSDDSSSSSSSSSSSSSSSSDDSSSS....",
+      "..SSSWWWSSSSSDDDSSSSSWWWSSSS....",
+      "..SSSWWWSSSDDSSDDSSDDWWWSSSS....",
+      "..SSDDSSSSSSDDDDDDSSSSDDSSSS....",
+      "..SSSDDDSSSSSDDDDSSSSDDDSSSS....",
+      "...SSSDDDSSSDDDDSDDDDDDSSS......",
+      "....SSSSDDDDDDDDDDDDDSSSS.......",
+      ".....SSSSSSSSSSSSSSSSSSS........",
+      "......SSSSSSSSSSSSSSSSS.........",
+      "....AAAAAKKKKKKKKKKKAAAAA.......",
+      "..AAAAAAAKKKKKKKKKKKAAAAAAA.....",
+      ".AAAAAAAAKKKKKKKKKKKAAAAAAAA....",
+      ".AAAAAAAAAKKKKKKKKKAAAAAAAAA....",
+      ".AAAAAAAAAAAAAAAAAAAAAAAAAAA....",
+      ".AAAAAAAAAAAAAAAAAAAAAAAAAAA....",
+      ".AAAAAAAAAAAAAAAAAAAAAAAAAAA...."
+    ]
   },
-
-  // 7. Gojo Satoru
-  'gojo-satoru': {
-    palette: {
-      '.': 'transparent',
-      'W': '#FFFFFF', // Frost white hair
-      'S': '#E2E8F0', // Hair shadow
-      'K': '#09090B', // Pitch blindfold
-      'G': '#27272A', // Blindfold highlight
-      'C': '#38BDF8', // Cyan glow sliver
-      'F': '#FEE2E2', // Pale skin
-      'M': '#FCA5A5', // Lip smirk
+  "gojo-satoru": {
+    "palette": {
+      ".": "transparent",
+      "W": "#FFFFFF",
+      "S": "#E2E8F0",
+      "D": "#CBD5E1",
+      "K": "#09090B",
+      "G": "#27272A",
+      "C": "#38BDF8",
+      "F": "#FEE2E2",
+      "M": "#FCA5A5",
+      "U": "#18181B"
     },
-    rows: [
-      '...W..WWW..W....',
-      '..WWWWWWWWWWWW..',
-      '.WWWWWWWWWWWWWW.',
-      'SWWSWWWSWWWSSWWS',
-      'SWWWWWWWWWWWWWWS',
-      '.SWKKKKKKKKKKWS.',
-      '..KKGGGGGGGGKK..',
-      '..KKKKKKKKKKKK..',
-      '..CCKKKKKKKKCC..',
-      '..FFFFFFFFFFFF..',
-      '..FFFFFFFFFFFF..',
-      '..FFFFFMMFFFFF..',
-      '...FFFFFFFFFF...',
-      '...FFFFFFFFFF...',
-      '....FFFFFFFF....',
-      '.....FFFFFF.....',
-    ],
+    "rows": [
+      "...W...WW...WWWW...WW...W.......",
+      "..WWW.WWWW.WWWWWW.WWWW.WWW......",
+      ".WWWWWWWWWWWWWWWWWWWWWWWWWW.....",
+      "WWWWWWWWWWWWWWWWWWWWWWWWWWWW....",
+      ".SWWWWWWWWWWWWWWWWWWWWWWWWWS....",
+      "..SWWWWWWWWWWWWWWWWWWWWWWWS.....",
+      "..SDDWWWWWWWWWWWWWWWWWWDDWS.....",
+      "..SDDDWWWWWWWWWWWWWWWWDDDWS.....",
+      "..KKKKKKKKKKKKKKKKKKKKKKKKKK....",
+      "..KKGGGGGGGGGGGGGGGGGGGGGGKK....",
+      "..KKGGGGGGGGGGGGGGGGGGGGGGKK....",
+      "..KKKKKKKKKKKKKKKKKKKKKKKKKK....",
+      "..KKKKKKKKKKKKKKKKKKKKKKKKKK....",
+      "..CCKKKKKKKKKKKKKKKKKKKKKKCC....",
+      "..FFFFFFFFFFFFFFFFFFFFFFFFFF....",
+      "..FFFFFFFFFFFFFFFFFFFFFFFFFF....",
+      "..FFFFFFFFFFFFFFFFFFFFFFFFFF....",
+      "..FFFFFFFFFFFFFFFFFFFFFFFFFF....",
+      "..FFFFFFFFFFMMMMFFFFFFFFFFFF....",
+      "..FFFFFFFFFMM..MMFFFFFFFFFFF....",
+      "..FFFFFFFFFFFFFFFFFFFFFFFFFF....",
+      "...FFFFFFFFFFFFFFFFFFFFFFFF.....",
+      "....FFFFFFFFFFFFFFFFFFFFFF......",
+      ".....FFFFFFFFFFFFFFFFFFFF.......",
+      "......FFFFFFFFFFFFFFFFFF........",
+      "....UUUUUUUUUUUUUUUUUUUUUU......",
+      "..UUUUUUUUUUUUUUUUUUUUUUUUUU....",
+      ".UUUUUUUUUUUUUUUUUUUUUUUUUUUU...",
+      ".UUUUUUUUUUUUUUUUUUUUUUUUUUUU...",
+      ".UUUUUUUUUUUUUUUUUUUUUUUUUUUU...",
+      ".UUUUUUUUUUUUUUUUUUUUUUUUUUUU...",
+      ".UUUUUUUUUUUUUUUUUUUUUUUUUUUU..."
+    ]
   },
-
-  // 8. Levi Ackerman
-  'levi-ackerman': {
-    palette: {
-      '.': 'transparent',
-      'K': '#18181B', // Parted dark undercut hair
-      'D': '#27272A', // Hair highlight
-      'S': '#FDE047', // Under-skin tone
-      'F': '#FCE7D6', // Pale face
-      'E': '#3F3F46', // Narrow stoic eyes
-      'W': '#FFFFFF', // Cravat
-      'G': '#166534', // Survey green cloak collar
-      'L': '#991B1B', // Lip line
+  "levi-ackerman": {
+    "palette": {
+      ".": "transparent",
+      "K": "#18181B",
+      "H": "#27272A",
+      "D": "#09090B",
+      "F": "#FCE7D6",
+      "S": "#E5C4AB",
+      "E": "#27272A",
+      "W": "#FFFFFF",
+      "G": "#166534",
+      "L": "#991B1B"
     },
-    rows: [
-      '....KKKKKKKK....',
-      '...KKKKKKKKKK...',
-      '..KKKKDDKKKKKK..',
-      '.KKKKDDFFDDKKKK.',
-      '.KKKDFFFFFDDKKK.',
-      '.KKDFFFFFFFDDKK.',
-      '.KKDFFEFFEEDKKK.',
-      '.KKDFFFFFFFDKKK.',
-      '..KDFFFFFFFDKK..',
-      '..KDFFFLFFFDKK..',
-      '...DFFFFFFFDD...',
-      '....FFFFFFF.....',
-      '...GGWWWWWGG....',
-      '..GGGGWWWWGGGG..',
-      '..GGGGWWWWGGGG..',
-      '...GGGGGGGGGG...',
-    ],
+    "rows": [
+      "...........KKKKKKKKKK...........",
+      ".........KKKKHHHHHHDKKK.........",
+      ".......KKKKHHHHHHHHHDDKKK.......",
+      "......KKKKHHHHHHHHHHHDDKKK......",
+      ".....KKKKHHHHHDDDDHHHHHDDKK.....",
+      "....KKKKHHHHDDFFFFDDHHHHDDKK....",
+      "...KKKKHHHHDFFFFFFFFDHHHHDDKK...",
+      "..KKKKHHHHDFFFFFFFFFFDHHHHDDKK..",
+      "..KKKHHHHDFFFFFFFFFFFFDHHHHDDK..",
+      "..KKKHHHHDFFFFFFFFFFFFDHHHHDDK..",
+      "..KKKHHHHDFFEFFFFFFEFFDHHHHDDK..",
+      "..KKKHHHHDFFEEFFFFEEFFDHHHHDDK..",
+      "..KKKHHHHDFFFFFFFFFFFFDHHHHDDK..",
+      "..KKKHHHHDFFFFFFFFFFSSDHHHHDDK..",
+      "..KKKHHHHDFFFFSFFFSSSSDHHHHDDK..",
+      "..KKKHHHHDFFFFSSSSSSSSDHHHHDDK..",
+      "..KKKHHHHDFFFFLLFFFFSSDHHHHDDK..",
+      "..KKKHHHHDFFFFFFFFFFSSDHHHHDDK..",
+      "...KKHHHHDFFFFFFFFFSSSDHHHDDK...",
+      "....KKHHHDFFFFFFFFFSSSDHHHDDK...",
+      ".....KKHHDFFFFFFFFSSSDHHHDDK....",
+      "......KKHDFFFFFFFSSSDHHHDDK.....",
+      ".......KHDFFFFFFSSSDHHHDDK......",
+      "........HDFFFFFSSSDHHHDDK.......",
+      ".........FFFFFSSSS..............",
+      "....GGGGGGWWWWWWWWWWGGGGGG......",
+      "..GGGGGGGGWWWWWWWWWWGGGGGGGG....",
+      ".GGGGGGGGGWWWWWWWWWWGGGGGGGGG...",
+      ".GGGGGGGGGGWWWWWWWWGGGGGGGGGG...",
+      ".GGGGGGGGGGGGGGGGGGGGGGGGGGGG...",
+      ".GGGGGGGGGGGGGGGGGGGGGGGGGGGG...",
+      ".GGGGGGGGGGGGGGGGGGGGGGGGGGGG..."
+    ]
   },
-
-  // 9. L Lawliet
-  'l-lawliet': {
-    palette: {
-      '.': 'transparent',
-      'K': '#09090B', // Wild messy jet hair
-      'S': '#27272A', // Hair tips
-      'F': '#FFF1F2', // Very pale skin
-      'E': '#18181B', // Intense pupil
-      'W': '#FFFFFF', // Eye white
-      'P': '#475569', // Dark under-eye circles
-      'L': '#E2E8F0', // Pale mouth
+  "l-lawliet": {
+    "palette": {
+      ".": "transparent",
+      "K": "#09090B",
+      "H": "#18181B",
+      "D": "#27272A",
+      "F": "#FFF1F2",
+      "S": "#F1F5F9",
+      "P": "#334155",
+      "E": "#09090B",
+      "W": "#FFFFFF",
+      "L": "#CBD5E1"
     },
-    rows: [
-      '.K...KK.KK...K..',
-      'KKKKKKKKKKKKKKK.',
-      'KKKKKKKKKKKKKKKK',
-      'KKKSKKKSKKKSKKKK',
-      'KKKFFFFFFFFFFKKK',
-      'SKFFFFFFFFFFFFKS',
-      'SKFFWWKFFWWKFFKS',
-      'SKFFWWWFFWWWFFKS',
-      'SKFFPPPFFPPPFFKS',
-      '.KFFFFFFFFFFFFK.',
-      '.KFFFFFFFFFFFFK.',
-      '..KFFFFLLFFFFK..',
-      '...FFFFFFFFFF...',
-      '....FFFFFFFF....',
-      '...WWWWWWWWWW...',
-      '..WWWWWWWWWWWW..',
-    ],
+    "rows": [
+      "...K...KK...KKKK...KK...K.......",
+      "..KKK.KKKK.KKKKKK.KKKK.KKK......",
+      ".KKKKKKKKKKKKKKKKKKKKKKKKKK.....",
+      "KKKKKKKKKKKKKKKKKKKKKKKKKKKK....",
+      ".HKKKKKKKKKKKKKKKKKKKKKKKKKH....",
+      "..HKKKKKKKKKKKKKKKKKKKKKKKH.....",
+      "..HKKDDKKKKKKKKKKKKKKDDKKKH.....",
+      "..HKDDFFFFKKKKKKKKFFFFDDDKH.....",
+      "..HKDFFFFFFFFFFFFFFFFFFDDKH.....",
+      "..HKDFFFFFFFFFFFFFFFFFFDDKH.....",
+      "..HKDFFWWWWFFFFFFFFWWWWFDDK.....",
+      "..HKDFFWEEWFFFFFFFFWEEWFDDK.....",
+      "..HKDFFWEEWFFFFFFFFWEEWFDDK.....",
+      "..HKDFFWWWWFFFFFFFFWWWWFDDK.....",
+      "..HKDFFPPPPFFFFFFFFPPPPFDDK.....",
+      "..HKDFFPPPPFFFFFFFFPPPPFDDK.....",
+      "..HKDFFFFFFFFFFFFFFFFFFFDDK.....",
+      "..HKDFFFFFFFFFFFFFFFFFFFDDK.....",
+      "..HKDFFFFFFLLLLLLFFFFFFFDDK.....",
+      "..HKDFFFFFFFFFFFFFFFFFFFDDK.....",
+      "..HKDFFFFFFFFFFFFFFFFFFFDDK.....",
+      "...KDFFFFFFFFFFFFFFFFFFFDDK.....",
+      "....DFFFFFFFFFFFFFFFFFFDDK......",
+      ".....FFFFFFFFFFFFFFFFFFDK.......",
+      "......FFFFFFFFFFFFFFFF..........",
+      "....WWWWWWWWWWWWWWWWWWWWWW......",
+      "..WWWWWWWWWWWWWWWWWWWWWWWWWW....",
+      ".WWWWWWWWWWWWWWWWWWWWWWWWWWWW...",
+      ".WWWWWWWWWWWWWWWWWWWWWWWWWWWW...",
+      ".WWWWWWWWWWWWWWWWWWWWWWWWWWWW...",
+      ".WWWWWWWWWWWWWWWWWWWWWWWWWWWW...",
+      ".WWWWWWWWWWWWWWWWWWWWWWWWWWWW..."
+    ]
   },
-
-  // 10. Elsa
-  'elsa': {
-    palette: {
-      '.': 'transparent',
-      'Y': '#FEF08A', // Platinum blonde hair
-      'H': '#FEF9C3', // Pale blonde highlight
-      'F': '#FDF2E9', // Pale porcelain skin
-      'C': '#06B6D4', // Cyan crystal eyes
-      'W': '#FFFFFF', // Eye highlight
-      'T': '#38BDF8', // Tiara crystal
-      'L': '#F43F5E', // Rose lips
-      'B': '#BAE6FD', // Ice braid side
+  "elsa": {
+    "palette": {
+      ".": "transparent",
+      "Y": "#FEF08A",
+      "H": "#FEF9C3",
+      "D": "#FDE047",
+      "T": "#38BDF8",
+      "F": "#FDF2E9",
+      "B": "#FECDD3",
+      "C": "#06B6D4",
+      "W": "#FFFFFF",
+      "L": "#F43F5E",
+      "G": "#BAE6FD"
     },
-    rows: [
-      '....TTTTTTTT....',
-      '...HHHHHHHHHH...',
-      '..HHHHHHHHHHHH..',
-      '.HYYYYYYYYYYYYH.',
-      '.HYYYYYYYYYYYYH.',
-      'BHYYFFFFFFFFYYH.',
-      'BHYFCWFFFNCWYH..',
-      'BHYFCCFFFCCYHB..',
-      'BHYFFFFFFFFFFHB.',
-      '.HYFFFFFFFFFFHB.',
-      '.HYFFFFLLFFFFHB.',
-      '..HYFFFFFFFFHB..',
-      '..BHYYYYYYYHB...',
-      '...BBBBBBBBB....',
-      '....BBBBBBB.....',
-      '.....BBBBB......',
-    ],
+    "rows": [
+      ".............TTTT...............",
+      "...........TTTTTTTT.............",
+      ".........HHHHHHHHHHHH...........",
+      ".......HHHHHHHHHHHHHHHH.........",
+      "......HHHHHYYYYYYYYYHHHHH.......",
+      ".....HHHHYYYYYYYYYYYYYHHHH......",
+      "....HHHHYYYYYYYYYYYYYYYHHHH.....",
+      "...HHHHYYYYYFFFFFFFFYYYYHHHH....",
+      "..HHHHYYYYYFFFFFFFFFFYYYYHHHH...",
+      "..HHHHYYYYFFFFFFFFFFFFYYYYHHH...",
+      "..HHHHYYYFCCWFFFFFCCWYFYYYHHH...",
+      "..HHHHYYYFCCWFFFFFCCWYFYYYHHH...",
+      "..HHHHYYYFCCCFFFFFCCCYFYYYHHH...",
+      "..DHHHYYYFBBBFFFFFBBBYFYYYHHH...",
+      "..DHHHYYYFFFFFFFFFFFFFYYYYHHH...",
+      "..DDHHYYYFFFFFLLFFFFFYFYYYHHH...",
+      "..DDHHYYYFFFFLLLLFFFFYFYYYHHH...",
+      "..DDDHHYYYFFFFFFFFFFYFYYYHHHH...",
+      "...DDDHHYYYFFFFFFFFYFYYYHHHH....",
+      "....DDDHHYYYYYYYYYYFYYYHHHH.....",
+      ".....DDDHHYYYYYYYYYYYYHHHH......",
+      "......DDDHHYYYYYYYYYYHHH........",
+      ".......DDDHYYYYYYYYYHHH.........",
+      "........DDYYYYYYYYYHH...........",
+      ".........DYYYYYYYYY.............",
+      "....GGGGGGYYYYYYYYYYGGGGGG......",
+      "..GGGGGGGGYYYYYYYYYYGGGGGGGG....",
+      ".GGGGGGGGGGYYYYYYYYGGGGGGGGGG...",
+      ".GGGGGGGGGGYYYYYYYYGGGGGGGGGG...",
+      ".GGGGGGGGGGGGGGGGGGGGGGGGGGGG...",
+      ".GGGGGGGGGGGGGGGGGGGGGGGGGGGG...",
+      ".GGGGGGGGGGGGGGGGGGGGGGGGGGGG..."
+    ]
   },
-
-  // 11. Rapunzel
-  'rapunzel': {
-    palette: {
-      '.': 'transparent',
-      'G': '#FBBF24', // Golden hair
-      'Y': '#FCD34D', // Bright gold
-      'F': '#FDE0D2', // Warm face
-      'E': '#10B981', // Emerald eyes
-      'W': '#FFFFFF', // White gleam
-      'P': '#F472B6', // Flower pink
-      'V': '#C084FC', // Flower purple
-      'L': '#FB7185', // Warm smile
+  "rapunzel": {
+    "palette": {
+      ".": "transparent",
+      "G": "#FBBF24",
+      "Y": "#FCD34D",
+      "D": "#F59E0B",
+      "P": "#F472B6",
+      "V": "#C084FC",
+      "F": "#FDE0D2",
+      "B": "#FECDD3",
+      "E": "#10B981",
+      "W": "#FFFFFF",
+      "L": "#FB7185",
+      "S": "#A855F7"
     },
-    rows: [
-      '...GGGGGGGGGG...',
-      '..GGGGYYYYGGGG..',
-      '.GGGYFPPPFYYGGG.',
-      'GGGYFFVVVFFYGGGG',
-      'GGYFFFFFFFFFFYGG',
-      'GGYFEWFFFFEWYFGG',
-      'GGYFEEFFFFEEFFGG',
-      'GGYFFFFFFFFFFYGG',
-      'GGYFFFLLLLFFFYGG',
-      'GGGYFFFFFFFFYGGG',
-      'GGGGYYYYYYYYGGGG',
-      'GGGGGGGGGGGGGGGG',
-      'GGGGGGGGGGGGGGGG',
-      '.GGGGGGGGGGGGGG.',
-      '..GGGGGGGGGGGG..',
-      '...GGGGGGGGGG...',
-    ],
+    "rows": [
+      "...........GGGGGGGGGG...........",
+      ".........GGGGYYYYYYGGGG.........",
+      ".......GGGGYYYYYYYYYYGGGG.......",
+      "......GGGGYYYPPYYVVYYYGGGG......",
+      ".....GGGGYYYYPPYYVVYYYYGGGG.....",
+      "....GGGGYYYYFFFFFFFFYYYYGGGG....",
+      "...GGGGYYYYFFFFFFFFFFYYYYGGGG...",
+      "..GGGGYYYYFFFFFFFFFFFFYYYYGGGG..",
+      "..GGGGYYYFFFFFFFFFFFFFFYYYGGGG..",
+      "..GGGGYYYFEEWFFFFFFEEWFYFFGGGG..",
+      "..GGGGYYYFEEWFFFFFFEEWFYFFGGGG..",
+      "..GGGGYYYFEEEFFFFFFEEEFYFFGGGG..",
+      "..GGGGYYYFBBBFFFFFFBBBFYFFGGGG..",
+      "..GGGGYYYFFFFFFFFFFFFFFYFFGGGG..",
+      "..GGGGYYYFFFFFLLLLFFFFFYFFGGGG..",
+      "..GGGGYYYFFFFFLLLLFFFFFYFFGGGG..",
+      "..GGGGYYYFFFFFFFFFFFFFFYFFGGGG..",
+      "..GGGGYYYYFFFFFFFFFFFFYYYYGGGG..",
+      "...GGGGYYYYFFFFFFFFFFYYYYGGGG...",
+      "...GGGGYYYYYFFFFFFFFYYYYYGGGG...",
+      "....GGGGYYYYYYYYYYYYYYYYGGGG....",
+      ".....GGGGYYYYYYYYYYYYYYGGGG.....",
+      "......GGGGYYYYYYYYYYYYGGGG......",
+      ".......GGGGYYYYYYYYYYGGGG.......",
+      "........GGGGYYYYYYYYGGGG........",
+      "....SSSSSSGGGGGGGGGGSSSSSS......",
+      "..SSSSSSSSGGGGGGGGGGSSSSSSSS....",
+      ".SSSSSSSSSSGGGGGGGGSSSSSSSSSS...",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSS...",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSS...",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSS...",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSS..."
+    ]
   },
-
-  // 12. Moana
-  'moana': {
-    palette: {
-      '.': 'transparent',
-      'K': '#291811', // Dark wavy hair
-      'H': '#451A03', // Hair highlight
-      'S': '#C28452', // Island skin tone
-      'R': '#EF4444', // Plumeria flower red
-      'Y': '#FCD34D', // Flower yellow center
-      'E': '#3E1C08', // Warm brown eyes
-      'W': '#FFFFFF', // Eye highlight
-      'L': '#A84E32', // Smile
+  "moana": {
+    "palette": {
+      ".": "transparent",
+      "K": "#291811",
+      "H": "#451A03",
+      "D": "#1C1917",
+      "R": "#EF4444",
+      "Y": "#FBBF24",
+      "S": "#C28452",
+      "J": "#A16237",
+      "E": "#451A03",
+      "W": "#FFFFFF",
+      "L": "#A84E32",
+      "T": "#06B6D4",
+      "C": "#E76F51"
     },
-    rows: [
-      '...KKKKKKKKKK...',
-      '..KKKHHHHHHKKK..',
-      '.KKKRRYHHHHHKKK.',
-      'KKKKRRRYHHHHHKKK',
-      'KKHSSSSSSSSSSSHK',
-      'KKHSEWSSSSSEWSHK',
-      'KKHSEEESSSSEESHK',
-      'KKHSSSSSSSSSSSHK',
-      'KKHSSSSLLSSSSHHK',
-      '.KHSSSSSSSSSSHK.',
-      '.KKHSSSSSSSSHHK.',
-      '..KKHHSSSSHHKK..',
-      '..KKKKKKKKKKKK..',
-      '.KKKKKKKKKKKKKK.',
-      'KKKKKKKKKKKKKKKK',
-      '.KKKKKKKKKKKKKK.',
-    ],
+    "rows": [
+      "...........KKKKKKKKKK...........",
+      ".........KKKKHHHHHHKKKK.........",
+      ".......KKKKHHHHHHHHHHKKKK.......",
+      "......KKKKHHHRRYHHHHHHKKKK......",
+      ".....KKKKHHHRRRYHHHHHHHKKKK.....",
+      "....KKKKHHHHRRYHHHHHHHHHKKKK....",
+      "...KKKKHHHHHSSSSSSSSHHHHHKKKK...",
+      "..KKKKHHHHHSSSSSSSSSSHHHHHKKKK..",
+      "..KKKKHHHHSSSSSSSSSSSSHHHHKKKK..",
+      "..KKKKHHHSEEEWSSSSSEEEWSHHHKKK..",
+      "..KKKKHHHSEEEWSSSSSEEEWSHHHKKK..",
+      "..KKKKHHHSEEEESSSSSEEEESHHHKKK..",
+      "..KKKKHHHSSSSSSSSSSSSSSSHHHKKK..",
+      "..KKKKHHHSSSSSSSSSSSSSSSHHHKKK..",
+      "..KKKKHHHSSSSSLLLLSSSSSSHHHKKK..",
+      "..KKKKHHHSSSSSLLLLSSSSSSHHHKKK..",
+      "..KKKKHHHHSSSSSSSSSSSSSHHHHKKK..",
+      "..KKKKHHHHSSSSSSSSSSSSSHHHHKKK..",
+      "...KKKKHHHHSSSSSSSSSSSHHHHKKK...",
+      "...KKKKHHHHHSSSSSSSHHHHHHKKKK...",
+      "....KKKKHHHHHHHHHHHHHHHHHKKK....",
+      ".....KKKKHHHHHHHHHHHHHHHKKK.....",
+      "......KKKKHHHHHHHHHHHHHKKK......",
+      ".......KKKKKHHHHHHHHHKKKKK......",
+      "........KKKKKKKKKKKKKKKKK.......",
+      "....CCCCCCSSSSSTTSSSSSCCCCCC....",
+      "..CCCCCCCCSSSSSTTSSSSSCCCCCCCC..",
+      ".CCCCCCCCCCSSSSSSSSSSCCCCCCCCCC.",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC."
+    ]
   },
-
-  // 13. Hermione Granger
-  'hermione-granger': {
-    palette: {
-      '.': 'transparent',
-      'B': '#78350F', // Bushy chestnut hair
-      'H': '#92400E', // Hair volume
-      'F': '#FCE7D6', // Warm skin
-      'E': '#451A03', // Warm brown eyes
-      'W': '#FFFFFF', // Eye catch
-      'R': '#991B1B', // Gryffindor red
-      'G': '#F59E0B', // Gryffindor gold
-      'L': '#B45309', // Lip line
+  "hermione-granger": {
+    "palette": {
+      ".": "transparent",
+      "B": "#78350F",
+      "H": "#92400E",
+      "D": "#5C2809",
+      "F": "#FCE7D6",
+      "S": "#E5C4AB",
+      "E": "#451A03",
+      "W": "#FFFFFF",
+      "R": "#991B1B",
+      "G": "#F59E0B",
+      "L": "#B45309",
+      "C": "#1F2937"
     },
-    rows: [
-      '..BBBBBBBBBBBB..',
-      '.BBHHHHHHHHHHBB.',
-      'BBHHBBBBBBBBHHBB',
-      'BBHFFFFFFFFFFHBB',
-      'BBHFEWFFFFEWFFBB',
-      'BBHFEEFFFFEEFFBB',
-      'BBHFFFFFFFFFFHBB',
-      'BBHFFFFLLFFFFHBB',
-      'BBHFFFFFFFFFFHBB',
-      '.BBHFFFFFFFFHBB.',
-      '..BBHHHHHHHHBB..',
-      '..RRRRGGGGRRRR..',
-      '.RRRRRGGGGRRRRR.',
-      '.GGGGRRRRRRGGGG.',
-      '..RRRRGGGGRRRR..',
-      '...RRRRRRRRRR...',
-    ],
+    "rows": [
+      "..........BBBBBBBBBBBB..........",
+      "........BBBBHHHHHHHHBBBB........",
+      "......BBBBHHHHHHHHHHHHBBBB......",
+      ".....BBBBHHHHHHHHHHHHHHBBBB.....",
+      "....BBBBHHHHHFFFFFFHHHHHBBBB....",
+      "...BBBBHHHHHFFFFFFFFHHHHHBBBB...",
+      "..BBBBHHHHHFFFFFFFFFFHHHHHBBBB..",
+      "..BBBHHHHHFFFFFFFFFFFFHHHHHBBB..",
+      "..BBBHHHHFFEEWFFFFFEEWFHHHHBBB..",
+      "..BBBHHHHFFEEWFFFFFEEWFHHHHBBB..",
+      "..BBBHHHHFEEEEFFFFFEEEEFHHHBBB..",
+      "..BBBHHHHFFFFFFFFFFFFFFHHHHBBB..",
+      "..BBBHHHHFFFFFFFFFFFFFFHHHHBBB..",
+      "..BBBHHHHFFFFFLLLLFFFFFHHHHBBB..",
+      "..BBBHHHHFFFFFFFFFFFFFFHHHHBBB..",
+      "..BBBBHHHFFFFFFFFFFFFFFHHHBBBB..",
+      "...BBBHHHHFFFFFFFFFFFFHHHHBBB...",
+      "...BBBBHHHHFFFFFFFFFFHHHHBBBB...",
+      "....BBBBHHHHHFFFFFFHHHHHBBBB....",
+      ".....BBBBHHHHHHHHHHHHHHBBBB.....",
+      "......BBBBHHHHHHHHHHHHBBBB......",
+      ".......BBBBBBHHHHHHBBBBBB.......",
+      "........BBBBBBBBBBBBBBBB........",
+      "....RRRRGGGGRRRRGGGGRRRRGGGG....",
+      "..RRRRRRGGGGRRRRGGGGRRRRGGGGGG..",
+      ".RRRRRRRGGGGRRRRGGGGRRRRGGGGGGG.",
+      ".GGGGGGGRRRRGGGGRRRRGGGGGGGGRRR.",
+      ".GGGGGGGRRRRGGGGRRRRGGGGGGGGRRR.",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC."
+    ]
   },
-
-  // 14. Wednesday Addams
-  'wednesday-addams': {
-    palette: {
-      '.': 'transparent',
-      'K': '#09090B', // Black hair & twin braids
-      'S': '#18181B', // Hair edge
-      'F': '#F5EBE6', // Gothic pale skin
-      'E': '#09090B', // Deadpan eyes
-      'W': '#FFFFFF', // Pointed white collar
-      'D': '#1C1917', // Black dress
-      'L': '#78716C', // Dark lips
+  "wednesday-addams": {
+    "palette": {
+      ".": "transparent",
+      "K": "#09090B",
+      "H": "#18181B",
+      "F": "#F5EBE6",
+      "S": "#E5D5CD",
+      "E": "#09090B",
+      "W": "#FFFFFF",
+      "L": "#78716C",
+      "D": "#1C1917"
     },
-    rows: [
-      '....KKKKKKKK....',
-      '...KKKKKKKKKK...',
-      '..KKKKKKKKKKKK..',
-      '.KKKFFFFFFFFKKK.',
-      '.KKKFFFFFFFFKKK.',
-      'KKKFFEFFFFEFFKKK',
-      'KKKFFEFFFFEFFKKK',
-      'KKKFFFFFFFFFFKKK',
-      'KKKFFFFLLFFFFKKK',
-      'KKKFFFFFFFFFFKKK',
-      'KKKWWFFFFFFWWKKK',
-      'KK.WWWFFFFWWW.KK',
-      'KK..WWWWWWWW..KK',
-      'KK...DDDDDD...KK',
-      'KK....DDDD....KK',
-      'KK............KK',
-    ],
+    "rows": [
+      "...........KKKKKKKKKK...........",
+      ".........KKKKHHHHHHKKKK.........",
+      ".......KKKKHHHHHHHHHHKKKK.......",
+      "......KKKKHHHHHHHHHHHHKKKK......",
+      ".....KKKKHHHHKKKKKKHHHHKKKK.....",
+      "....KKKKHHHKKFFFFFFKKHHHKKKK....",
+      "...KKKKHHHKFFFFFFFFFFKHHHKKKK...",
+      "..KKKKHHHKFFFFFFFFFFFFKHHHKKKK..",
+      "..KKKHHHKFFFFFFFFFFFFFFKHHHKKK..",
+      "..KKKHHHKFFEEFFFFFFEEFFKHHHKKK..",
+      "..KKKHHHKFFEEFFFFFFEEFFKHHHKKK..",
+      "..KKKHHHKFFFFFFFFFFFFFFKHHHKKK..",
+      "..KKKHHHKFFFFFFFFFFFFFFKHHHKKK..",
+      "..KKKHHHKFFFFFLLLLFFFFFKHHHKKK..",
+      "..KKKHHHKFFFFFFFFFFFFFFKHHHKKK..",
+      "..KKKHHHKFFFFFFFFFFFFFFKHHHKKK..",
+      "..KKKHHHKFFFFFFFFFFFFFFKHHHKKK..",
+      "..KKKHHHKFFFFFFFFFFFFFFKHHHKKK..",
+      "..KKKHHHKKFFFFFFFFFFFFKKHHHKKK..",
+      "..KKKHHHHKKFFFFFFFFFFKKHHHHKKK..",
+      "..KKKHHHHKKKKFFFFFFKKKKHHHHKKK..",
+      "..KKKHHHH.KKKWWWWWWKKK..HHHHKKK.",
+      "..KKKK....KKWWWWWWWWKK....KKKK..",
+      "..KKKK.....KWWWWWWWWK.....KKKK..",
+      "..KKKK......WWWWWWWW......KKKK..",
+      "..KKKK..DDDDD..WW..DDDDD..KKKK..",
+      "..KKKK.DDDDDDD....DDDDDDD.KKKK..",
+      "..KKKKDDDDDDDDDDDDDDDDDDDDDKKK..",
+      "..KKK.DDDDDDDDDDDDDDDDDDDD..KKK.",
+      "..KKK.DDDDDDDDDDDDDDDDDDDD..KKK.",
+      "..KK...DDDDDDDDDDDDDDDDDD...KK..",
+      "..KK...DDDDDDDDDDDDDDDDDD...KK.."
+    ]
   },
-
-  // 15. Officer K
-  'officer-k': {
-    palette: {
-      '.': 'transparent',
-      'K': '#292524', // Dark tousled hair
-      'H': '#44403C', // Hair edge
-      'F': '#FCE7D6', // Face base
-      'O': '#FB923C', // Amber cyberpunk rim light (left)
-      'C': '#38BDF8', // Cyan phosphor rim light (right)
-      'E': '#1C1917', // Focused gaze
-      'T': '#1C1917', // High trench coat collar
-      'S': '#78716C', // Shearling lining
+  "officer-k": {
+    "palette": {
+      ".": "transparent",
+      "K": "#292524",
+      "H": "#44403C",
+      "F": "#FCE7D6",
+      "O": "#FB923C",
+      "C": "#38BDF8",
+      "E": "#1C1917",
+      "T": "#1C1917",
+      "S": "#A8A29E",
+      "L": "#B45309"
     },
-    rows: [
-      '....KKKKKKKK....',
-      '...KKKHHHHHKK...',
-      '..KKKKKKKKKKKK..',
-      '.OKKKKKKKKKKKKC.',
-      '.OKFFFFFFFFFFKC.',
-      '.OKFFEFFFFEFFKC.',
-      '.OKFFEFFFFEFFKC.',
-      '.OKFFFFFFFFFFKC.',
-      '.OKFFFFFFFFFFKC.',
-      '..KFFFFFFFFFFK..',
-      '..TTFFFFFFFFTT..',
-      '.TTTSFFFFFFSTTT.',
-      '.TTTSSSSSSSSSTT.',
-      '..TTTTTTTTTTTT..',
-      '..TTTTTTTTTTTT..',
-      '...TTTTTTTTTT...',
-    ],
+    "rows": [
+      "...........KKKKKKKKKK...........",
+      ".........KKKKHHHHHHKKKK.........",
+      ".......KKKKHHHHHHHHHHKKKK.......",
+      "......OKKKHHHHHHHHHHHHKKKC......",
+      ".....OKKKHHHHHHHHHHHHHHKKKC.....",
+      "....OKKKHHHFFFFFFFFFFHHHKKKC....",
+      "...OKKKHHHFFFFFFFFFFFFHHHKKKC...",
+      "..OKKKHHHFFFFFFFFFFFFFFHHHKKKC..",
+      "..OKKHHHFFFFFFFFFFFFFFFFHHHKKC..",
+      "..OKKHHHFFEEFFFFFFFFEEFFHHHKKC..",
+      "..OKKHHHFFEEFFFFFFFFEEFFHHHKKC..",
+      "..OKKHHHFFFFFFFFFFFFFFFFHHHKKC..",
+      "..OKKHHHFFFFFFFFFFFFFFFFHHHKKC..",
+      "..OKKHHHFFFFFLLLLFFFFFFFHHHKKC..",
+      "..OKKHHHFFFFFFFFFFFFFFFFHHHKKC..",
+      "..OKKHHHFFFFFFFFFFFFFFFFHHHKKC..",
+      "..OKKHHHHFFFFFFFFFFFFFFHHHHKKC..",
+      "..OKKKHHHFFFFFFFFFFFFFFHHHKKKC..",
+      "...OKKKHHHFFFFFFFFFFFFHHHKKKC...",
+      "....OKKKHHHFFFFFFFFFFHHHKKKC....",
+      ".....OKKKHHHHHHHHHHHHHHKKKC.....",
+      ".....TTTTTTTTTTTTTTTTTTTTTT.....",
+      "....TTTSSSSSSSSSSSSSSSSSTTTT....",
+      "...TTTTSSSSSSSSSSSSSSSSSTTTT....",
+      "..TTTTTSSSSSSSSSSSSSSSSSTTTTT...",
+      "..TTTTTTTTTTTTTTTTTTTTTTTTTTT...",
+      ".TTTTTTTTTTTTTTTTTTTTTTTTTTTTT..",
+      ".TTTTTTTTTTTTTTTTTTTTTTTTTTTTT..",
+      ".TTTTTTTTTTTTTTTTTTTTTTTTTTTTT..",
+      ".TTTTTTTTTTTTTTTTTTTTTTTTTTTTT..",
+      ".TTTTTTTTTTTTTTTTTTTTTTTTTTTTT..",
+      ".TTTTTTTTTTTTTTTTTTTTTTTTTTTTT.."
+    ]
   },
-
-  // 16. Neo (The One)
-  'neo': {
-    palette: {
-      '.': 'transparent',
-      'K': '#09090B', // Slick black hair
-      'G': '#22C55E', // Matrix phosphor green glow
-      'F': '#FDE6D2', // Pale skin
-      'S': '#18181B', // Dark sunglasses
-      'W': '#E4E4E7', // Specular lens shine
-      'L': '#B45309', // Stoic mouth
-      'C': '#09090B', // High black coat collar
+  "neo": {
+    "palette": {
+      ".": "transparent",
+      "K": "#09090B",
+      "H": "#18181B",
+      "G": "#22C55E",
+      "F": "#FDE6D2",
+      "S": "#18181B",
+      "W": "#E4E4E7",
+      "L": "#B45309",
+      "C": "#09090B"
     },
-    rows: [
-      '....KKKKKKKK....',
-      '...KKKKKKKKKK...',
-      '..KKKKKKKKKKKK..',
-      '.GKKKKKKKKKKKKG.',
-      '.GKFFFFFFFFFFKG.',
-      '.GKSSWWFFSSWWKG.',
-      '.GKSSSSFFSSSSKG.',
-      '.GKFFFFFFFFFFKG.',
-      '.GKFFFFLLFFFFKG.',
-      '..KFFFFFFFFFFK..',
-      '...FFFFFFFFFF...',
-      '...CCCC..CCCC...',
-      '..CCCCCC.CCCCCC.',
-      '.CCCCCCCCCCCCCC.',
-      'CCCCCCCCCCCCCCCC',
-      '.CCCCCCCCCCCCCC.',
-    ],
+    "rows": [
+      "...........KKKKKKKKKK...........",
+      ".........KKKKHHHHHHKKKK.........",
+      ".......KKKKHHHHHHHHHHKKKK.......",
+      "......GKKKHHHHHHHHHHHHKKKG......",
+      ".....GKKKHHHHHHHHHHHHHHKKKG.....",
+      "....GKKKHHHFFFFFFFFFFHHHKKKG....",
+      "...GKKKHHHFFFFFFFFFFFFHHHKKKG...",
+      "..GKKKHHHFFFFFFFFFFFFFFHHHKKKG..",
+      "..GKKHHHFFFFFFFFFFFFFFFFHHHKKG..",
+      "..GKKHHHSSSSSSSSSSSSSSSSHHHKKG..",
+      "..GKKHHHSSSWWSSSSSSSWWSSHHHKKG..",
+      "..GKKHHHSSSSSSSSSSSSSSSSHHHKKG..",
+      "..GKKHHHFFFFFFFFFFFFFFFFHHHKKG..",
+      "..GKKHHHFFFFFLLLLFFFFFFFHHHKKG..",
+      "..GKKHHHFFFFFFFFFFFFFFFFHHHKKG..",
+      "..GKKHHHFFFFFFFFFFFFFFFFHHHKKG..",
+      "..GKKHHHHFFFFFFFFFFFFFFHHHHKKG..",
+      "..GKKKHHHFFFFFFFFFFFFFFHHHKKKG..",
+      "...GKKKHHHFFFFFFFFFFFFHHHKKKG...",
+      "....GKKKHHHFFFFFFFFFFHHHKKKG....",
+      ".....GKKKHHHHHHHHHHHHHHKKKG.....",
+      "......GKKKKKKKKKKKKKKKKKKG......",
+      "........CCCC........CCCC........",
+      ".......CCCCCC......CCCCCC.......",
+      "......CCCCCCCC....CCCCCCCC......",
+      "....CCCCCCCCCCCCCCCCCCCCCCCC....",
+      "..CCCCCCCCCCCCCCCCCCCCCCCCCCCC..",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC."
+    ]
   },
-
-  // 17. Cozy Study Girl
-  'cozy-study-girl': {
-    palette: {
-      '.': 'transparent',
-      'B': '#6B4226', // Warm brown hair bun
-      'H': '#8C5935', // Hair highlight
-      'F': '#FDE0D2', // Cozy skin
-      'P': '#52796F', // Sage green headphones
-      'C': '#CAD2C5', // Headphone pad
-      'R': '#F87171', // Rosy cheek blush
-      'E': '#5C3D2E', // Smiling eyes
-      'S': '#E07A5F', // Terracotta sweater
-      'L': '#B45309', // Smile
+  "cozy-study-girl": {
+    "palette": {
+      ".": "transparent",
+      "B": "#6B4226",
+      "H": "#8C5935",
+      "D": "#52341C",
+      "P": "#52796F",
+      "C": "#CAD2C5",
+      "F": "#FDE0D2",
+      "R": "#F87171",
+      "E": "#5C3D2E",
+      "L": "#B45309",
+      "S": "#E07A5F"
     },
-    rows: [
-      '....BBBBBBBB....',
-      '...BBHHHHHHBB...',
-      '..BBBBBBBBBBBB..',
-      '.PBBFFFFFFFFBBP.',
-      '.PBFEFFFFFEFFBP.',
-      '.PCFRFFFFFRFCBP.',
-      '.PCFFFFFFFFFFCBP.',
-      '.PBFFFFLLFFFFFBP.',
-      '..PBFFFFFFFFBP..',
-      '..PPBFFFFFFBPP..',
-      '...PPBBBBBBPP...',
-      '...SSSSSSSSSS...',
-      '..SSSSSSSSSSSS..',
-      '.SSSSSSSSSSSSSS.',
-      '.SSSSSSSSSSSSSS.',
-      '..SSSSSSSSSSSS..',
-    ],
+    "rows": [
+      "............BBBBBBBB............",
+      "..........BBBBHHHHBBBB..........",
+      ".........BBBBHHHHHHBBBB.........",
+      "..........BBBBHHHHBBBB..........",
+      "........PPP.BBBBBBBB.PPP........",
+      ".......PPPP.BBBBBBBB.PPPP.......",
+      "......PPPPBBBBBBBBBBBBPPPP......",
+      ".....PPPPBBBBHHHHHHBBBBPPPP.....",
+      "....PPPPBBBBHHHHHHHHBBBBPPPP....",
+      "...PPPPBBBBFFFFFFFFFFBBBBPPPP...",
+      "..PPPPBBBBFFFFFFFFFFFFBBBBPPPP..",
+      "..PCCBBBBFFFFFFFFFFFFFFBBBBCP...",
+      "..PCCBBBBFFEEFFFFFFEEFFBBBBCP...",
+      "..PCCBBBBFFEEFFFFFFEEFFBBBBCP...",
+      "..PCCBBBBFFRRFFFFFFRRFFBBBBCP...",
+      "..PCCBBBBFFFFFFFFFFFFFFBBBBCP...",
+      "..PPPPBBBBFFFFLLLLFFFFBBBBPPPP..",
+      "..PPPPBBBBFFFFLLLLFFFFBBBBPPPP..",
+      "...PPPPBBBBFFFFFFFFFFBBBBPPPP...",
+      "....PPPBBBBFFFFFFFFFFBBBBPPP....",
+      ".....PPBBBBFFFFFFFFFFBBBBPP.....",
+      ".......BBBBBBBBBBBBBBBBBB.......",
+      "........BBBBBBBBBBBBBBBB........",
+      "....SSSSSSSSSSSSSSSSSSSSSSSS....",
+      "..SSSSSSSSSSSSSSSSSSSSSSSSSSSS..",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS.",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS.",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS.",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS.",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS.",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS.",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS."
+    ]
   },
-
-  // 18. Late-Night Study Boy
-  'late-night-study-boy': {
-    palette: {
-      '.': 'transparent',
-      'H': '#0F172A', // Dark hoodie
-      'K': '#1E293B', // Hoodie inner
-      'B': '#1E1B4B', // Dark messy hair
-      'F': '#FCD5B5', // Late night face
-      'C': '#38BDF8', // Cyan glowing glasses
-      'W': '#FFFFFF', // Glasses reflection
-      'L': '#78350F', // Calm mouth
-      'A': '#FBBF24', // Amber monitor glow
+  "late-night-study-boy": {
+    "palette": {
+      ".": "transparent",
+      "H": "#0F172A",
+      "K": "#1E293B",
+      "B": "#1E1B4B",
+      "F": "#FCD5B5",
+      "C": "#38BDF8",
+      "W": "#FFFFFF",
+      "L": "#78350F",
+      "A": "#FBBF24",
+      "S": "#0F172A"
     },
-    rows: [
-      '....HHHHHHHH....',
-      '...HHHHHHHHHH...',
-      '..HHBBBBBBBBHH..',
-      '.HHBBFBBFBBBHHH.',
-      '.HKFCWCFCWCFKKH.',
-      '.HKFCCCCFCCFKKH.',
-      'AHKFFFFFFFFFKKH.',
-      'AHKFFFFLLFFFKKH.',
-      'AHKFFFFFFFFFKKH.',
-      '.HKKFFFFFFFKKH..',
-      '..KKKFFFFFKKK...',
-      '...HHHHHHHHHH...',
-      '..HHHHHHHHHHHH..',
-      '.HHHHHHHHHHHHHH.',
-      '.HHHHHHHHHHHHHH.',
-      '..HHHHHHHHHHHH..',
-    ],
+    "rows": [
+      "...........HHHHHHHHHH...........",
+      ".........HHHHHHHHHHHHHH.........",
+      ".......HHHHHHHHHHHHHHHHHH.......",
+      "......HHHHHHBBBBBBBBHHHHHH......",
+      ".....HHHHHHBBBBBBBBBBHHHHHH.....",
+      "....AHHHHHBBBBBBBBBBBBHHHHH.....",
+      "...AHHHHHKKFFFFFFFFFFKKHHHHH....",
+      "..AHHHHHKKFFFFFFFFFFFFKKHHHHH...",
+      "..AHHHHHKKFFFFFFFFFFFFKKHHHHH...",
+      "..AHHHHHKKFFCCCCCCCCFFKKHHHHH...",
+      "..AHHHHHKKFCWWFCWWFFCFKKHHHHH...",
+      "..AHHHHHKKFCWWFCWWFFCFKKHHHHH...",
+      "..AHHHHHKKFFCCCCCCCCFFKKHHHHH...",
+      "..AHHHHHKKFFFFFFFFFFKKHHHHH.....",
+      "..AHHHHHKKFFFFLLFFFFKKHHHHH.....",
+      "..AHHHHHKKFFFFFFFFFFKKHHHHH.....",
+      "..AHHHHHKKFFFFFFFFFFKKHHHHH.....",
+      "..AHHHHHKKKFFFFFFFFKKKHHHHH.....",
+      "...AHHHHHKKKFFFFFFKKKHHHHH......",
+      "....AHHHHHHKKFFFFKKHHHHHH.......",
+      ".....AHHHHHHKKKKKKHHHHHH........",
+      "......AHHHHHHHHHHHHHHHH.........",
+      ".......AHHHHHHHHHHHHHH..........",
+      "....SSSSSSSSSSSSSSSSSSSSSSSS....",
+      "..SSSSSSSSSSSSSSSSSSSSSSSSSSSS..",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS.",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS.",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS.",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS.",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS.",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS.",
+      ".SSSSSSSSSSSSSSSSSSSSSSSSSSSSSS."
+    ]
   },
-
-  // 19. Purring Window Cat
-  'purring-window-cat': {
-    palette: {
-      '.': 'transparent',
-      'O': '#FB923C', // Honey orange ginger fur
-      'D': '#EA580C', // Orange fur stripe
-      'C': '#FFF7ED', // Cream muzzle & chest
-      'P': '#FB7185', // Pink nose / ears
-      'E': '#7C2D12', // Purring ^ ^ eyes
-      'W': '#FFFFFF', // Whisker dots
+  "purring-window-cat": {
+    "palette": {
+      ".": "transparent",
+      "O": "#FB923C",
+      "D": "#EA580C",
+      "C": "#FFF7ED",
+      "P": "#FB7185",
+      "E": "#7C2D12",
+      "W": "#FFFFFF"
     },
-    rows: [
-      '.O............O.',
-      '.OP..........PO.',
-      '.OOPD......DPOO.',
-      '.OOPDD....DDPOO.',
-      '..OODDOOOODDOO..',
-      '.OOOOODDDDOOOOO.',
-      '.OOOODDDDDOOOOO.',
-      '.OOEEOOOOOEEOOO.',
-      '.OOOOOOOOOOOOOO.',
-      '.OOOWWWCCWWWOOO.',
-      '.OOOWWPCCPWWOOO.',
-      '..OOOCCPCOOOO...',
-      '...OCCCCCCCOO...',
-      '...CCCCCCCCCC...',
-      '....CCCCCCCC....',
-      '.....CCCCCC.....',
-    ],
+    "rows": [
+      "..OO......................OO....",
+      "..OOP....................POO....",
+      "..OOPD..................DPOO....",
+      "..OOPDD................DDPOO....",
+      "..OOPDDD..............DDDPOO....",
+      "...OOPDDDOOOOOOOOOOOODDDPOO.....",
+      "...OOPDDOOOOOOOOOOOOOODDPOO.....",
+      "...OODOOOOOODDDDOOOOOOOODOO.....",
+      "..OODOOOOOODDDDDDOOOOOOOODOO....",
+      "..OODOOOOOODDDDDDOOOOOOOODOO....",
+      "..OOOOOOOOODDDDDDOOOOOOOOOOO....",
+      "..OOOOOOOOOOOOOOOOOOOOOOOOOO....",
+      "..OOOOEEEOOOOOOOOOOOEEEOOOOO....",
+      "..OOOEEEEEOOOOOOOOOEEEEEOOOO....",
+      "..OOOOEEEOOOOOOOOOOOEEEOOOOO....",
+      "..OOOOOOOOOOOOOOOOOOOOOOOOOO....",
+      "..OOOOOOOWWWCCCCWWWOOOOOOOOO....",
+      "..OOOOOOWWWCPPPPCWWWOOOOOOOO....",
+      "..OOOOOOOWWCPPPPCWWOOOOOOOOO....",
+      "..OOOOOOOOOCCPPCOOOOOOOOOOOO....",
+      "...OOOOOOOCCCCCCCCCOOOOOOOO.....",
+      "....OOOOOCCCCCCCCCCCOOOOOO......",
+      ".....OOOCCCCCCCCCCCCCOOOO.......",
+      ".......CCCCCCCCCCCCCCCC.........",
+      "....CCCCCCCCCCCCCCCCCCCCCCCC....",
+      "..CCCCCCCCCCCCCCCCCCCCCCCCCCCC..",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC.",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCCCCCC."
+    ]
   },
-
-  // 20. Loyal Fireplace Dog
-  'loyal-fireplace-dog': {
-    palette: {
-      '.': 'transparent',
-      'G': '#D97706', // Golden brown fur
-      'Y': '#F59E0B', // Golden highlight
-      'E': '#78350F', // Floppy ear dark brown
-      'D': '#1C1917', // Dark nose / friendly eyes
-      'W': '#FFFFFF', // Eye spark
-      'T': '#F43F5E', // Happy pink tongue
-      'C': '#DC2626', // Red collar
-      'K': '#FBBF24', // Gold collar tag
+  "loyal-fireplace-dog": {
+    "palette": {
+      ".": "transparent",
+      "G": "#D97706",
+      "Y": "#F59E0B",
+      "E": "#78350F",
+      "D": "#1C1917",
+      "W": "#FFFFFF",
+      "T": "#F43F5E",
+      "C": "#DC2626",
+      "K": "#FBBF24"
     },
-    rows: [
-      '..EE........EE..',
-      '.EEEE......EEEE.',
-      '.EEEGGYYYYGGEEE.',
-      '.EEEGGYYYYGGEEE.',
-      '.EEGYGGGGGGYGEE.',
-      '.EEGYDWGGYDWGEE.',
-      '.EEGGDDGGYDDGEE.',
-      '.EEGGGGGGGGGGEE.',
-      '..EGGGGDDGGGGE..',
-      '...GGGGDDGGGG...',
-      '...GGGGTTGGGG...',
-      '....GGTTTTGG....',
-      '.....GGGGGG.....',
-      '....CCCCKCCCC...',
-      '...CCCCCCCCCCC..',
-      '....CCCCCCCCC...',
-    ],
-  },
+    "rows": [
+      "..EEEE..................EEEE....",
+      ".EEEEEE................EEEEEE...",
+      ".EEEEEE................EEEEEE...",
+      ".EEEEEEEGGYYYYYYYYGG..EEEEEEE...",
+      ".EEEEEEEGGYYYYYYYYGG..EEEEEEE...",
+      ".EEEEEEGGYYYYYYYYYYGG.EEEEEEE...",
+      ".EEEEEEGGYYYYYYYYYYGG.EEEEEEE...",
+      ".EEEEEGGYYYYYYYYYYYYGGEEEEEE....",
+      "..EEEEGGYYYYYYYYYYYYGGEEEEE.....",
+      "..EEEGGYDWGGYYYYDWGGYGEEEE......",
+      "..EEEGGYDDGGYYYYDDGGYGEEEE......",
+      "..EEEGGGGGGGGGGGGGGGGGGEEE......",
+      "..EEEGGGGGGGGGGGGGGGGGGEEE......",
+      "...EEGGGGGGDDDDDGGGGGGGEE.......",
+      "...EEGGGGGGDDDDDGGGGGGGEE.......",
+      "....EGGGGGGTTTTTGGGGGGGE........",
+      ".....GGGGGGTTTTTGGGGGGG.........",
+      "......GGGGGTTTTTGGGGGG..........",
+      ".......GGGGGGTTGGGGGG...........",
+      "........GGGGGGGGGGGG............",
+      ".........GGGGGGGGGG.............",
+      "..........GGGGGGGG..............",
+      "....CCCCCCCKKKKKKCCCCCCC........",
+      "..CCCCCCCCCCKKKKCCCCCCCCCC......",
+      ".CCCCCCCCCCCCKKCCCCCCCCCCCC.....",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCC.....",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCC.....",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCC.....",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCC.....",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCC.....",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCC.....",
+      ".CCCCCCCCCCCCCCCCCCCCCCCCCC....."
+    ]
+  }
 };
 
-const DEFAULT_FACE: PixelFaceData = {
+const DEFAULT_PORTRAIT: PixelPortraitData = {
   palette: {
     '.': 'transparent',
     'X': '#F5C242',
     'B': '#120E24',
   },
   rows: [
-    '................',
-    '....XXXXXXXX....',
-    '..XXXXXXXXXXXX..',
-    '.XXXXXXXXXXXXXX.',
-    '.XXBBXXXXXXBBXX.',
-    '.XXBBXXXXXXBBXX.',
-    '.XXXXXXXXXXXXXX.',
-    '.XXXXXXXXXXXXXX.',
-    '.XXXXXXXXXXXXXX.',
-    '.XXBXXXXXXXXBXX.',
-    '.XXXBBBBBBBBXXX.',
-    '..XXXXXXXXXXXX..',
-    '....XXXXXXXX....',
-    '................',
-    '................',
-    '................',
+    '................................',
+    '................................',
+    '..........XXXXXXXXXXXX..........',
+    '........XXXXXXXXXXXXXXXX........',
+    '.......XXXXXXXXXXXXXXXXXX.......',
+    '......XXXXXXXXXXXXXXXXXXXX......',
+    '.....XXXXXXXXXXXXXXXXXXXXXX.....',
+    '....XXXXXXXXXXXXXXXXXXXXXXXX....',
+    '....XXXXXXXXXXXXXXXXXXXXXXXX....',
+    '....XXXXBBBBXXXXXXXXBBBBXXXX....',
+    '....XXXXBBBBXXXXXXXXBBBBXXXX....',
+    '....XXXXXXXXXXXXXXXXXXXXXXXX....',
+    '....XXXXXXXXXXXXXXXXXXXXXXXX....',
+    '....XXXXXXXXXXXXXXXXXXXXXXXX....',
+    '....XXXXXBBXXXXXXXXXXBBXXXXX....',
+    '.....XXXXXBBBBBBBBBBBBXXXXX.....',
+    '......XXXXXXXXXXXXXXXXXXXX......',
+    '.......XXXXXXXXXXXXXXXXXX.......',
+    '........XXXXXXXXXXXXXXXX........',
+    '..........XXXXXXXXXXXX..........',
+    '................................',
+    '................................',
+    '....XXXXXXXXXXXXXXXXXXXXXXXX....',
+    '..XXXXXXXXXXXXXXXXXXXXXXXXXXXX..',
+    '.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.',
+    '.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.',
+    '.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.',
+    '.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.',
+    '.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.',
+    '.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.',
+    '.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.',
+    '.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.',
   ],
 };
+
+interface PixelRun {
+  x: number;
+  y: number;
+  w: number;
+  color: string;
+}
+
+/**
+ * Optimizes 32x32 pixel rows into merged horizontal pixel runs.
+ * Reduces 1024 elements down to ~60-100 SVG rects per avatar for silky-smooth 60fps rendering!
+ */
+function compilePixelRuns(data: PixelPortraitData): PixelRun[] {
+  const runs: PixelRun[] = [];
+  data.rows.forEach((row, y) => {
+    let currentFill: string | null = null;
+    let startX = 0;
+    let len = 0;
+
+    for (let x = 0; x < row.length; x++) {
+      const char = row[x];
+      const color = data.palette[char];
+
+      if (!color || color === 'transparent') {
+        if (currentFill) {
+          runs.push({ x: startX, y, w: len, color: currentFill });
+          currentFill = null;
+        }
+      } else {
+        if (color === currentFill) {
+          len++;
+        } else {
+          if (currentFill) {
+            runs.push({ x: startX, y, w: len, color: currentFill });
+          }
+          currentFill = color;
+          startX = x;
+          len = 1;
+        }
+      }
+    }
+
+    if (currentFill) {
+      runs.push({ x: startX, y, w: len, color: currentFill });
+    }
+  });
+
+  return runs;
+}
 
 interface PixelFaceAvatarProps {
   characterId: string;
@@ -691,15 +1073,16 @@ interface PixelFaceAvatarProps {
 
 export const PixelFaceAvatar: React.FC<PixelFaceAvatarProps> = ({
   characterId,
-  size = 40,
+  size = 56,
   className = '',
   title,
 }) => {
-  const data = CHARACTER_FACES[characterId] || DEFAULT_FACE;
+  const data = CHARACTER_PORTRAITS_32[characterId] || DEFAULT_PORTRAIT;
+  const runs = useMemo(() => compilePixelRuns(data), [characterId]);
 
   return (
     <svg
-      viewBox="0 0 16 16"
+      viewBox="0 0 32 32"
       width={size}
       height={size}
       className={`shrink-0 select-none ${className}`}
@@ -709,22 +1092,16 @@ export const PixelFaceAvatar: React.FC<PixelFaceAvatarProps> = ({
       }}
     >
       {title && <title>{title}</title>}
-      {data.rows.map((row, y) =>
-        row.split('').map((char, x) => {
-          const color = data.palette[char];
-          if (!color || color === 'transparent') return null;
-          return (
-            <rect
-              key={`${x}-${y}`}
-              x={x}
-              y={y}
-              width={1}
-              height={1}
-              fill={color}
-            />
-          );
-        })
-      )}
+      {runs.map((r, i) => (
+        <rect
+          key={i}
+          x={r.x}
+          y={r.y}
+          width={r.w}
+          height={1}
+          fill={r.color}
+        />
+      ))}
     </svg>
   );
 };

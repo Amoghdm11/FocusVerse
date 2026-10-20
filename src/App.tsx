@@ -107,7 +107,7 @@ export const App: React.FC = () => {
   };
 
   const handleOpenRoster = () => {
-    setSpiritFilter('ALL');
+    setSpiritFilter(selectedCharacter.genderOrSpirit === 'girl' ? 'girl' : 'boy');
     setView('SELECT');
   };
 
@@ -144,7 +144,7 @@ export const App: React.FC = () => {
           character={selectedCharacter}
           onSelectAnotherCharacter={(char) => setSelectedCharacter(char)}
           onBackToRoster={() => {
-            setSpiritFilter('ALL');
+            setSpiritFilter(selectedCharacter.genderOrSpirit === 'girl' ? 'girl' : 'boy');
             setView('SELECT');
           }}
           archetypeMode={archetypeMode}

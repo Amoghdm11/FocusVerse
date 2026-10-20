@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Play, Star, Music, Sparkles, Volume2, ShieldCheck, Compass, Check } from 'lucide-react';
 import { Character } from '../types/character';
+import { PixelFaceAvatar } from './PixelFaceAvatar';
 import { audioEngine } from '../utils/audioEngine';
 
 interface CharacterInfoPanelProps {
@@ -28,7 +29,7 @@ export const CharacterInfoPanel: React.FC<CharacterInfoPanelProps> = ({
   };
 
   return (
-    <div className="bg-void-card pixel-border border-arcade-border p-4 shadow-pixel flex flex-col justify-between h-full select-none">
+    <div className="backdrop-blur-md bg-[#0E0B1C]/90 border-2 border-[#3E356B] shadow-[8px_8px_0px_rgba(0,0,0,0.65)] p-4 flex flex-col justify-between h-full select-none">
       {/* Top Header: Category Tag & Favorite Toggle */}
       <div>
         <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#241E3E] text-xs font-mono">
@@ -61,23 +62,31 @@ export const CharacterInfoPanel: React.FC<CharacterInfoPanelProps> = ({
           </button>
         </div>
 
-        {/* Character Title & Universe */}
-        <div className="mb-3">
-          <div className="text-[10px] font-mono text-gray-500 uppercase tracking-widest truncate">
-            {character.universe}
-          </div>
-          <h2 className="font-pixel text-xs sm:text-sm md:text-base text-white uppercase mt-1 mb-1 leading-normal break-words drop-shadow-[0_2px_8px_rgba(245,194,66,0.2)]">
-            {archetypeMode ? character.archetypeName : character.name}
-          </h2>
-          {archetypeMode && (
-            <div className="text-[10px] font-mono text-arcade-cyan truncate">
-              // CANON: {character.name}
+        {/* Character Title & 16x16 Pixel Face */}
+        <div className="flex items-start gap-3 mb-3">
+          <PixelFaceAvatar
+            characterId={character.id}
+            size={48}
+            className="border-2 border-arcade-gold/80 shadow-pixel-sm p-0.5 bg-black/60 shrink-0 mt-0.5"
+            title={character.name}
+          />
+          <div className="flex-1 min-w-0">
+            <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest truncate">
+              {character.universe}
             </div>
-          )}
+            <h2 className="font-pixel text-xs sm:text-sm text-white uppercase mt-0.5 mb-0.5 leading-normal break-words drop-shadow-[0_2px_8px_rgba(245,194,66,0.25)]">
+              {archetypeMode ? character.archetypeName : character.name}
+            </h2>
+            {archetypeMode && (
+              <div className="text-[10px] font-mono text-arcade-cyan truncate">
+                // CANON: {character.name}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Personality Quote */}
-        <div className="bg-void-darkest p-2.5 border border-arcade-border/80 mb-3 text-xs font-mono text-arcade-gold italic leading-relaxed">
+        <div className="bg-void-darkest/90 p-2.5 border border-arcade-border/80 mb-3 text-xs font-mono text-arcade-gold italic leading-relaxed">
           {character.quote}
         </div>
 
@@ -144,9 +153,9 @@ export const CharacterInfoPanel: React.FC<CharacterInfoPanelProps> = ({
             audioEngine.playClick();
             onEnterWorkspace(character);
           }}
-          className="w-full pixel-btn-primary py-3 px-4 font-silkscreen text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-pixel hover:shadow-pixel-gold"
+          className="w-full pixel-btn-primary py-3 px-3 font-silkscreen text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-pixel hover:shadow-pixel-gold whitespace-nowrap"
         >
-          <Play size={16} fill="currentColor" />
+          <Play size={14} fill="currentColor" />
           <span>STUDY WITH THIS COMPANION ▶</span>
         </button>
       </div>

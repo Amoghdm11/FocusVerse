@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ShieldCheck, Dices, Search, Star, Sparkles, Filter } from 'lucide-react';
+import { ChevronLeft, ShieldCheck, Dices, Search, Filter } from 'lucide-react';
 import { CHARACTERS } from '../data/characters';
-import { Character, CharacterCategory } from '../types/character';
+import { Character } from '../types/character';
 import { CharacterVoxelStage } from '../components/CharacterVoxelStage';
-import { CharacterCarousel } from '../components/CharacterCarousel';
 import { CharacterInfoPanel } from '../components/CharacterInfoPanel';
+import { PixelFaceAvatar } from '../components/PixelFaceAvatar';
 import { Footer } from '../components/Footer';
 import { audioEngine } from '../utils/audioEngine';
 
-export type SpiritFilterType = 'ALL' | 'girl' | 'boy' | 'neutral';
+export type SpiritGenderType = 'boy' | 'girl';
+export type SpiritToggleOption = 'gender-only' | 'pets-only' | 'both';
+export type SpiritFilterType = 'boy' | 'girl' | 'ALL' | 'neutral';
 
 interface SelectPageProps {
   onSelectCharacter: (character: Character) => void;
@@ -16,7 +18,7 @@ interface SelectPageProps {
   archetypeMode: boolean;
   onToggleArchetypeMode: () => void;
   initialCharacter?: Character;
-  initialSpirit?: SpiritFilterType;
+  initialSpirit?: 'boy' | 'girl' | 'ALL' | 'neutral';
   onPreviewCharacterChange?: (character: Character) => void;
 }
 
@@ -26,12 +28,28 @@ export const SelectPage: React.FC<SelectPageProps> = ({
   archetypeMode,
   onToggleArchetypeMode,
   initialCharacter,
-  initialSpirit = 'ALL',
+  initialSpirit = 'boy',
   onPreviewCharacterChange,
 }) => {
-  const [selectedSpirit, setSelectedSpirit] = useState<SpiritFilterType>(initialSpirit);
+  // 1. Strict Gender Determination (Locked based on Homepage choice: 'boy' or 'girl')
+  const [chosenGender, setChosenGender] = useState<SpiritGenderType>(() => {
+    if (initialSpirit === 'girl') return 'girl';
+    if (initialSpirit === 'boy') return 'boy';
+    if (initialCharacter && initialCharacter.genderOrSpirit === 'girl') return 'girl';
+    return 'boy';
+  });
 
-  // Selected character in the dressing room (defaults to initialCharacter or saved character)
+  // Keep chosenGender in sync if initialSpirit updates
+  useEffect(() => {
+    if (initialSpirit === 'girl' || initialSpirit === 'boy') {
+      setChosenGender(initialSpirit);
+    }
+  }, [initialSpirit]);
+
+  // Sub-toggle inside the allowed pool: Default is gender-only
+  const [spiritToggle, setSpiritToggle] = useState<SpiritToggleOption>('gender-only');
+
+  // Selected companion on dressing stage
   const [selectedCharacter, setSelectedCharacter] = useState<Character>(() => {
     if (initialCharacter) return initialCharacter;
     try {
@@ -41,15 +59,8 @@ export const SelectPage: React.FC<SelectPageProps> = ({
         if (found) return found;
       }
     } catch (_) {}
-    return CHARACTERS[0];
+    return CHARACTERS.find((c) => c.genderOrSpirit === chosenGender) || CHARACTERS[0];
   });
-
-  // Keep spirit filter synced if parent initialSpirit changes
-  useEffect(() => {
-    if (initialSpirit) {
-      setSelectedSpirit(initialSpirit);
-    }
-  }, [initialSpirit]);
 
   // Keep selected character synced if parent initialCharacter changes
   useEffect(() => {
@@ -92,28 +103,44 @@ export const SelectPage: React.FC<SelectPageProps> = ({
     }
   };
 
-  const categories = [
-    'ALL',
-    'SUPERHEROES',
-    'ANIME',
-    'ANIMATED & FANTASY',
-    'SCI-FI',
-    'COZY & EVERYDAY',
-    '★ FAVORITES',
+  // Compact category filter tabs
+  const categoryTabs = [
+    { id: 'ALL', label: 'ALL' },
+    { id: 'HEROES', label: 'HEROES' },
+    { id: 'ANIME', label: 'ANIME' },
+    { id: 'FANTASY', label: 'FANTASY' },
+    { id: 'SCI-FI', label: 'SCI-FI' },
+    { id: 'COZY', label: 'COZY' },
+    { id: '★', label: '★' },
   ];
 
-  // Filter roster for the carousel
+  // STRICT FILTERING: Only chosen gender + pets
   const filteredCharacters = CHARACTERS.filter((char) => {
-    // 1. Spirit / Gender Filter
-    if (selectedSpirit === 'girl' && char.genderOrSpirit !== 'girl') return false;
-    if (selectedSpirit === 'boy' && char.genderOrSpirit !== 'boy') return false;
-    if (selectedSpirit === 'neutral' && char.genderOrSpirit !== 'neutral') return false;
+    // 1. Strict Spirit Filter
+    if (chosenGender === 'boy') {
+      if (spiritToggle === 'gender-only' && char.genderOrSpirit !== 'boy') return false;
+      if (spiritToggle === 'pets-only' && char.genderOrSpirit !== 'neutral') return false;
+      if (spiritToggle === 'both' && char.genderOrSpirit !== 'boy' && char.genderOrSpirit !== 'neutral') return false;
+    } else {
+      // chosenGender === 'girl'
+      if (spiritToggle === 'gender-only' && char.genderOrSpirit !== 'girl') return false;
+      if (spiritToggle === 'pets-only' && char.genderOrSpirit !== 'neutral') return false;
+      if (spiritToggle === 'both' && char.genderOrSpirit !== 'girl' && char.genderOrSpirit !== 'neutral') return false;
+    }
 
     // 2. Category Filter
-    if (selectedCategory === '★ FAVORITES') {
+    if (selectedCategory === '★') {
       if (!favorites.includes(char.id)) return false;
     } else if (selectedCategory !== 'ALL') {
-      if (char.category.toUpperCase() !== selectedCategory) return false;
+      const catMap: Record<string, string> = {
+        'HEROES': 'Superheroes',
+        'ANIME': 'Anime',
+        'FANTASY': 'Animated & Fantasy',
+        'SCI-FI': 'Sci-Fi',
+        'COZY': 'Cozy & Everyday',
+      };
+      const targetCat = catMap[selectedCategory] || selectedCategory;
+      if (char.category.toLowerCase() !== targetCat.toLowerCase()) return false;
     }
 
     // 3. Search query
@@ -134,21 +161,39 @@ export const SelectPage: React.FC<SelectPageProps> = ({
     if (filteredCharacters.length > 0 && !filteredCharacters.some((c) => c.id === selectedCharacter.id)) {
       handleSelectCompanion(filteredCharacters[0]);
     }
-  }, [selectedSpirit, selectedCategory]);
+  }, [spiritToggle, selectedCategory, chosenGender]);
 
-  // Pick a random companion (Minecraft PE style)
+  // Pick a random companion strictly within the allowed pool
   const pickRandomCompanion = () => {
     audioEngine.playClick();
-    const available = filteredCharacters.length > 0 ? filteredCharacters : CHARACTERS;
+    const available = filteredCharacters.length > 0 ? filteredCharacters : (
+      CHARACTERS.filter((c) => chosenGender === 'boy'
+        ? (c.genderOrSpirit === 'boy' || c.genderOrSpirit === 'neutral')
+        : (c.genderOrSpirit === 'girl' || c.genderOrSpirit === 'neutral')
+      )
+    );
+    if (available.length === 0) return;
     const randomIndex = Math.floor(Math.random() * available.length);
     handleSelectCompanion(available[randomIndex]);
   };
 
   return (
-    <div className="min-h-screen pb-4 pt-3 px-2 sm:px-6 w-full max-w-7xl mx-auto flex flex-col justify-between gap-3 select-none overflow-x-hidden">
-      {/* --- TOP TACTICAL HUD BAR --- */}
-      <header className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 bg-void-darkest border-2 border-arcade-border text-xs font-mono shadow-pixel">
-        {/* Left: Back Button & Roster Status */}
+    <div className="relative w-screen h-screen overflow-hidden select-none bg-[#090714] text-gray-200">
+      {/* ========================================================================= */}
+      {/* LAYER 0 (z-0): UNBOXED FULL-SCREEN 3D BACKGROUND PLANE                    */}
+      {/* Character rig and pedestal stand proudly on the right side (~71% width)   */}
+      {/* ========================================================================= */}
+      <CharacterVoxelStage
+        character={selectedCharacter}
+        archetypeMode={archetypeMode}
+        fullScreen={true}
+      />
+
+      {/* ========================================================================= */}
+      {/* LAYER 1 (z-20): TOP FLOATING TACTICAL HUD BAR                             */}
+      {/* ========================================================================= */}
+      <header className="fixed top-3 left-3 right-3 sm:left-6 sm:right-6 max-w-7xl mx-auto z-20 flex items-center justify-between gap-2 px-3 py-2 backdrop-blur-md bg-[#0E0B1C]/85 border-2 border-[#3E356B] text-xs font-mono shadow-[6px_6px_0px_rgba(0,0,0,0.65)]">
+        {/* Left: Return Home & Dressing Room Status */}
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => {
@@ -169,8 +214,10 @@ export const SelectPage: React.FC<SelectPageProps> = ({
               DRESSING ROOM
             </span>
             <span className="text-gray-600 hidden md:inline">|</span>
-            <span className="hidden md:inline">
-              SELECT COMPANION: <strong className="text-white">{selectedCharacter.index}</strong>
+            <span className="hidden md:inline font-mono">
+              ROSTER: <strong className={chosenGender === 'girl' ? 'text-[#E07A5F]' : 'text-arcade-cyan'}>
+                {chosenGender === 'girl' ? '♀ GIRL SPIRITS + PETS' : '♂ BOY SPIRITS + PETS'}
+              </strong>
             </span>
           </div>
         </div>
@@ -181,7 +228,7 @@ export const SelectPage: React.FC<SelectPageProps> = ({
           <button
             onClick={pickRandomCompanion}
             className="pixel-btn px-2.5 py-1 text-[10px] text-arcade-cyan hover:text-white flex items-center gap-1.5"
-            title="Choose a random companion"
+            title="Choose a random companion from active pool"
           >
             <Dices size={14} />
             <span className="hidden sm:inline">RANDOM</span>
@@ -206,107 +253,238 @@ export const SelectPage: React.FC<SelectPageProps> = ({
         </div>
       </header>
 
-      {/* --- DUAL SPIRIT & CATEGORY FILTER BAR --- */}
-      <div className="flex flex-col gap-2 bg-void-card pixel-border border-arcade-border p-2.5 shadow-pixel">
-        {/* Row 1: Spirit / Gender Filter Pills */}
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-arcade-border/50 pb-2">
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[10px] font-mono text-gray-400 font-bold uppercase mr-1 flex items-center gap-1">
-              <Filter size={11} className="text-arcade-gold" />
-              SPIRIT:
-            </span>
-            {(
-              [
-                { id: 'ALL' as const, label: '[ ALL SPIRITS ]' },
-                { id: 'girl' as const, label: '[ ♀ GIRL SPIRITS ]' },
-                { id: 'boy' as const, label: '[ ♂ BOY SPIRITS ]' },
-                { id: 'neutral' as const, label: '[ 🐾 PETS ]' },
-              ]
-            ).map((s) => {
-              const isActive = selectedSpirit === s.id;
-              let activeClass = 'border-arcade-gold bg-arcade-gold text-black shadow-pixel-sm font-bold';
-              if (s.id === 'girl') {
-                activeClass = 'border-[#E07A5F] bg-[#E07A5F] text-black shadow-pixel-sm font-bold';
-              } else if (s.id === 'boy') {
-                activeClass = 'border-arcade-cyan bg-arcade-cyan text-black shadow-pixel-sm font-bold';
-              } else if (s.id === 'neutral') {
-                activeClass = 'border-amber-400 bg-amber-400 text-black shadow-pixel-sm font-bold';
-              }
+      {/* ========================================================================= */}
+      {/* LAYER 2 (z-10): FLOATING HUD WINDOWS OVER 3D PLANE                        */}
+      {/* Leftmost Roster Window + Center-Left Description Window                   */}
+      {/* Right side is completely unobstructed for the 3D model!                  */}
+      {/* ========================================================================= */}
+      <main className="fixed top-16 bottom-11 left-3 right-3 sm:left-6 sm:right-6 max-w-7xl mx-auto z-10 pointer-events-none flex flex-col lg:flex-row items-stretch lg:items-start gap-4">
+        
+        {/* ===================================================================== */}
+        {/* 1. LEFTMOST POP-UP WINDOW: CHARACTER CHOOSING ROSTER                 */}
+        {/* ===================================================================== */}
+        <section
+          aria-label="Companion Roster Window"
+          className="w-full lg:w-[370px] max-h-[46vh] lg:max-h-[calc(100vh-120px)] flex flex-col backdrop-blur-md bg-[#0E0B1C]/92 border-2 border-[#3E356B] shadow-[8px_8px_0px_rgba(0,0,0,0.7)] pointer-events-auto p-3 shrink-0"
+        >
+          {/* Top of Leftmost Pop-up: Spirit / Pet Toggle */}
+          <div className="pb-2.5 border-b border-[#241E3E] space-y-2">
+            <div className="flex items-center justify-between text-[10px] font-mono">
+              <span className="text-gray-400 font-bold uppercase flex items-center gap-1">
+                <Filter size={11} className="text-arcade-gold" />
+                SPIRIT POOL:
+              </span>
+              <span className="text-[10px] text-gray-400">
+                SHOWING: <strong className="text-arcade-gold">{filteredCharacters.length}</strong> COMPANIONS
+              </span>
+            </div>
 
-              return (
-                <button
-                  key={s.id}
-                  onClick={() => {
-                    audioEngine.playClick();
-                    setSelectedSpirit(s.id);
-                  }}
-                  className={`px-2.5 py-1 text-[9px] sm:text-[10px] font-pixel border transition-all ${
-                    isActive
-                      ? activeClass
-                      : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-arcade-gold'
-                  }`}
-                >
-                  {s.label}
-                </button>
-              );
-            })}
+            {/* Strict Spirit Toggle Pills (Only chosen gender + pets) */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {chosenGender === 'boy' ? (
+                <>
+                  <button
+                    onClick={() => {
+                      audioEngine.playClick();
+                      setSpiritToggle('gender-only');
+                    }}
+                    className={`px-2 py-1 text-[9px] font-pixel border transition-all ${
+                      spiritToggle === 'gender-only'
+                        ? 'border-arcade-cyan bg-arcade-cyan text-black shadow-pixel-sm font-bold'
+                        : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-arcade-cyan'
+                    }`}
+                  >
+                    [ ♂ BOY SPIRITS ]
+                  </button>
+                  <button
+                    onClick={() => {
+                      audioEngine.playClick();
+                      setSpiritToggle('pets-only');
+                    }}
+                    className={`px-2 py-1 text-[9px] font-pixel border transition-all ${
+                      spiritToggle === 'pets-only'
+                        ? 'border-amber-400 bg-amber-400 text-black shadow-pixel-sm font-bold'
+                        : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-amber-400'
+                    }`}
+                  >
+                    [ 🐾 PETS ]
+                  </button>
+                  <button
+                    onClick={() => {
+                      audioEngine.playClick();
+                      setSpiritToggle('both');
+                    }}
+                    className={`px-2 py-1 text-[9px] font-pixel border transition-all ${
+                      spiritToggle === 'both'
+                        ? 'border-arcade-gold bg-arcade-gold text-black shadow-pixel-sm font-bold'
+                        : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-arcade-gold'
+                    }`}
+                  >
+                    [ BOY + PETS ]
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => {
+                      audioEngine.playClick();
+                      setSpiritToggle('gender-only');
+                    }}
+                    className={`px-2 py-1 text-[9px] font-pixel border transition-all ${
+                      spiritToggle === 'gender-only'
+                        ? 'border-[#E07A5F] bg-[#E07A5F] text-black shadow-pixel-sm font-bold'
+                        : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-[#E07A5F]'
+                    }`}
+                  >
+                    [ ♀ GIRL SPIRITS ]
+                  </button>
+                  <button
+                    onClick={() => {
+                      audioEngine.playClick();
+                      setSpiritToggle('pets-only');
+                    }}
+                    className={`px-2 py-1 text-[9px] font-pixel border transition-all ${
+                      spiritToggle === 'pets-only'
+                        ? 'border-amber-400 bg-amber-400 text-black shadow-pixel-sm font-bold'
+                        : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-amber-400'
+                    }`}
+                  >
+                    [ 🐾 PETS ]
+                  </button>
+                  <button
+                    onClick={() => {
+                      audioEngine.playClick();
+                      setSpiritToggle('both');
+                    }}
+                    className={`px-2 py-1 text-[9px] font-pixel border transition-all ${
+                      spiritToggle === 'both'
+                        ? 'border-arcade-gold bg-arcade-gold text-black shadow-pixel-sm font-bold'
+                        : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-arcade-gold'
+                    }`}
+                  >
+                    [ GIRL + PETS ]
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Category Filter Pills & Search Input */}
+            <div className="flex flex-col gap-1.5 pt-1">
+              <div className="flex flex-wrap gap-1 text-[9px] font-mono">
+                {categoryTabs.map((cat) => {
+                  const isActive = selectedCategory === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => {
+                        audioEngine.playClick();
+                        setSelectedCategory(cat.id);
+                      }}
+                      className={`px-1.5 py-0.5 border uppercase font-bold transition-all ${
+                        isActive
+                          ? 'border-arcade-gold bg-arcade-gold/20 text-arcade-gold shadow-pixel-sm'
+                          : 'border-arcade-border/80 bg-void-darkest text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      {cat.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Compact Search Input */}
+              <div className="flex items-center gap-1.5 bg-void-darkest border border-arcade-border px-2 py-1 text-xs font-mono w-full">
+                <Search size={11} className="text-arcade-gold shrink-0" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="> filter_companion..."
+                  className="bg-transparent text-gray-200 placeholder-gray-600 outline-none w-full text-[10px]"
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="text-[10px] font-mono text-gray-400">
-            SHOWING: <strong className="text-arcade-gold">{filteredCharacters.length}</strong> / 20 COMPANIONS
+          {/* Scrollable Body: 2-Column Vertical Roster Grid */}
+          <div className="flex-1 overflow-y-auto pr-1 mt-2.5 space-y-2">
+            {filteredCharacters.length === 0 ? (
+              <div className="text-center py-8 text-xs font-mono text-gray-500">
+                // No companions match the current filters.
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                {filteredCharacters.map((char) => {
+                  const isSelected = char.id === selectedCharacter.id;
+                  const isFav = favorites.includes(char.id);
+
+                  return (
+                    <button
+                      key={char.id}
+                      onClick={() => {
+                        audioEngine.playClick();
+                        handleSelectCompanion(char);
+                      }}
+                      className={`p-2 flex flex-col items-center text-center transition-all border relative select-none ${
+                        isSelected
+                          ? 'border-arcade-gold bg-amber-950/40 text-arcade-gold shadow-[0_0_12px_rgba(245,194,66,0.35)]'
+                          : 'border-arcade-border/80 bg-void-darkest/90 text-gray-300 hover:border-arcade-gold/60 hover:text-white'
+                      }`}
+                    >
+                      {/* Top Bar inside card: Index and Favorite Star */}
+                      <div className="w-full flex items-center justify-between text-[9px] font-mono mb-1 text-gray-500">
+                        <span className={isSelected ? 'text-arcade-gold font-bold' : ''}>
+                          {char.index}
+                        </span>
+                        {isFav && <span className="text-arcade-gold">★</span>}
+                      </div>
+
+                      {/* 16x16 Pixel Art Character Face */}
+                      <div className="my-1">
+                        <PixelFaceAvatar
+                          characterId={char.id}
+                          size={40}
+                          className={`border ${
+                            isSelected ? 'border-arcade-gold shadow-pixel-sm' : 'border-[#3E356B]'
+                          }`}
+                          title={char.name}
+                        />
+                      </div>
+
+                      {/* Character Title */}
+                      <div className="w-full mt-1">
+                        <div className={`font-pixel text-[9px] leading-tight truncate ${
+                          isSelected ? 'text-white' : 'text-gray-300'
+                        }`}>
+                          {archetypeMode
+                            ? char.archetypeName.split('/')[0].trim()
+                            : char.name.split('(')[0].trim()}
+                        </div>
+                        <div className="text-[8px] font-mono text-gray-500 uppercase truncate mt-0.5">
+                          {char.category.split('&')[0].trim()}
+                        </div>
+                      </div>
+
+                      {/* Active Cursor Marker */}
+                      {isSelected && (
+                        <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-arcade-gold border border-black animate-pulse" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        </div>
+        </section>
 
-        {/* Row 2: Universe Category Tabs & Search Bar */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 pt-0.5">
-          <div className="flex flex-wrap gap-1 text-[9px] sm:text-[10px] font-mono">
-            {categories.map((cat) => {
-              const isActive = selectedCategory === cat;
-              return (
-                <button
-                  key={cat}
-                  onClick={() => {
-                    audioEngine.playClick();
-                    setSelectedCategory(cat);
-                  }}
-                  className={`px-2 py-0.5 border uppercase font-bold transition-all ${
-                    isActive
-                      ? 'border-arcade-gold bg-arcade-gold/20 text-arcade-gold border-arcade-gold shadow-pixel-sm'
-                      : 'border-arcade-border/80 bg-void-darkest text-gray-400 hover:text-white'
-                  }`}
-                >
-                  {cat}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Search Input */}
-          <div className="flex items-center gap-1.5 bg-void-darkest border border-arcade-border px-2 py-1 text-xs font-mono w-full md:w-56 shrink-0">
-            <Search size={12} className="text-arcade-gold shrink-0" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="> filter_companion..."
-              className="bg-transparent text-gray-200 placeholder-gray-600 outline-none w-full text-[11px]"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* --- MAIN IMMERSIVE STAGE: 3D CHARACTER PREVIEW + COMPACT INFO PANEL --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch flex-1 my-1">
-        {/* Area A: Large Central 3D Character Preview (7 cols on desktop) */}
-        <div className="lg:col-span-7 xl:col-span-8 flex flex-col justify-center">
-          <CharacterVoxelStage
-            character={selectedCharacter}
-            archetypeMode={archetypeMode}
-          />
-        </div>
-
-        {/* Area C: Compact Character Information & Action Panel (5 cols on desktop) */}
-        <div className="lg:col-span-5 xl:col-span-4 flex flex-col">
+        {/* ===================================================================== */}
+        {/* 2. CENTER-LEFT FLOATING POP-UP: CHARACTER DESCRIPTION & LAUNCH CARD   */}
+        {/* ===================================================================== */}
+        <section
+          key={selectedCharacter.id}
+          aria-label="Companion Details Window"
+          className="w-full lg:w-[360px] max-h-[46vh] lg:max-h-[calc(100vh-120px)] flex flex-col pointer-events-auto overflow-y-auto animate-fadeIn shrink-0"
+        >
           <CharacterInfoPanel
             character={selectedCharacter}
             onEnterWorkspace={onSelectCharacter}
@@ -314,29 +492,15 @@ export const SelectPage: React.FC<SelectPageProps> = ({
             onToggleFavorite={toggleFavorite}
             archetypeMode={archetypeMode}
           />
-        </div>
-      </div>
+        </section>
+      </main>
 
-      {/* --- AREA B: CHARACTER SELECTION CAROUSEL STRIP (Minecraft PE Style) --- */}
-      <div className="w-full mt-1 mb-2">
-        {filteredCharacters.length === 0 ? (
-          <div className="text-center py-4 bg-void-darkest border border-arcade-border text-xs font-mono text-gray-500">
-            // No companions match the current filter or search parameters.
-          </div>
-        ) : (
-          <CharacterCarousel
-            characters={filteredCharacters}
-            selectedCharacter={selectedCharacter}
-            onSelectCharacter={handleSelectCompanion}
-            favorites={favorites}
-            archetypeMode={archetypeMode}
-          />
-        )}
+      {/* ========================================================================= */}
+      {/* LAYER 3 (z-20): GLOBAL CREDITS FOOTER                                     */}
+      {/* ========================================================================= */}
+      <div className="fixed bottom-0 left-0 right-0 z-20 pointer-events-auto">
+        <Footer />
       </div>
-
-      {/* Global Credits Footer */}
-      <Footer />
     </div>
   );
 };
-

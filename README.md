@@ -26,24 +26,26 @@ FocusVerse is an immersive, retro-futuristic productivity environment inspired b
 
 ---
 
-### 2. Minecraft Bedrock / Pocket Edition Character Selection (`SelectPage.tsx`)
-* **Dual Spirit & Category Filtering Strip:**
-  * Spirit/Gender Pills: `[ ALL SPIRITS ]`, `[ ♀ GIRL SPIRITS ]`, `[ ♂ BOY SPIRITS ]`, `[ 🐾 PETS ]`.
-  * Universe Category Tabs: `ALL`, `SUPERHEROES`, `ANIME`, `ANIMATED & FANTASY`, `SCI-FI`, `COZY & EVERYDAY`, `★ FAVORITES`.
-  * Real-time search filter and instant random companion picker (`[ 🎲 RANDOM ]`).
-* **Central 3D Voxel Stage (`CharacterVoxelStage.tsx`):**
-  * Powered by **Three.js** with high-performance WebGL rendering.
-  * Articulated 3D humanoid voxel avatars (and custom quadrupeds for the Cat and Dog) with authentic hairstyles, headbands, blindfolds, cloaks, and weapons.
-  * Procedurally painted pixel-art textures using `THREE.NearestFilter` for razor-sharp retro edges.
-  * 360° drag-to-rotate interaction with realistic angular momentum and inertia.
-  * Idle breathing and subtle arm swaying animations.
-  * Minecraft Bedrock dressing room style obsidian & rune platform pedestal with dynamic lighting (directional key light, spotlight, character-tinted rim backlight, and cast shadows).
-  * Auto-spin toggle (`[ ↻ SPIN ]`), front view reset (`[ ↺ FRONT ]`), and interactive zoom controls.
-* **Compact Information & Action Panel (`CharacterInfoPanel.tsx`):**
-  * Displays companion identity, archetype name (with Copyright-Safe Mode support), universe, quote, and tagline.
-  * Real-time Canvas FX mode and acoustic profile readouts.
-  * Native Web Audio frequency chord sampler (`[ 🎵 SAMPLE AUDIO ]`).
-  * Unmissable primary action button: `[ STUDY WITH THIS COMPANION ▶ ]`.
+### 2. Full-Screen Unboxed 3D Dressing Room & Strict Spirit Filtering (`SelectPage.tsx`)
+* **Strict Spirit Filtering (Chosen Gender Spirit + Pets Only):**
+  * Removing generic `ALL SPIRITS` clutter — the dressing room strictly respects the companion chosen on the Homepage:
+    * **If Study Boy was selected:** Displays only `[ ♂ BOY SPIRITS ]` (default), `[ 🐾 PETS ]`, or `[ BOY + PETS ]`. Girl spirits are completely hidden in that session.
+    * **If Study Girl was selected:** Displays only `[ ♀ GIRL SPIRITS ]` (default), `[ 🐾 PETS ]`, or `[ GIRL + PETS ]`. Boy spirits are completely hidden in that session.
+  * Category filters (`ALL`, `HEROES`, `ANIME`, `FANTASY`, `SCI-FI`, `COZY`, `★`) and real-time search filter strictly within that active pool.
+* **Full-Screen Unboxed 3D Background Plane (`CharacterVoxelStage.tsx`):**
+  * Powered by **Three.js** WebGL rendering across the entire viewport (`fixed inset-0 w-screen h-screen z-0`).
+  * 3D character rig and glowing rune pedestal anchored proudly on the open right side of the screen (~68%–71% width).
+  * 360° drag-to-rotate interaction across the open right plane with momentum physics.
+  * Idle breathing, arm swaying animations, and dynamic lighting (key light, spotlight, rim light, and soft floor shadows).
+  * Floating camera control pill in the bottom-right corner: `[ AUTO-SPIN ]`, `[ FRONT ]`, `[ + ]`, `[ - ]`.
+* **Layered Translucent UI Pop-Ups (`z-10` / `z-20`):**
+  * **Top Floating Tactical HUD Bar (`z-20`):** `[ ◀ RETURN HOME ]`, active spirit roster readout, `[ 🎲 RANDOM ]`, and `[ 🛡️ SAFE MODE ]`.
+  * **Leftmost Pop-Up Window (Character Choosing Roster):** Anchored to the far left with spirit pills, compact category tabs, search input, and a 2-column vertical roster grid.
+  * **Center-Left Floating Pop-Up Window (Character Description & Launch Card):** Displays category, 16x16 face, name/archetype, personality quote, Canvas FX, acoustic profile, color swatches, `[ SAMPLE AUDIO ]`, and the golden `[ STUDY WITH THIS COMPANION ▶ ]` button.
+* **16x16 Pixel Art Character Faces (`PixelFaceAvatar.tsx`):**
+  * Dedicated high-performance SVG pixel component with crisp edges (`shape-rendering="crispEdges"`, `image-rendering="pixelated"`).
+  * Authentic, custom-crafted 16x16 pixel face/head matrices for all 20 companions (Spider-Man, Batman with cowl & bat ears, Iron Man helmet, Miles Morales, Gwen Stacy hood, Naruto shinobi headband, Gojo blindfold, Levi, L Lawliet dark circles, Elsa braid, Rapunzel, Moana, Hermione, Wednesday twin braids, Officer K cyberpunk lighting, Neo Matrix shades, Cozy Study Girl, Late-Night Study Boy, Purring Cat, and Loyal Dog).
+  * Displayed on every roster slot in the leftmost pop-up and next to the companion's title in the description pop-up!
 
 ---
 
@@ -73,9 +75,9 @@ FocusVerse is an immersive, retro-futuristic productivity environment inspired b
 | :---: | :---: |
 | ![Homepage Initial](docs/screenshots/home_polished_decluttered_initial.png) | ![9:16 Spirit Cards](docs/screenshots/home_minimalist_916_revealed.png) |
 
-| 3D Dressing Room (Girl Spirits Filter) | 3D Dressing Room (Boy Spirits Filter) |
+| 3D Dressing Room (Boy Spirits + Pets) | 3D Dressing Room (Girl Spirits + Pets) |
 | :---: | :---: |
-| ![Girl Spirits Roster](docs/screenshots/select_girl_spirit_roster.png) | ![Boy Spirits Roster](docs/screenshots/select_boy_spirit_roster.png) |
+| ![Boy Spirits Roster](docs/screenshots/dressing_room_boy_unboxed_3d.png) | ![Girl Spirits Roster](docs/screenshots/dressing_room_girl_unboxed_3d.png) |
 
 | Workspace with Top Audio Engine Popover | Batman Batcave Sonar Stage |
 | :---: | :---: |

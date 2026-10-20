@@ -35,7 +35,8 @@ import {
   HairColorId,
   SkinToneId,
   AccessoryId,
-  CharacterGender
+  CharacterGender,
+  getAppearanceForCharacter
 } from '../utils/pixelSpriteCompositor';
 import { FullBodyPixelSprite } from './FullBodyPixelSprite';
 import { PixelTransitionOverlay } from './PixelTransitionOverlay';
@@ -129,79 +130,8 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
     }
     setSelectedCharacter(char);
 
-    const charGender: CharacterGender = char.genderOrSpirit === 'girl' ? 'girl' : 'boy';
-    const defaults = charGender === 'girl' ? DEFAULT_GIRL_CUSTOM : DEFAULT_BOY_CUSTOM;
-
-    let outfit: OutfitId = defaults.outfit;
-    let hairStyle: HairStyleId = defaults.hairStyle;
-    let hairColor: HairColorId = defaults.hairColor;
-    let accessory: AccessoryId = defaults.accessory;
-
-    if (char.id === 'peter-parker' || char.id === 'miles-morales') {
-      outfit = 'arachnid-suit';
-      hairStyle = 'study-tousle';
-      hairColor = 'chestnut';
-    } else if (char.id === 'gwen-stacy') {
-      outfit = 'arachnid-suit';
-      hairStyle = 'cyber-bob';
-      hairColor = 'platinum';
-    } else if (char.id === 'bruce-wayne') {
-      outfit = 'stealth-ops';
-      hairStyle = 'sleek-undercut';
-      hairColor = 'black';
-      accessory = 'hero-mask';
-    } else if (char.id === 'tony-stark') {
-      outfit = 'cyber-ronin';
-      hairStyle = 'sleek-undercut';
-      hairColor = 'black';
-      accessory = 'cyber-visor';
-    } else if (char.id === 'gojo-satoru') {
-      outfit = 'cyber-ronin';
-      hairStyle = 'anime-spikes';
-      hairColor = 'platinum';
-      accessory = 'cyber-visor';
-    } else if (char.id === 'naruto-uzumaki' || char.id === 'son-goku') {
-      outfit = 'retro-arcade';
-      hairStyle = 'anime-spikes';
-      hairColor = char.id === 'naruto-uzumaki' ? 'blonde' : 'black';
-    } else if (char.id === 'neo' || char.id === 'officer-k') {
-      outfit = 'stealth-ops';
-      hairStyle = 'sleek-undercut';
-      hairColor = 'black';
-      accessory = 'cyber-visor';
-    } else if (char.id === 'elsa') {
-      outfit = 'scholar-blazer';
-      hairStyle = 'high-ponytail';
-      hairColor = 'platinum';
-    } else if (char.id === 'wednesday-addams') {
-      outfit = 'scholar-blazer';
-      hairStyle = 'cascading-waves';
-      hairColor = 'black';
-    } else if (char.id === 'hermione-granger') {
-      outfit = 'scholar-blazer';
-      hairStyle = 'cascading-waves';
-      hairColor = 'chestnut';
-    } else if (char.id === 'cozy-study-girl') {
-      outfit = 'study-hoodie';
-      hairStyle = 'cozy-buns';
-      hairColor = 'chestnut';
-      accessory = 'headphones';
-    } else if (char.id === 'late-night-study-boy') {
-      outfit = 'study-hoodie';
-      hairStyle = 'study-tousle';
-      hairColor = 'black';
-      accessory = 'headphones';
-    }
-
-    setAppearance({
-      gender: charGender,
-      outfit,
-      hairStyle,
-      hairColor,
-      skinTone: 'fair',
-      accessory,
-      playerName,
-    });
+    const newAppearance = getAppearanceForCharacter(char, playerName);
+    setAppearance(newAppearance);
 
     const charShortName = char.name.split('(')[0].trim();
     setSpeechBubble(`Character ${charShortName} selected!`);

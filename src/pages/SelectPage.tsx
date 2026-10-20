@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ShieldCheck, Dices, Search, Filter } from 'lucide-react';
 import { CHARACTERS } from '../data/characters';
 import { Character } from '../types/character';
-import { CharacterVoxelStage } from '../components/CharacterVoxelStage';
 import { CharacterInfoPanel } from '../components/CharacterInfoPanel';
 import { PixelFaceAvatar } from '../components/PixelFaceAvatar';
 import { Footer } from '../components/Footer';
 import { audioEngine } from '../utils/audioEngine';
 import { SpiderManCustomizationMenu } from '../components/SpiderManCustomizationMenu';
-import { CustomAppearanceState } from '../utils/pixelSpriteCompositor';
+import { CustomAppearanceState, getAppearanceForCharacter } from '../utils/pixelSpriteCompositor';
+import { FullBodyPixelSprite } from '../components/FullBodyPixelSprite';
 
 export type SpiritGenderType = 'boy' | 'girl';
 export type SpiritToggleOption = 'gender-only' | 'pets-only' | 'both';
@@ -208,17 +208,28 @@ export const SelectPage: React.FC<SelectPageProps> = ({
     );
   }
 
-  // 3D Voxel Stage and Companion Roster View
+  // 2D Sprite Stage and Companion Roster View
   return (
     <div className="relative w-screen h-screen overflow-hidden select-none bg-[#090714] text-gray-200">
       {/* ========================================================================= */}
-      {/* LAYER 0 (z-0): UNBOXED FULL-SCREEN 3D BACKGROUND PLANE                    */}
+      {/* LAYER 0 (z-0): 2D SPRITE STAGE & HOLOGRAPHIC PEDESTAL (RIGHT SIDE)       */}
       {/* ========================================================================= */}
-      <CharacterVoxelStage
-        character={selectedCharacter}
-        archetypeMode={archetypeMode}
-        fullScreen={true}
-      />
+      <div className="absolute inset-0 flex items-center justify-end pr-12 lg:pr-32 pointer-events-none z-0">
+        <div className="relative pointer-events-auto transform hover:scale-105 transition-transform duration-300">
+          <FullBodyPixelSprite
+            appearance={getAppearanceForCharacter(selectedCharacter)}
+            size={420}
+            showPlatform={true}
+            platformColor={selectedCharacter.palette?.borderPrimary || '#F5C242'}
+            animated={true}
+            onClick={() => {
+              audioEngine.playClick();
+              audioEngine.playVictoryJingle(selectedCharacter.synthNotes);
+            }}
+            title={`Click ${selectedCharacter.name} for focus melody`}
+          />
+        </div>
+      </div>
 
       {/* ========================================================================= */}
       {/* LAYER 1 (z-20): TOP FLOATING TACTICAL HUD BAR                             */}

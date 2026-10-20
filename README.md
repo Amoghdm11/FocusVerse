@@ -6,17 +6,22 @@ FocusVerse is an immersive, retro-futuristic productivity environment inspired b
 
 ## ✦ Key Architectural Systems
 
-### 1. 2-Column Split Homepage & Interactive "LOCK IN" Gateway (`HomePage.tsx`)
-* **Left Column (Brand, Orbit & Telemetry):**
-  * Live quote banner, signature retro-arcade `FOCUSVERSE` logo, and cosmic subtitle.
+### 1. Living Animated Background & Decluttered 2-Column Homepage (`HomePage.tsx`)
+* **Living Animated Atmosphere (`HomeAmbientBackground.tsx`):**
+  * Multi-layered twilight & aurora gradient wash (`#0B0C1E`, `#3B1D38`, `#4A2525`, `#102A3A`).
+  * High-performance 60fps HTML5 Canvas with 130+ twinkling stars, mouse parallax reaction, 25+ drifting warm bokeh lanterns/fireflies, and periodic shooting star comets with glowing gradient tails.
+  * Layered mountain & skyline horizon silhouette with warm flickering building windows.
+  * Semi-transparent glassmorphic panels (`backdrop-blur-md bg-[#121026]/75 border border-white/15 shadow-2xl`).
+* **Left Column (Decluttered Brand, Orbit & Telemetry):**
+  * Live quote banner and signature retro-arcade `FOCUSVERSE` logo breathing cleanly without clutter.
   * Interactive 3D rotating pixel globe (`CosmicGlobe.tsx`) with dynamic LO/HI boundary measurement guides.
   * Segmented live counter blocks (`20 WORLDS ROSTER`, `4 FLOW TOOLS`, `100% SYNTH CHIPTUNE`, `0 DISTRACTIONS`).
-  * Direct session launcher (`[ ► LAUNCH QUICK SESSION ► ]`) and full companion directory links.
-* **Right Column ("LOCK IN" Gateway & 9:16 Spirit Cards):**
+  * Direct session launcher (`[ ► LAUNCH QUICK SESSION ► ]`) cleanly aligned below the stats.
+* **Right Column ("LOCK IN" Gateway & Ultra-Minimalist 9:16 Cards):**
   * **Initial State:** High-impact arcade gateway box with glowing golden-amber CTA button `[ 🔒 LOCK IN ► ]`.
-  * **Revealed State:** Smoothly reveals the `CHOOSE A COMPANION` heading with two adjacent portrait cards in strict `9:16` aspect ratio (`SpiritCard.tsx`):
-    1. **Cozy Study Girl Spirit (`aspect-[9/16]`):** Warm terracotta, sage green, autumn rain/leaves particles, steaming mug, and lo-fi attic headphones.
-    2. **Late-Night Study Boy Spirit (`aspect-[9/16]`):** Midnight navy, neon cyan/purple skyline, tungsten lamp, terminal debugger, and dark hoodie.
+  * **Revealed State:** Smoothly reveals the `CHOOSE A COMPANION` heading with two adjacent ultra-minimalist portrait cards in strict `9:16` aspect ratio (`SpiritCard.tsx`):
+    1. **Study Girl Spirit (`aspect-[9/16]`):** Rich sunset amber, terracotta, and rose-gold atmosphere with floating warm fairy lights, large-scale pixel art illustration, and clean bottom label (`STUDY GIRL` / `Cozy Flow` + `→`).
+    2. **Study Boy Spirit (`aspect-[9/16]`):** Deep midnight sapphire, indigo, and cyan atmosphere with twinkling night-sky particles, large-scale pixel art illustration, and clean bottom label (`STUDY BOY` / `Night Focus` + `→`).
   * Selecting either card instantly navigates to the 3D Dressing Room pre-filtered to that companion spirit!
 
 ---
@@ -64,9 +69,9 @@ FocusVerse is an immersive, retro-futuristic productivity environment inspired b
 
 ## ✦ Interface Showcase
 
-| 2-Column Homepage (Interactive Lock In) | Revealed 9:16 Companion Spirit Cards |
+| Living Background & Decluttered Homepage | Revealed Ultra-Minimalist 9:16 Companion Cards |
 | :---: | :---: |
-| ![Homepage 2-Column](docs/screenshots/home_full_lockin_initial.png) | ![9:16 Spirit Cards](docs/screenshots/home_spirit_revealed_full.png) |
+| ![Homepage Initial](docs/screenshots/home_polished_decluttered_initial.png) | ![9:16 Spirit Cards](docs/screenshots/home_minimalist_916_revealed.png) |
 
 | 3D Dressing Room (Girl Spirits Filter) | 3D Dressing Room (Boy Spirits Filter) |
 | :---: | :---: |

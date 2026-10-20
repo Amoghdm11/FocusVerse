@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Play, Sparkles, ShieldCheck, Lock, ChevronLeft, Compass, Users } from 'lucide-react';
+import { Play, Sparkles, ShieldCheck, Lock, ChevronLeft } from 'lucide-react';
 import { CHARACTERS } from '../data/characters';
 import { Character } from '../types/character';
 import { CosmicGlobe } from '../components/CosmicGlobe';
 import { SpiritCard } from '../components/SpiritCard';
 import { Footer } from '../components/Footer';
+import { HomeAmbientBackground } from '../components/HomeAmbientBackground';
 import { audioEngine } from '../utils/audioEngine';
 
 interface HomePageProps {
@@ -33,10 +34,13 @@ export const HomePage: React.FC<HomePageProps> = ({
   };
 
   return (
-    <div className="relative min-h-screen text-gray-200 flex flex-col justify-between selection:bg-arcade-gold selection:text-black">
+    <div className="relative min-h-screen text-gray-200 flex flex-col justify-between selection:bg-arcade-gold selection:text-black overflow-x-hidden">
+      {/* --- LIVING ANIMATED BACKGROUND (Twilight Aurora, Canvas Starfield & Floating Orbs) --- */}
+      <HomeAmbientBackground />
+
       {/* Top Copyright-Safe Mode & Kernel Status Banner */}
-      <div className="w-full px-4 pt-3 max-w-7xl mx-auto">
-        <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-1.5 bg-void-darkest border border-arcade-border text-[11px] font-mono select-none">
+      <div className="w-full px-4 pt-3 max-w-7xl mx-auto relative z-10">
+        <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-1.5 bg-[#0D0B1E]/80 backdrop-blur-md border border-white/15 text-[11px] font-mono select-none shadow-sm">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 bg-green-400 animate-ping" />
             <span className="text-arcade-gold font-bold">FOCUSVERSE KERNEL v2.6</span>
@@ -63,7 +67,7 @@ export const HomePage: React.FC<HomePageProps> = ({
       </div>
 
       {/* --- BALANCED 2-COLUMN SPLIT CONTAINER --- */}
-      <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 md:py-10 flex-1 flex items-center">
+      <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 md:py-10 flex-1 flex items-center relative z-10">
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* ========================================================= */}
@@ -72,20 +76,17 @@ export const HomePage: React.FC<HomePageProps> = ({
           <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left space-y-6">
             
             {/* Top Narrative Dialog Banner */}
-            <div className="inline-block relative px-4 py-2 bg-void-card pixel-border border-arcade-border shadow-pixel">
+            <div className="inline-block relative px-4 py-2 bg-[#121026]/80 backdrop-blur-md pixel-border border border-arcade-gold/40 shadow-pixel">
               <div className="font-pixel text-[10px] sm:text-xs text-arcade-gold tracking-wider uppercase">
                 &gt; &quot;8.2 billion people. 20 worlds to find your focus.&quot;
               </div>
             </div>
 
-            {/* Main Brand Title & Subtitle */}
-            <div className="space-y-2">
-              <h1 className="font-pixel text-3xl sm:text-5xl md:text-6xl text-white tracking-tight uppercase drop-shadow-[0_4px_16px_rgba(245,194,66,0.3)]">
+            {/* Main Brand Title (Cleanly Breathing Above Globe - Description Removed) */}
+            <div>
+              <h1 className="font-pixel text-3xl sm:text-5xl md:text-6xl text-white tracking-tight uppercase drop-shadow-[0_4px_20px_rgba(245,194,66,0.35)]">
                 FOCUS<span className="text-arcade-gold">VERSE</span>
               </h1>
-              <p className="font-mono text-xs sm:text-sm text-gray-300 max-w-xl leading-relaxed">
-                A Pixel-Arcade &amp; Live-Code Character Productivity Sanctuary. Inspired by Synergy&apos;26 and cosmic retro-futuristic code visualizers.
-              </p>
             </div>
 
             {/* Rotating Pixel Globe / Node Visualizer */}
@@ -93,27 +94,27 @@ export const HomePage: React.FC<HomePageProps> = ({
               <CosmicGlobe onNodeClick={() => onSelectCompanion()} />
             </div>
 
-            {/* Segmented Synergy-Style Live Counter Blocks */}
+            {/* Segmented Synergy-Style Live Counter Blocks (Glassmorphic) */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full max-w-xl select-none">
-              <div className="bg-void-darkest pixel-border border-arcade-border p-3 text-center">
+              <div className="bg-[#121026]/75 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-pixel transition-all hover:border-arcade-gold hover:shadow-[0_0_15px_rgba(245,194,66,0.2)]">
                 <div className="font-pixel text-lg sm:text-xl text-arcade-gold">20</div>
                 <div className="font-silkscreen text-[9px] text-gray-400 mt-1 uppercase tracking-wider">
                   WORLDS ROSTER
                 </div>
               </div>
-              <div className="bg-void-darkest pixel-border border-arcade-border p-3 text-center">
+              <div className="bg-[#121026]/75 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-pixel transition-all hover:border-arcade-cyan hover:shadow-[0_0_15px_rgba(92,225,230,0.2)]">
                 <div className="font-pixel text-lg sm:text-xl text-arcade-cyan">4</div>
                 <div className="font-silkscreen text-[9px] text-gray-400 mt-1 uppercase tracking-wider">
                   FLOW TOOLS
                 </div>
               </div>
-              <div className="bg-void-darkest pixel-border border-arcade-border p-3 text-center">
+              <div className="bg-[#121026]/75 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-pixel transition-all hover:border-arcade-pink hover:shadow-[0_0_15px_rgba(255,0,127,0.2)]">
                 <div className="font-pixel text-lg sm:text-xl text-arcade-pink">100%</div>
                 <div className="font-silkscreen text-[9px] text-gray-400 mt-1 uppercase tracking-wider">
                   SYNTH CHIPTUNE
                 </div>
               </div>
-              <div className="bg-void-darkest pixel-border border-arcade-border p-3 text-center">
+              <div className="bg-[#121026]/75 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-pixel transition-all hover:border-green-400 hover:shadow-[0_0_15px_rgba(74,222,128,0.2)]">
                 <div className="font-pixel text-lg sm:text-xl text-green-400">0</div>
                 <div className="font-silkscreen text-[9px] text-gray-400 mt-1 uppercase tracking-wider">
                   DISTRACTIONS
@@ -121,28 +122,17 @@ export const HomePage: React.FC<HomePageProps> = ({
               </div>
             </div>
 
-            {/* Primary Action Buttons */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
+            {/* Primary Action Button (Single Clean Button - "View All" Removed) */}
+            <div className="flex items-center justify-center lg:justify-start pt-1 w-full max-w-xl">
               <button
                 onClick={() => {
                   audioEngine.playClick();
                   onLaunchQuickSession(CHARACTERS[0]); // Peter Parker default quick launch
                 }}
-                className="pixel-btn-primary px-5 py-3 font-silkscreen text-xs sm:text-sm uppercase flex items-center gap-2 shadow-pixel"
+                className="pixel-btn-primary w-full sm:w-auto px-8 py-3.5 font-silkscreen text-xs sm:text-sm uppercase flex items-center justify-center gap-2.5 shadow-[0_0_20px_rgba(245,194,66,0.35)] hover:scale-105 transition-all"
               >
                 <Play size={14} fill="currentColor" />
                 <span>► LAUNCH QUICK SESSION ►</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  audioEngine.playClick();
-                  onSelectCompanion();
-                }}
-                className="pixel-btn px-4 py-3 font-silkscreen text-xs text-arcade-gold hover:text-white uppercase flex items-center gap-2"
-              >
-                <Compass size={14} />
-                <span>VIEW ALL 20 COMPANIONS ▶</span>
               </button>
             </div>
           </div>
@@ -154,17 +144,17 @@ export const HomePage: React.FC<HomePageProps> = ({
             <div className="w-full max-w-md">
               {!isLockedIn ? (
                 /* --- INITIAL STATE: HIGH-IMPACT ARCADE "LOCK IN" BUTTON --- */
-                <div className="bg-void-darkest pixel-border border-2 border-arcade-border p-6 sm:p-8 text-center shadow-[0_4px_24px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col items-center justify-center min-h-[440px] transition-all duration-300">
+                <div className="bg-[#121026]/75 backdrop-blur-md pixel-border border-2 border-white/15 p-6 sm:p-8 text-center shadow-[0_4px_30px_rgba(0,0,0,0.8)] relative overflow-hidden flex flex-col items-center justify-center min-h-[440px] transition-all duration-300 hover:border-arcade-gold/50">
                   {/* Subtle retro grid background */}
                   <div className="absolute inset-0 bg-[radial-gradient(#3E356B_1px,transparent_1px)] [background-size:16px_16px] opacity-20 pointer-events-none" />
 
                   {/* Top telemetry stamp */}
-                  <div className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-4">
+                  <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-4">
                     FOCUS GATEWAY // SEC_01
                   </div>
 
                   {/* Glowing Icon Frame */}
-                  <div className="w-16 h-16 mb-5 border-2 border-arcade-gold flex items-center justify-center bg-amber-950/30 shadow-[0_0_20px_rgba(245,194,66,0.3)]">
+                  <div className="w-16 h-16 mb-5 border-2 border-arcade-gold flex items-center justify-center bg-amber-950/40 shadow-[0_0_25px_rgba(245,194,66,0.35)]">
                     <Lock className="w-8 h-8 text-arcade-gold animate-pulse" />
                   </div>
 
@@ -194,10 +184,10 @@ export const HomePage: React.FC<HomePageProps> = ({
                   </div>
                 </div>
               ) : (
-                /* --- REVEALED STATE: TWO 9:16 PORTRAIT SPIRIT CARDS --- */
-                <div className="bg-void-darkest pixel-border border-2 border-arcade-gold p-4 sm:p-5 shadow-[0_0_35px_rgba(245,194,66,0.2)] relative transition-all duration-300 animate-fadeIn">
+                /* --- REVEALED STATE: ULTRA-MINIMALIST 9:16 COMPANION CARDS --- */
+                <div className="bg-[#121026]/85 backdrop-blur-md pixel-border border-2 border-arcade-gold/70 p-4 sm:p-5 shadow-[0_0_40px_rgba(245,194,66,0.18)] relative transition-all duration-300 animate-fadeIn">
                   {/* Revealed Header */}
-                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-arcade-border select-none">
+                  <div className="flex items-center justify-between pb-3 mb-4 border-b border-white/10 select-none">
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 bg-arcade-gold animate-ping" />
                       <h2 className="font-pixel text-[11px] sm:text-xs text-arcade-gold uppercase tracking-wider">
@@ -210,7 +200,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                         audioEngine.playClick();
                         setIsLockedIn(false);
                       }}
-                      className="pixel-btn px-2 py-1 text-[10px] font-mono text-gray-400 hover:text-white flex items-center gap-1"
+                      className="pixel-btn px-2.5 py-1 text-[10px] font-mono text-gray-300 hover:text-white hover:border-arcade-gold flex items-center gap-1 transition-all"
                       title="Collapse to Lock In button"
                     >
                       <ChevronLeft size={12} />
@@ -218,33 +208,19 @@ export const HomePage: React.FC<HomePageProps> = ({
                     </button>
                   </div>
 
-                  {/* The Two Adjacent 9:16 Portrait Cards */}
+                  {/* The Two Adjacent 9:16 Portrait Cards (Ultra-Clean, Seamlessly Interactive) */}
                   <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                    {/* Card 1: Cozy Study Girl Spirit */}
+                    {/* Card 1: Study Girl Spirit */}
                     <SpiritCard
                       type="girl"
                       onClick={() => handleSpiritChoice('girl')}
                     />
 
-                    {/* Card 2: Late-Night Study Boy Spirit */}
+                    {/* Card 2: Study Boy Spirit */}
                     <SpiritCard
                       type="boy"
                       onClick={() => handleSpiritChoice('boy')}
                     />
-                  </div>
-
-                  {/* Quick Browse Link below cards */}
-                  <div className="text-center pt-3 mt-1 border-t border-arcade-border/60">
-                    <button
-                      onClick={() => {
-                        audioEngine.playClick();
-                        onSelectCompanion();
-                      }}
-                      className="text-[10px] font-mono text-arcade-cyan hover:text-arcade-gold underline flex items-center justify-center gap-1 mx-auto"
-                    >
-                      <Users size={12} />
-                      <span>Prefer to browse all 20 companions? Open Dressing Room ▶</span>
-                    </button>
                   </div>
                 </div>
               )}

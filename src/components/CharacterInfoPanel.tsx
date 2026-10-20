@@ -62,12 +62,12 @@ export const CharacterInfoPanel: React.FC<CharacterInfoPanelProps> = ({
           </button>
         </div>
 
-        {/* Character Title & 16x16 Pixel Face */}
+        {/* Character Title & 64x64 Pixel Face */}
         <div className="flex items-start gap-3 mb-3">
           <PixelFaceAvatar
             characterId={character.id}
-            size={48}
-            className="border-2 border-arcade-gold/80 shadow-pixel-sm p-0.5 bg-black/60 shrink-0 mt-0.5"
+            size={56}
+            className="w-14 h-14 border-2 border-arcade-gold/80 shadow-[0_0_8px_rgba(245,194,66,0.4)] p-0 bg-black/60 shrink-0 mt-0.5"
             title={character.name}
           />
           <div className="flex-1 min-w-0">

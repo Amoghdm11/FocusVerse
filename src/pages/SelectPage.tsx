@@ -460,28 +460,30 @@ export const SelectPage: React.FC<SelectPageProps> = ({
                         {isFav && <span className="text-arcade-gold">★</span>}
                       </div>
 
-                      {/* 32x32 Pixel Art Character Face (Displayed at 56x56px) */}
-                      <div className="my-1">
+                      {/* 64x64 Full-Face Pixel Art Sprite (Displayed at 64x64px, Zero Inner Padding) */}
+                      <div className="my-1 flex items-center justify-center">
                         <PixelFaceAvatar
                           characterId={char.id}
-                          size={56}
-                          className={`border ${
-                            isSelected ? 'border-arcade-gold shadow-pixel-sm' : 'border-[#3E356B]'
+                          size={64}
+                          className={`w-16 h-16 border-2 transition-all p-0 ${
+                            isSelected
+                              ? 'border-arcade-gold shadow-[0_0_10px_rgba(245,194,66,0.6)]'
+                              : 'border-[#3E356B] hover:border-arcade-gold/50'
                           }`}
                           title={char.name}
                         />
                       </div>
 
                       {/* Character Title */}
-                      <div className="w-full mt-1">
-                        <div className={`font-pixel text-[9px] leading-tight truncate ${
+                      <div className="w-full mt-1 px-0.5">
+                        <div className={`font-pixel text-[11px] leading-tight line-clamp-1 ${
                           isSelected ? 'text-white' : 'text-gray-300'
                         }`}>
                           {archetypeMode
                             ? char.archetypeName.split('/')[0].trim()
                             : char.name.split('(')[0].trim()}
                         </div>
-                        <div className="text-[8px] font-mono text-gray-500 uppercase truncate mt-0.5">
+                        <div className="text-[9px] font-mono text-gray-500 uppercase truncate mt-0.5">
                           {char.category.split('&')[0].trim()}
                         </div>
                       </div>

@@ -93,7 +93,7 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
       if (!fullScreen || w < 1024) return 0;
       const aspect = w / h;
       const visibleHalfWidth = Math.tan((36 * Math.PI) / 360) * 12.0 * aspect;
-      return visibleHalfWidth * 0.36; // ~68% screen horizontal position
+      return visibleHalfWidth * 0.28; // ~64% screen horizontal position (centered in open right viewport, zero clipping)
     };
 
     const initialTargetX = computeTargetX(width, height);

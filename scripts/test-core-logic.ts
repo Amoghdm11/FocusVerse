@@ -29,6 +29,9 @@ import { rpgStore, getTodayDateString } from '../src/utils/rpgStore.ts';
 import { aiService } from '../src/utils/aiService.ts';
 import { MINECRAFT_STUDY_COLLECTION } from '../src/data/minecraftTracks.ts';
 import { TUTOR_ARCHETYPES, CORE_TUTOR_PROFILES } from '../src/data/tutorArchetypes.ts';
+import { TUTOR_ECOSYSTEM_PROFILES, DEFAULT_STUDY_SQUADS, DEFAULT_FOCUS_PRESETS } from '../src/data/tutorProfiles.ts';
+import { CHARACTERS } from '../src/data/characters.ts';
+import { tutorDialogueService } from '../src/utils/tutorDialogueService.ts';
 
 async function runTests() {
   console.log('--- STARTING FOCUSVERSE COMPREHENSIVE AUDIT & LOGIC SUITE ---');
@@ -192,6 +195,111 @@ Dijkstra algorithm calculates the shortest path from a single source node to all
   assert(sweden !== undefined, 'C418 Sweden track present');
   assert(sweden?.youtubeId === 'aBkTkxKDduc', 'Valid YouTube video identifier associated with Sweden');
   assert(sweden?.proceduralFallbackProfile === 'lofi', 'Safe procedural fallback profile configured');
+
+  // 11. 20-TUTOR ECOSYSTEM INTEGRITY
+  assert(CHARACTERS.length === 20, 'Existing 20 3D characters preserved intact');
+  assert(Object.keys(TUTOR_ECOSYSTEM_PROFILES).length === 20, 'All 20 characters have complete ecosystem profiles');
+  let validProfilesCount = 0;
+  for (const char of CHARACTERS) {
+    const prof = TUTOR_ECOSYSTEM_PROFILES[char.id];
+    if (
+      prof &&
+      prof.name.length > 0 &&
+      prof.primarySpecialty.length > 0 &&
+      prof.secondarySpecialties.length > 0 &&
+      prof.suggestedDuration > 0 &&
+      prof.challenges.length >= 3 &&
+      prof.dialogue.greetings.length >= 2 &&
+      prof.dialogue.onStart.length >= 1 &&
+      prof.dialogue.onSessionComplete.length >= 1
+    ) {
+      validProfilesCount++;
+    }
+  }
+  assert(validProfilesCount === 20, 'Every one of the 20 tutors has valid specialties, durations, 3+ challenges, and dialogue sets');
+
+  // 12. AFFINITY PROGRESSION & COSMETICS
+  const initialAffinity = rpgStore.getTutorAffinity('peter-parker');
+  assert(initialAffinity.affinityLevel === 1, 'Initial tutor affinity is Level 1');
+  const affProgress = rpgStore.recordTutorFocusMinutes('peter-parker', 100, true, 0);
+  assert(affProgress.affinity.affinityXp > 0, 'Tutor affinity XP increased after focus session');
+  assert(affProgress.affinity.totalMinutesFocused === 100, 'Total minutes focused recorded accurately');
+  assert(affProgress.affinity.affinityLevel >= 2, 'Tutor leveled up to Level 2 after meeting XP threshold');
+
+  // 13. TUTOR CHALLENGES ADVANCEMENT
+  const peterChallenges = rpgStore.getTutorChallenges('peter-parker');
+  assert(peterChallenges.length >= 3, 'Tutor has at least 3 distinct challenges');
+  const firstChallenge = peterChallenges[0];
+  const prevProg = firstChallenge.progress;
+  rpgStore.advanceTutorChallenge(firstChallenge.type, 50, 'peter-parker');
+  const updatedPeterChallenges = rpgStore.getTutorChallenges('peter-parker');
+  const updatedChallenge = updatedPeterChallenges.find((c) => c.id === firstChallenge.id);
+  assert(updatedChallenge !== undefined && updatedChallenge.progress >= prevProg, 'Challenge progress advanced accurately');
+
+  // 14. STUDY SQUADS (3-TUTOR COMPOSITION)
+  const defaultSquads = rpgStore.getStudySquads();
+  assert(defaultSquads.length >= 4, 'Default study squads initialized');
+  const newSquad = rpgStore.addStudySquad({
+    name: 'Cybernetic Focus Trio',
+    description: 'High-intensity coding and systems analysis squad',
+    leadTutorId: 'officer-k',
+    supportTutorIds: ['neo', 'tony-stark'],
+    recommendedSubjects: ['Computer Science', 'Cybersecurity'],
+    bonusDescription: '+15% Tech Focus Efficiency',
+    icon: '⚡',
+  });
+  assert(newSquad.leadTutorId === 'officer-k', 'Study squad created with designated lead');
+  assert(newSquad.supportTutorIds.length === 2, 'Study squad enforces exactly 2 support companions');
+  assert(rpgStore.getStudySquads().some((s) => s.id === newSquad.id), 'New squad persisted in storage');
+
+  // 15. FOCUS PRESETS (SESSION RECIPES)
+  const defaultPresets = rpgStore.getFocusPresets();
+  assert(defaultPresets.length >= 4, 'Default focus presets initialized');
+  const customPreset = rpgStore.addFocusPreset({
+    name: 'Speed Flashcard Sprint',
+    description: '15m quick recall burst',
+    tutorId: 'peter-parker',
+    subject: 'Biology',
+    focusMinutes: 15,
+    breakMinutes: 3,
+    ambienceTrackId: 'mc-sweden',
+    icon: '⚡',
+  });
+  assert(customPreset.focusMinutes === 15, 'Preset saved with exact duration');
+  assert(rpgStore.getFocusPresets().some((p) => p.id === customPreset.id), 'Custom preset persisted');
+
+  // 16. SUBJECT-TO-TUTOR MAPPING
+  rpgStore.assignTutorToSubject('Quantum Physics', 'tony-stark');
+  assert(rpgStore.getTutorForSubject('Quantum Physics') === 'tony-stark', 'Subject mapped directly to designated specialist tutor');
+
+  // 17. TUTOR REAL ANALYTICS ENGINE
+  rpgStore.addSession({
+    durationMinutes: 45,
+    plannedMinutes: 45,
+    timerType: 'POMODORO',
+    subject: 'Computer Science',
+    tutorId: 'peter-parker',
+    distractionCount: 1,
+    completed: true,
+  });
+  const tutorAnalytics = rpgStore.getTutorAnalytics();
+  assert(Array.isArray(tutorAnalytics), 'Tutor analytics returns an array');
+  assert(tutorAnalytics.length === 20, 'Tutor analytics covers all 20 companions');
+  const peterStats = tutorAnalytics.find((s) => s.tutorId === 'peter-parker');
+  assert(peterStats !== undefined && peterStats.totalMinutes >= 45, 'Peter Parker analytics reflects real session minutes');
+
+  // 18. EVENT-DRIVEN TUTOR DIALOGUE SERVICE
+  const dialogueResult = tutorDialogueService.triggerEvent('SESSION_START', 'peter-parker');
+  assert(dialogueResult !== null, 'Dialogue service returns in-character dialogue on session start');
+  assert(dialogueResult?.tutorName?.includes('Peter Parker') === true, 'Dialogue identified correctly with Peter Parker');
+  assert(dialogueResult?.message.length! > 0, 'Dialogue message body is non-empty');
+
+  // Muted dialogue check
+  const savedSettings = rpgStore.getSettings();
+  rpgStore.saveSettings({ ...savedSettings, tutorDialogueFrequency: 'MUTED' });
+  const mutedResult = tutorDialogueService.triggerEvent('SESSION_START', 'peter-parker');
+  assert(mutedResult === null, 'Dialogue returns null when muted');
+  rpgStore.saveSettings(savedSettings); // restore
 
   console.log(`\nTEST RESULTS: ${passed} passed, ${failed} failed.`);
   if (failed > 0) {

@@ -192,4 +192,139 @@ export interface AppSettings {
     longBreak: number;
     sessionsBeforeLong: number;
   };
+  tutorDialogueFrequency: 'ALL' | 'ESSENTIAL' | 'MUTED';
+}
+
+// ========================================================
+// --- 20-TUTOR COMPREHENSIVE ECOSYSTEM ARCHITECTURE ---
+// ========================================================
+
+export type TutorDifficultyPreference = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'ALL_LEVELS';
+
+export interface TutorDialogueSet {
+  greetings: string[];
+  onStart: string[];
+  onPause: string[];
+  onResume: string[];
+  onBreak: string[];
+  onBreakReturn: string[];
+  onTaskComplete: string[];
+  onSessionComplete: string[];
+  onSessionInterrupted: string[];
+  onDailyGoalReached: string[];
+  onFlashcardReview: string[];
+  onStrugglingTask: string[];
+  onPersonalBest: string[];
+  onTutorSelected: string[];
+  unlockedDialogue: string[];
+}
+
+export interface TutorChallenge {
+  id: string;
+  tutorId: string;
+  title: string;
+  description: string;
+  requirement: string;
+  target: number;
+  progress: number;
+  completed: boolean;
+  xpReward: number;
+  affinityReward: number;
+  type: 'FOCUS_MINUTES' | 'SESSIONS_COUNT' | 'ZERO_DISTRACTIONS' | 'TASKS_COMPLETED' | 'FLASHCARDS_REVIEWED' | 'REFLECTION_LOGGED';
+}
+
+export interface TutorEcosystemProfile {
+  id: string; // matches Character.id
+  name: string;
+  characterIndex: string; // e.g. "01/20"
+  archetype: RPGTutorArchetype;
+  communicationStyle: string;
+  tone: string;
+  encouragementStyle: string;
+  preferredStudyMethods: string[];
+  suggestedDuration: number;
+  suggestedBreak: number;
+  primarySpecialty: string;
+  secondarySpecialties: string[];
+  difficultyPreference: TutorDifficultyPreference;
+  shortBio: string;
+  dialogue: TutorDialogueSet;
+  challenges: TutorChallenge[];
+}
+
+export interface TutorAffinityRecord {
+  tutorId: string;
+  sessionsCompleted: number;
+  totalMinutesFocused: number;
+  tasksCompletedWithTutor: number;
+  distractionsLogged: number;
+  challengesCompleted: string[]; // array of challenge IDs
+  affinityLevel: number; // Level 1 to 5
+  affinityXp: number;
+  nextLevelAffinityXp: number;
+  unlockedCosmetics: string[];
+  lastStudiedDate: string; // YYYY-MM-DD
+}
+
+export interface SubjectTutorAssignment {
+  id: string;
+  subject: string;
+  tutorId: string;
+  assignedAt: number;
+}
+
+export interface StudySquad {
+  id: string;
+  name: string;
+  description: string;
+  leadTutorId: string;
+  supportTutorIds: string[]; // up to 2 supporting tutors
+  purposeSubject?: string;
+  preferredTimerDuration?: number;
+  preferredBreakDuration?: number;
+  environmentId?: string;
+  ambienceProfile?: string;
+  isDefault?: boolean;
+  createdAt: number;
+}
+
+export interface FocusPreset {
+  id: string;
+  name: string;
+  description: string;
+  tutorId: string;
+  squadId?: string;
+  subject: string;
+  focusMinutes: number;
+  shortBreakMinutes: number;
+  longBreakMinutes: number;
+  environmentId: string;
+  ambienceProfile: string;
+  taskCategory?: string;
+  isFavorite?: boolean;
+  isDefault?: boolean;
+  createdAt: number;
+}
+
+export interface TutorPerformanceStat {
+  tutorId: string;
+  tutorName: string;
+  totalMinutes: number;
+  totalSessions: number;
+  averageSessionMinutes: number;
+  tasksCompleted: number;
+  distractionsLogged: number;
+  completionRate: number; // 0 to 100 percentage
+  mostStudiedSubject: string;
+}
+
+export interface TutorCosmeticUnlock {
+  id: string;
+  tutorId: string;
+  title: string;
+  type: 'NAMEPLATE' | 'PROFILE_FRAME' | 'DASHBOARD_THEME' | 'SPECIAL_DIALOGUE';
+  description: string;
+  requiredAffinityLevel: number;
+  icon: string;
+  unlocked: boolean;
 }

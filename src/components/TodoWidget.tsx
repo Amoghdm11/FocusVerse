@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CheckSquare, Square, Trash2, Plus, Sparkles, AlertCircle } from 'lucide-react';
 import { audioEngine } from '../utils/audioEngine';
+import { tutorDialogueService } from '../utils/tutorDialogueService';
 
 export type TaskPriority = 'HIGH' | 'MED' | 'LOW';
 
@@ -71,6 +72,7 @@ export const TodoWidget: React.FC<TodoWidgetProps> = ({
     if (willBeCompleted) {
       audioEngine.playTaskComplete();
       triggerPixelSparks();
+      tutorDialogueService.triggerEvent('TASK_COMPLETE');
     } else {
       audioEngine.playClick();
     }

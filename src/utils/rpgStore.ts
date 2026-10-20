@@ -11,9 +11,23 @@ import {
   DailyReflection, 
   AppSettings, 
   CustomTutorProfile,
-  StudyRoom
+  StudyRoom,
+  TutorAffinityRecord,
+  TutorChallenge,
+  SubjectTutorAssignment,
+  StudySquad,
+  FocusPreset,
+  TutorPerformanceStat,
+  TutorCosmeticUnlock
 } from '../types/rpg';
 import { CORE_TUTOR_PROFILES } from '../data/tutorArchetypes';
+import { 
+  TUTOR_ECOSYSTEM_PROFILES, 
+  DEFAULT_STUDY_SQUADS, 
+  DEFAULT_FOCUS_PRESETS, 
+  TUTOR_COSMETIC_UNLOCKS 
+} from '../data/tutorProfiles';
+import { CHARACTERS } from '../data/characters';
 
 // Helper for formatted today's date YYYY-MM-DD
 export const getTodayDateString = (d: Date = new Date()): string => {
@@ -38,6 +52,7 @@ const DEFAULT_SETTINGS: AppSettings = {
     longBreak: 15,
     sessionsBeforeLong: 4,
   },
+  tutorDialogueFrequency: 'ALL',
 };
 
 const INITIAL_ACHIEVEMENTS: Achievement[] = [
@@ -224,6 +239,18 @@ class RPGStore {
     this.advanceQuestProgress('SESSIONS', 1);
     this.advanceQuestProgress('MINUTES', session.durationMinutes);
 
+    // Record Tutor Affinity & Advance Tutor Challenges
+    if (session.tutorId) {
+      this.recordTutorFocusMinutes(session.tutorId, session.durationMinutes, session.completed, session.distractionCount || 0);
+      this.advanceTutorChallenge('FOCUS_MINUTES', session.durationMinutes, session.tutorId);
+      if (session.completed) {
+        this.advanceTutorChallenge('SESSIONS_COUNT', 1, session.tutorId);
+      }
+      if (session.distractionCount === 0) {
+        this.advanceTutorChallenge('ZERO_DISTRACTIONS', 1, session.tutorId);
+      }
+    }
+
     return record;
   }
 
@@ -381,6 +408,9 @@ class RPGStore {
       this.unlockAchievement('first_task');
       const completedCount = tasks.filter((t) => t.completed).length;
       if (completedCount >= 10) this.unlockAchievement('task_10');
+
+      // Advance tutor challenges
+      this.advanceTutorChallenge('TASKS_COMPLETED', 1);
     }
 
     return willBeCompleted;
@@ -603,6 +633,9 @@ class RPGStore {
     this.awardXp(15, 'Reviewed flashcard');
     this.advanceQuestProgress('FLASHCARDS', 1);
     this.unlockAchievement('recall_master');
+
+    // Advance tutor challenges
+    this.advanceTutorChallenge('FLASHCARDS_REVIEWED', 1);
 
     return updated;
   }
@@ -866,6 +899,469 @@ class RPGStore {
     } catch (_) {}
   }
 
+  // ========================================================
+  // --- 20-TUTOR ECOSYSTEM PROGRESSION & AFFINITY ---
+  // ========================================================
+
+  public getAllTutorAffinities(): Record<string, TutorAffinityRecord> {
+    try {
+      const data = localStorage.getItem('focusverse_tutor_affinities');
+      if (data) return JSON.parse(data);
+    } catch (_) {}
+
+    // Initialize all 20 tutors at Level 1 (New Acquaintance)
+    const initial: Record<string, TutorAffinityRecord> = {};
+    for (const char of CHARACTERS) {
+      initial[char.id] = {
+        tutorId: char.id,
+        sessionsCompleted: 0,
+        totalMinutesFocused: 0,
+        tasksCompletedWithTutor: 0,
+        distractionsLogged: 0,
+        challengesCompleted: [],
+        affinityLevel: 1,
+        affinityXp: 0,
+        nextLevelAffinityXp: 50,
+        unlockedCosmetics: [],
+        lastStudiedDate: '',
+      };
+    }
+    this.saveTutorAffinities(initial);
+    return initial;
+  }
+
+  public getTutorAffinity(tutorId: string): TutorAffinityRecord {
+    const affinities = this.getAllTutorAffinities();
+    if (!affinities[tutorId]) {
+      affinities[tutorId] = {
+        tutorId,
+        sessionsCompleted: 0,
+        totalMinutesFocused: 0,
+        tasksCompletedWithTutor: 0,
+        distractionsLogged: 0,
+        challengesCompleted: [],
+        affinityLevel: 1,
+        affinityXp: 0,
+        nextLevelAffinityXp: 50,
+        unlockedCosmetics: [],
+        lastStudiedDate: '',
+      };
+      this.saveTutorAffinities(affinities);
+    }
+    return affinities[tutorId];
+  }
+
+  public saveTutorAffinities(affinities: Record<string, TutorAffinityRecord>) {
+    try {
+      localStorage.setItem('focusverse_tutor_affinities', JSON.stringify(affinities));
+    } catch (_) {}
+  }
+
+  public recordTutorFocusMinutes(
+    tutorId: string,
+    minutes: number,
+    completed: boolean,
+    distractions: number = 0
+  ): { affinity: TutorAffinityRecord; leveledUp: boolean; newLevel: number } {
+    const affinities = this.getAllTutorAffinities();
+    const record = affinities[tutorId] || {
+      tutorId,
+      sessionsCompleted: 0,
+      totalMinutesFocused: 0,
+      tasksCompletedWithTutor: 0,
+      distractionsLogged: 0,
+      challengesCompleted: [],
+      affinityLevel: 1,
+      affinityXp: 0,
+      nextLevelAffinityXp: 50,
+      unlockedCosmetics: [],
+      lastStudiedDate: '',
+    };
+
+    record.totalMinutesFocused += minutes;
+    record.distractionsLogged += distractions;
+    record.lastStudiedDate = getTodayDateString();
+    if (completed) {
+      record.sessionsCompleted += 1;
+    }
+
+    // Award Affinity XP: 1 XP per 2 minutes + 10 XP bonus for completion
+    const xpGain = Math.round(minutes * 0.5) + (completed ? 10 : 0);
+    record.affinityXp += xpGain;
+
+    let leveledUp = false;
+    let currentLvl = record.affinityLevel;
+
+    // Thresholds: Level 1 (0), Level 2 (50), Level 3 (150), Level 4 (300), Level 5 (500)
+    const levelThresholds = [0, 50, 150, 300, 500, 999999];
+    while (currentLvl < 5 && record.affinityXp >= levelThresholds[currentLvl]) {
+      currentLvl += 1;
+      leveledUp = true;
+    }
+
+    record.affinityLevel = currentLvl;
+    record.nextLevelAffinityXp = levelThresholds[currentLvl] || 999999;
+
+    affinities[tutorId] = record;
+    this.saveTutorAffinities(affinities);
+
+    if (leveledUp) {
+      window.dispatchEvent(
+        new CustomEvent('focusverse_tutor_affinity_up', {
+          detail: { tutorId, newLevel: currentLvl },
+        })
+      );
+    }
+
+    return { affinity: record, leveledUp, newLevel: currentLvl };
+  }
+
+  // --- TUTOR CHALLENGES ---
+  public getTutorChallenges(tutorId?: string): TutorChallenge[] {
+    try {
+      const data = localStorage.getItem('focusverse_tutor_challenges');
+      if (data) {
+        const parsed: TutorChallenge[] = JSON.parse(data);
+        return tutorId ? parsed.filter((c) => c.tutorId === tutorId) : parsed;
+      }
+    } catch (_) {}
+
+    // Initialize all challenges from TUTOR_ECOSYSTEM_PROFILES
+    const initial: TutorChallenge[] = [];
+    for (const id in TUTOR_ECOSYSTEM_PROFILES) {
+      const p = TUTOR_ECOSYSTEM_PROFILES[id];
+      if (p.challenges) {
+        initial.push(...p.challenges);
+      }
+    }
+    this.saveTutorChallenges(initial);
+    return tutorId ? initial.filter((c) => c.tutorId === tutorId) : initial;
+  }
+
+  public saveTutorChallenges(challenges: TutorChallenge[]) {
+    try {
+      localStorage.setItem('focusverse_tutor_challenges', JSON.stringify(challenges));
+    } catch (_) {}
+  }
+
+  public advanceTutorChallenge(
+    type: TutorChallenge['type'],
+    amount: number,
+    tutorId?: string
+  ): { completedChallenges: TutorChallenge[] } {
+    const all = this.getTutorChallenges();
+    const completedList: TutorChallenge[] = [];
+
+    const updated = all.map((c) => {
+      // If challenge already completed, do not re-claim
+      if (c.completed) return c;
+
+      // Filter by tutor if specified
+      if (tutorId && c.tutorId !== tutorId) return c;
+
+      if (c.type === type) {
+        const nextProgress = c.progress + amount;
+        if (nextProgress >= c.target) {
+          const completedChal: TutorChallenge = { ...c, progress: c.target, completed: true };
+          completedList.push(completedChal);
+
+          // Award general profile XP
+          this.awardXp(c.xpReward, `Cleared Challenge: ${c.title}`);
+
+          // Award Affinity XP
+          const affinities = this.getAllTutorAffinities();
+          if (affinities[c.tutorId]) {
+            affinities[c.tutorId].affinityXp += c.affinityReward;
+            if (!affinities[c.tutorId].challengesCompleted.includes(c.id)) {
+              affinities[c.tutorId].challengesCompleted.push(c.id);
+            }
+            this.saveTutorAffinities(affinities);
+          }
+
+          return completedChal;
+        }
+        return { ...c, progress: nextProgress };
+      }
+      return c;
+    });
+
+    this.saveTutorChallenges(updated);
+    return { completedChallenges: completedList };
+  }
+
+  // --- SUBJECT TO TUTOR ASSIGNMENTS ---
+  public getSubjectAssignments(): SubjectTutorAssignment[] {
+    try {
+      const data = localStorage.getItem('focusverse_subject_tutors');
+      if (data) return JSON.parse(data);
+    } catch (_) {}
+
+    const defaults: SubjectTutorAssignment[] = [
+      { id: 'sub-math', subject: 'Mathematics', tutorId: 'peter-parker', assignedAt: Date.now() },
+      { id: 'sub-prog', subject: 'Programming', tutorId: 'neo', assignedAt: Date.now() },
+      { id: 'sub-exam', subject: 'Exam Prep', tutorId: 'hermione-granger', assignedAt: Date.now() },
+      { id: 'sub-strat', subject: 'Planning & Strategy', tutorId: 'bruce-wayne', assignedAt: Date.now() },
+      { id: 'sub-lit', subject: 'Literature & Writing', tutorId: 'wednesday-addams', assignedAt: Date.now() },
+      { id: 'sub-cozy', subject: 'General Study', tutorId: 'cozy-study-girl', assignedAt: Date.now() },
+    ];
+    this.saveSubjectAssignments(defaults);
+    return defaults;
+  }
+
+  public saveSubjectAssignments(assignments: SubjectTutorAssignment[]) {
+    try {
+      localStorage.setItem('focusverse_subject_tutors', JSON.stringify(assignments));
+    } catch (_) {}
+  }
+
+  public assignTutorToSubject(subject: string, tutorId: string) {
+    const list = this.getSubjectAssignments();
+    const existing = list.find((s) => s.subject.toLowerCase() === subject.toLowerCase());
+    if (existing) {
+      existing.tutorId = tutorId;
+      existing.assignedAt = Date.now();
+    } else {
+      list.push({
+        id: `sub-${Date.now()}`,
+        subject,
+        tutorId,
+        assignedAt: Date.now(),
+      });
+    }
+    this.saveSubjectAssignments(list);
+  }
+
+  public getTutorForSubject(subject: string): string | null {
+    if (!subject) return null;
+    const list = this.getSubjectAssignments();
+    const found = list.find((s) =>
+      s.subject.toLowerCase().includes(subject.toLowerCase()) ||
+      subject.toLowerCase().includes(s.subject.toLowerCase())
+    );
+    return found ? found.tutorId : null;
+  }
+
+  // --- STUDY SQUADS (CRUD) ---
+  public getStudySquads(): StudySquad[] {
+    try {
+      const data = localStorage.getItem('focusverse_study_squads');
+      if (data) return JSON.parse(data);
+    } catch (_) {}
+    this.saveStudySquads(DEFAULT_STUDY_SQUADS);
+    return DEFAULT_STUDY_SQUADS;
+  }
+
+  public saveStudySquads(squads: StudySquad[]) {
+    try {
+      localStorage.setItem('focusverse_study_squads', JSON.stringify(squads));
+    } catch (_) {}
+  }
+
+  public addStudySquad(squad: Omit<StudySquad, 'id' | 'createdAt'>): StudySquad {
+    const squads = this.getStudySquads();
+    const newSquad: StudySquad = {
+      ...squad,
+      id: `squad-${Date.now()}`,
+      createdAt: Date.now(),
+    };
+    squads.push(newSquad);
+    this.saveStudySquads(squads);
+    return newSquad;
+  }
+
+  public updateStudySquad(id: string, updates: Partial<StudySquad>) {
+    const squads = this.getStudySquads().map((s) => (s.id === id ? { ...s, ...updates } : s));
+    this.saveStudySquads(squads);
+  }
+
+  public deleteStudySquad(id: string) {
+    const squads = this.getStudySquads().filter((s) => s.id !== id);
+    this.saveStudySquads(squads);
+  }
+
+  public getActiveSquad(): StudySquad | null {
+    try {
+      const id = localStorage.getItem('focusverse_active_squad');
+      if (id) {
+        const found = this.getStudySquads().find((s) => s.id === id);
+        if (found) return found;
+      }
+    } catch (_) {}
+    return this.getStudySquads()[0] || null;
+  }
+
+  public setActiveSquad(squadId: string | null) {
+    try {
+      if (squadId) localStorage.setItem('focusverse_active_squad', squadId);
+      else localStorage.removeItem('focusverse_active_squad');
+    } catch (_) {}
+  }
+
+  // --- FOCUS PRESETS (CRUD) ---
+  public getFocusPresets(): FocusPreset[] {
+    try {
+      const data = localStorage.getItem('focusverse_focus_presets');
+      if (data) return JSON.parse(data);
+    } catch (_) {}
+    this.saveFocusPresets(DEFAULT_FOCUS_PRESETS);
+    return DEFAULT_FOCUS_PRESETS;
+  }
+
+  public saveFocusPresets(presets: FocusPreset[]) {
+    try {
+      localStorage.setItem('focusverse_focus_presets', JSON.stringify(presets));
+    } catch (_) {}
+  }
+
+  public addFocusPreset(preset: Omit<FocusPreset, 'id' | 'createdAt'>): FocusPreset {
+    const presets = this.getFocusPresets();
+    const newPreset: FocusPreset = {
+      ...preset,
+      id: `preset-${Date.now()}`,
+      createdAt: Date.now(),
+    };
+    presets.push(newPreset);
+    this.saveFocusPresets(presets);
+    return newPreset;
+  }
+
+  public updateFocusPreset(id: string, updates: Partial<FocusPreset>) {
+    const presets = this.getFocusPresets().map((p) => (p.id === id ? { ...p, ...updates } : p));
+    this.saveFocusPresets(presets);
+  }
+
+  public deleteFocusPreset(id: string) {
+    const presets = this.getFocusPresets().filter((p) => p.id !== id);
+    this.saveFocusPresets(presets);
+  }
+
+  public toggleFavoritePreset(id: string) {
+    const presets = this.getFocusPresets().map((p) =>
+      p.id === id ? { ...p, isFavorite: !p.isFavorite } : p
+    );
+    this.saveFocusPresets(presets);
+  }
+
+  // --- TUTOR PERFORMANCE ANALYTICS (REAL SESSION DATA) ---
+  public getTutorAnalytics(filters?: {
+    dateRange?: 'ALL' | '7D' | '30D';
+    subject?: string;
+    tutorId?: string;
+  }): TutorPerformanceStat[] {
+    const sessions = this.getSessions();
+    const now = Date.now();
+
+    // Filter by date range
+    let filtered = sessions;
+    if (filters?.dateRange === '7D') {
+      const cutoff = now - 7 * 86400000;
+      filtered = filtered.filter((s) => s.timestamp >= cutoff);
+    } else if (filters?.dateRange === '30D') {
+      const cutoff = now - 30 * 86400000;
+      filtered = filtered.filter((s) => s.timestamp >= cutoff);
+    }
+
+    // Filter by subject
+    if (filters?.subject && filters.subject !== 'ALL') {
+      filtered = filtered.filter((s) => s.subject.toLowerCase() === filters.subject!.toLowerCase());
+    }
+
+    // Group by tutor
+    const statsMap: Record<string, {
+      totalMins: number;
+      totalSessions: number;
+      completedSessions: number;
+      distractions: number;
+      subjects: Record<string, number>;
+    }> = {};
+
+    for (const s of filtered) {
+      const tid = s.tutorId || 'unknown';
+      if (!statsMap[tid]) {
+        statsMap[tid] = {
+          totalMins: 0,
+          totalSessions: 0,
+          completedSessions: 0,
+          distractions: 0,
+          subjects: {},
+        };
+      }
+      statsMap[tid].totalMins += s.durationMinutes;
+      statsMap[tid].totalSessions += 1;
+      if (s.completed) statsMap[tid].completedSessions += 1;
+      statsMap[tid].distractions += s.distractionCount || 0;
+      statsMap[tid].subjects[s.subject] = (statsMap[tid].subjects[s.subject] || 0) + s.durationMinutes;
+    }
+
+    // Map to array of stats for each of the 20 characters
+    const results: TutorPerformanceStat[] = [];
+    for (const char of CHARACTERS) {
+      if (filters?.tutorId && filters.tutorId !== 'ALL' && char.id !== filters.tutorId) {
+        continue;
+      }
+
+      const st = statsMap[char.id] || statsMap[char.name] || {
+        totalMins: 0,
+        totalSessions: 0,
+        completedSessions: 0,
+        distractions: 0,
+        subjects: {},
+      };
+
+      let topSub = 'None';
+      let maxSubMins = 0;
+      for (const sub in st.subjects) {
+        if (st.subjects[sub] > maxSubMins) {
+          maxSubMins = st.subjects[sub];
+          topSub = sub;
+        }
+      }
+
+      const avgMins = st.totalSessions > 0 ? Math.round(st.totalMins / st.totalSessions) : 0;
+      const compRate = st.totalSessions > 0 ? Math.round((st.completedSessions / st.totalSessions) * 100) : 0;
+
+      results.push({
+        tutorId: char.id,
+        tutorName: char.name,
+        totalMinutes: st.totalMins,
+        totalSessions: st.totalSessions,
+        averageSessionMinutes: avgMins,
+        tasksCompleted: st.completedSessions,
+        distractionsLogged: st.distractions,
+        completionRate: compRate,
+        mostStudiedSubject: topSub,
+      });
+    }
+
+    return results.sort((a, b) => b.totalMinutes - a.totalMinutes);
+  }
+
+  // --- TUTOR COSMETICS ---
+  public getTutorCosmetics(tutorId?: string): TutorCosmeticUnlock[] {
+    const affinities = this.getAllTutorAffinities();
+    return TUTOR_COSMETIC_UNLOCKS.map((c) => {
+      const aff = affinities[c.tutorId];
+      const isUnlocked = aff && aff.affinityLevel >= c.requiredAffinityLevel;
+      return { ...c, unlocked: Boolean(isUnlocked) };
+    }).filter((c) => !tutorId || c.tutorId === tutorId);
+  }
+
+  public getActiveEquippedCosmetics(): { nameplate?: string; profileFrame?: string } {
+    try {
+      const data = localStorage.getItem('focusverse_equipped_cosmetics');
+      if (data) return JSON.parse(data);
+    } catch (_) {}
+    return { nameplate: '', profileFrame: '' };
+  }
+
+  public equipCosmetic(cosmeticId: string, type: 'nameplate' | 'profileFrame') {
+    const current = this.getActiveEquippedCosmetics();
+    current[type] = cosmeticId;
+    try {
+      localStorage.setItem('focusverse_equipped_cosmetics', JSON.stringify(current));
+    } catch (_) {}
+  }
+
   // --- EXPORT & RESET DATA ---
 
   public exportData(): string {
@@ -881,6 +1377,11 @@ class RPGStore {
       reflections: this.getReflections(),
       settings: this.getSettings(),
       customTutors: this.getCustomTutors(),
+      tutorAffinities: this.getAllTutorAffinities(),
+      tutorChallenges: this.getTutorChallenges(),
+      subjectAssignments: this.getSubjectAssignments(),
+      studySquads: this.getStudySquads(),
+      focusPresets: this.getFocusPresets(),
       exportDate: new Date().toISOString(),
     };
     return JSON.stringify(allData, null, 2);
@@ -902,6 +1403,13 @@ class RPGStore {
       'focusverse_app_settings',
       'focusverse_custom_tutors',
       'focusverse_study_room',
+      'focusverse_tutor_affinities',
+      'focusverse_tutor_challenges',
+      'focusverse_subject_tutors',
+      'focusverse_study_squads',
+      'focusverse_active_squad',
+      'focusverse_focus_presets',
+      'focusverse_equipped_cosmetics',
     ];
     for (const k of keys) {
       localStorage.removeItem(k);

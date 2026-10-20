@@ -12,6 +12,10 @@ import { UserFocusAction } from '../components/AudioCodeFooter';
 import { audioEngine } from '../utils/audioEngine';
 import { Footer } from '../components/Footer';
 import { RPGTask } from '../types/rpg';
+import { TutorDialogueBanner } from '../components/TutorDialogueBanner';
+import { tutorDialogueService } from '../utils/tutorDialogueService';
+import { rpgStore } from '../utils/rpgStore';
+import { TUTOR_ECOSYSTEM_PROFILES } from '../data/tutorProfiles';
 
 interface WorkspacePageProps {
   character: Character;
@@ -40,9 +44,15 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
 
   // Audio Mute State
   const [isMuted, setIsMuted] = useState(false);
+  const [dismissedSubjectSuggestion, setDismissedSubjectSuggestion] = useState(false);
+
+  const suggestedTutorId = initialTask?.subject ? rpgStore.getTutorForSubject(initialTask.subject) : null;
+  const showSubjectSuggestion = !dismissedSubjectSuggestion && suggestedTutorId && suggestedTutorId !== character.id;
+  const suggestedProfile = suggestedTutorId ? TUTOR_ECOSYSTEM_PROFILES[suggestedTutorId] : null;
 
   useEffect(() => {
     audioEngine.setSynthNotes(character.synthNotes);
+    tutorDialogueService.triggerEvent('GREETING', character.id);
   }, [character]);
 
   const toggleMute = () => {
@@ -227,6 +237,38 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
           </div>
         )}
 
+        {/* Subject Specialist Suggestion Notification */}
+        {showSubjectSuggestion && suggestedProfile && !zenMode && (
+          <div className="mb-4 bg-void-card pixel-border border border-arcade-cyan p-2.5 flex flex-wrap items-center justify-between gap-3 text-xs font-mono animate-fadeIn">
+            <div className="flex items-center gap-2">
+              <span className="text-arcade-gold font-pixel text-[10px]">💡 SUBJECT SPECIALIST:</span>
+              <span className="text-gray-300">
+                <strong className="text-arcade-cyan">{suggestedProfile.name}</strong> is designated for <strong className="text-white">{initialTask?.subject}</strong>.
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  const found = CHARACTERS.find((c) => c.id === suggestedTutorId);
+                  if (found) {
+                    audioEngine.playClick();
+                    onSelectAnotherCharacter(found);
+                  }
+                }}
+                className="pixel-btn px-2.5 py-1 text-[10px] text-arcade-cyan hover:text-white"
+              >
+                [ SWITCH TO {suggestedProfile.name.toUpperCase()} ]
+              </button>
+              <button
+                onClick={() => setDismissedSubjectSuggestion(true)}
+                className="text-gray-500 hover:text-gray-300 text-[10px]"
+              >
+                [ DISMISS ]
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* 3-Column Interactive Layout */}
         <div className={`grid grid-cols-1 ${zenMode ? 'max-w-xl mx-auto' : 'lg:grid-cols-12'} gap-5 items-start`}>
           {/* Left Column: Multi-Mode Timer & Focus Song Melody (5 Cols or Full in Zen) */}
@@ -262,6 +304,9 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
             </div>
           )}
         </div>
+
+        {/* Global Floating Tutor Dialogue Banner */}
+        <TutorDialogueBanner activeCharacter={character} />
       </main>
 
       {/* Global Credits Footer */}

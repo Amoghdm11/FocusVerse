@@ -31,6 +31,8 @@ import { MultiNote, FlashcardDeck, Flashcard } from '../types/rpg';
 import { rpgStore } from '../utils/rpgStore';
 import { audioEngine } from '../utils/audioEngine';
 import { aiService, AIChatMessage, GeneratedCardDraft } from '../utils/aiService';
+import { tutorDialogueService } from '../utils/tutorDialogueService';
+import { TUTOR_ECOSYSTEM_PROFILES } from '../data/tutorProfiles';
 
 interface NotesAndFlashcardsViewProps {
   onStartFocusSession?: (subject: string, noteTitle: string) => void;
@@ -55,6 +57,10 @@ export const NotesAndFlashcardsView: React.FC<NotesAndFlashcardsViewProps> = ({
   // AI Assistant Panel State
   const [showAiPanel, setShowAiPanel] = useState(true);
   const [aiContextNoteId, setAiContextNoteId] = useState<string>(selectedNoteId);
+  const [activeTutorId, setActiveTutorId] = useState<string>(() => {
+    const firstSub = notes[0]?.subject;
+    return (firstSub ? rpgStore.getTutorForSubject(firstSub) : null) || 'peter-parker';
+  });
   const [chatHistory, setChatHistory] = useState<AIChatMessage[]>([
     {
       id: 'msg-welcome',
@@ -219,7 +225,8 @@ export const NotesAndFlashcardsView: React.FC<NotesAndFlashcardsViewProps> = ({
         aiContextNote?.content || '',
         aiContextNote?.title || 'Untitled Note',
         questionText,
-        chatHistory
+        chatHistory,
+        activeTutorId
       );
 
       const assistantMsg: AIChatMessage = {
@@ -327,6 +334,7 @@ export const NotesAndFlashcardsView: React.FC<NotesAndFlashcardsViewProps> = ({
       rpgStore.reviewCard(currentCard.id, rating);
       setCards(rpgStore.getFlashcards());
       setReviewedCount((prev) => prev + 1);
+      tutorDialogueService.triggerEvent('FLASHCARD_REVIEW', activeTutorId);
     }
 
     if (reviewCardIndex + 1 < activeDeckCards.length) {
@@ -335,6 +343,7 @@ export const NotesAndFlashcardsView: React.FC<NotesAndFlashcardsViewProps> = ({
     } else {
       audioEngine.playVictoryJingle();
       setReviewCompleted(true);
+      tutorDialogueService.triggerEvent('SESSION_COMPLETE', activeTutorId);
     }
   };
 
@@ -670,20 +679,44 @@ export const NotesAndFlashcardsView: React.FC<NotesAndFlashcardsViewProps> = ({
                 </div>
               </div>
 
-              {/* Context Note Selector Pill */}
-              <div className="py-2 border-b border-arcade-border/60 flex items-center justify-between gap-1 text-[9px]">
-                <span className="text-gray-500 font-pixel shrink-0">CONTEXT:</span>
-                <select
-                  value={aiContextNoteId}
-                  onChange={(e) => setAiContextNoteId(e.target.value)}
-                  className="bg-void border border-arcade-border text-arcade-gold text-[9px] px-1 py-0.5 outline-none truncate max-w-[190px]"
-                >
-                  {notes.map((n) => (
-                    <option key={n.id} value={n.id}>
-                      {n.title}
-                    </option>
-                  ))}
-                </select>
+              {/* Context Note & Active Tutor Selector Pills */}
+              <div className="py-2 border-b border-arcade-border/60 space-y-1.5 text-[9px]">
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-gray-500 font-pixel shrink-0">NOTE:</span>
+                  <select
+                    value={aiContextNoteId}
+                    onChange={(e) => {
+                      setAiContextNoteId(e.target.value);
+                      const targetNote = notes.find((n) => n.id === e.target.value);
+                      if (targetNote?.subject) {
+                        const mappedTutor = rpgStore.getTutorForSubject(targetNote.subject);
+                        if (mappedTutor) setActiveTutorId(mappedTutor);
+                      }
+                    }}
+                    className="bg-void border border-arcade-border text-arcade-gold text-[9px] px-1 py-0.5 outline-none truncate max-w-[190px]"
+                  >
+                    {notes.map((n) => (
+                      <option key={n.id} value={n.id}>
+                        {n.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-gray-500 font-pixel shrink-0">TUTOR:</span>
+                  <select
+                    value={activeTutorId}
+                    onChange={(e) => setActiveTutorId(e.target.value)}
+                    className="bg-void border border-arcade-border text-arcade-cyan text-[9px] px-1 py-0.5 outline-none truncate max-w-[190px]"
+                  >
+                    {Object.values(TUTOR_ECOSYSTEM_PROFILES).map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name} ({p.primarySpecialty})
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               {/* Chat Thread */}

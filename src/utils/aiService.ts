@@ -4,6 +4,8 @@
  * with a high-fidelity local semantic note analyzer fallback.
  */
 
+import { TUTOR_ECOSYSTEM_PROFILES } from '../data/tutorProfiles';
+
 export interface AIChatMessage {
   id: string;
   sender: 'user' | 'assistant';
@@ -59,14 +61,15 @@ export class AIService {
     noteContent: string,
     noteTitle: string,
     question: string,
-    history: AIChatMessage[] = []
+    history: AIChatMessage[] = [],
+    tutorId?: string
   ): Promise<{ answer: string; sourceType: 'LIVE_API' | 'LOCAL_ENGINE'; draftCards?: GeneratedCardDraft[] }> {
     const config = this.getConfig();
 
     // 1. If valid Gemini API key is configured, call live API
     if (this.hasLiveApiKey()) {
       try {
-        const liveResult = await this.callGeminiAPI(config.apiKey, config.model, noteTitle, noteContent, question, history);
+        const liveResult = await this.callGeminiAPI(config.apiKey, config.model, noteTitle, noteContent, question, history, tutorId);
         return {
           answer: liveResult,
           sourceType: 'LIVE_API',
@@ -74,7 +77,7 @@ export class AIService {
       } catch (err: any) {
         console.warn('Live API request failed, falling back to local semantic analyzer:', err);
         // Fall back gracefully with clear explanation
-        const local = this.generateLocalSemanticAnswer(noteTitle, noteContent, question);
+        const local = this.generateLocalSemanticAnswer(noteTitle, noteContent, question, tutorId);
         return {
           answer: `[API Notice: ${err.message || 'Network/quota error'}. Switched to local analyzer]\n\n${local.answer}`,
           sourceType: 'LOCAL_ENGINE',
@@ -84,7 +87,7 @@ export class AIService {
     }
 
     // 2. Local Intelligent Semantic Analyzer fallback
-    const localResult = this.generateLocalSemanticAnswer(noteTitle, noteContent, question);
+    const localResult = this.generateLocalSemanticAnswer(noteTitle, noteContent, question, tutorId);
     return {
       answer: localResult.answer,
       sourceType: 'LOCAL_ENGINE',
@@ -101,17 +104,29 @@ export class AIService {
     noteTitle: string,
     noteContent: string,
     question: string,
-    history: AIChatMessage[]
+    history: AIChatMessage[],
+    tutorId?: string
   ): Promise<string> {
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model || 'gemini-1.5-flash'}:generateContent?key=${apiKey.trim()}`;
 
-    const systemPrompt = `You are a knowledgeable, disciplined retro-RPG study companion and academic tutor in FocusVerse.
+    const profile = tutorId ? TUTOR_ECOSYSTEM_PROFILES[tutorId] : undefined;
+    const personaInstruction = profile
+      ? `You are roleplaying as ${profile.name} (${profile.shortBio}), an academic tutor and study companion in FocusVerse.
+Archetype: ${profile.archetype}
+Tone: ${profile.tone}
+Encouragement Style: ${profile.encouragementStyle}
+Primary Specialty: ${profile.primarySpecialty}
+Secondary Specialties: ${profile.secondarySpecialties.join(', ')}
+Stay completely in character using authentic vocabulary and signature encouragement, while providing academically accurate, concise, and structured guidance.`
+      : `You are a knowledgeable, disciplined retro-RPG study companion and academic tutor in FocusVerse.`;
+
+    const systemPrompt = `${personaInstruction}
 The user is studying a note titled: "${noteTitle}".
 
 CURRENT NOTE CONTENT:
-\"\"\"
+"""
 ${noteContent || '(The note is currently empty)'}
-\"\"\"
+"""
 
 Guidelines:
 1. Ground your answers primarily on the note contents provided above.
@@ -154,14 +169,24 @@ Guidelines:
   public generateLocalSemanticAnswer(
     noteTitle: string,
     noteContent: string,
-    question: string
+    question: string,
+    tutorId?: string
   ): { answer: string; draftCards?: GeneratedCardDraft[] } {
     const trimmed = (noteContent || '').trim();
     const lowerQ = question.toLowerCase();
 
+    const profile = tutorId ? TUTOR_ECOSYSTEM_PROFILES[tutorId] : undefined;
+    const tutorHeader = profile
+      ? `> **[TUTOR: ${profile.name.toUpperCase()} // ${profile.archetype.toUpperCase()}]**\n> *Specialty: ${profile.primarySpecialty} | Style: ${profile.encouragementStyle}*\n\n`
+      : '';
+    const tutorSignoff =
+      profile && profile.dialogue.onTaskComplete?.length > 0
+        ? `\n\n— *"${profile.dialogue.onTaskComplete[0]}"* (**${profile.name}**)`
+        : '';
+
     if (!trimmed) {
       return {
-        answer: `Your note "${noteTitle}" is currently empty. Add some notes or concepts in the editor, and I'll analyze, summarize, or quiz you on them!`,
+        answer: `${tutorHeader}Your note "${noteTitle}" is currently empty. Add some notes or concepts in the editor, and I'll analyze, summarize, or quiz you on them!${tutorSignoff}`,
       };
     }
 
@@ -208,7 +233,7 @@ Guidelines:
       }
 
       return {
-        answer: `### 🃏 Flashcards Generated from "${noteTitle}"\n\nI have extracted **${cards.length} key active recall question/answer pairs** from your note. You can review and approve them below to add them directly into your spaced repetition revision deck!`,
+        answer: `${tutorHeader}### 🃏 Flashcards Generated from "${noteTitle}"\n\nI have extracted **${cards.length} key active recall question/answer pairs** from your note. You can review and approve them below to add them directly into your spaced repetition revision deck!${tutorSignoff}`,
         draftCards: cards,
       };
     }
@@ -216,13 +241,13 @@ Guidelines:
     // 2. Summary query
     if (lowerQ.includes('summar') || lowerQ.includes('brief') || lowerQ.includes('overview')) {
       return {
-        answer: `### 📋 Summary of "${noteTitle}"\n\n**Core Topics Covered:**\n${
+        answer: `${tutorHeader}### 📋 Summary of "${noteTitle}"\n\n**Core Topics Covered:**\n${
           headings.length > 0 ? headings.map((h) => `- **${h}**`).join('\n') : `- General overview of ${noteTitle}`
         }\n\n**Key Takeaways:**\n${
           bullets.length > 0
             ? bullets.slice(0, 4).map((b) => `• ${b}`).join('\n')
             : sentences.slice(0, 3).map((s) => `• ${s}`).join('\n')
-        }\n\n*Estimated study density:* ${sentences.length} concepts, ${trimmed.split(/\s+/).length} words.`,
+        }\n\n*Estimated study density:* ${sentences.length} concepts, ${trimmed.split(/\s+/).length} words.${tutorSignoff}`,
       };
     }
 
@@ -240,30 +265,30 @@ Guidelines:
       }
 
       return {
-        answer: `### 🎯 Practice Quiz for "${noteTitle}"\n\nTest your active recall against these questions derived from your notes:\n\n${qList.join(
+        answer: `${tutorHeader}### 🎯 Practice Quiz for "${noteTitle}"\n\nTest your active recall against these questions derived from your notes:\n\n${qList.join(
           '\n\n'
-        )}\n\n*Tip: Try answering from memory before checking the note text!*`,
+        )}\n\n*Tip: Try answering from memory before checking the note text!*${tutorSignoff}`,
       };
     }
 
     // 4. Simple explanation / Beginner query
     if (lowerQ.includes('simple') || lowerQ.includes('beginner') || lowerQ.includes('explain')) {
       return {
-        answer: `### 💡 Simple Explanation of "${noteTitle}"\n\nLet's break this down into plain English:\n\n1. **The Big Picture:** This note is about organizing and mastering **${noteTitle}**.\n2. **The Key Building Blocks:**\n${
+        answer: `${tutorHeader}### 💡 Simple Explanation of "${noteTitle}"\n\nLet's break this down into plain English:\n\n1. **The Big Picture:** This note is about organizing and mastering **${noteTitle}**.\n2. **The Key Building Blocks:**\n${
           bullets.length > 0
             ? bullets.slice(0, 3).map((b, i) => `   - **Step ${i + 1}:** ${b}`).join('\n')
             : `   - Focuses on: ${sentences[0] || trimmed.slice(0, 100)}`
-        }\n3. **Practical Analogy:** Think of this like a puzzle where each concept connects directly to your overall study goal.\n\n*Would you like me to turn this into 3 flashcards or quiz you?*`,
+        }\n3. **Practical Analogy:** Think of this like a puzzle where each concept connects directly to your overall study goal.\n\n*Would you like me to turn this into 3 flashcards or quiz you?*${tutorSignoff}`,
       };
     }
 
     // Default responsive synthesis
     return {
-      answer: `### 🧠 Analysis of "${noteTitle}"\n\nRegarding your question: *"${question}"*\n\nBased on the contents of your current note:\n- **Direct Match:** Found ${
+      answer: `${tutorHeader}### 🧠 Analysis of "${noteTitle}"\n\nRegarding your question: *"${question}"*\n\nBased on the contents of your current note:\n- **Direct Match:** Found ${
         bullets.length
       } bullet points and ${sentences.length} sentences.\n- **Relevant Highlights:**\n${
         lines.slice(0, 4).map((l) => `> ${l}`).join('\n')
-      }\n\n*Need a deeper breakdown? Ask me to "Explain this in simple terms", "Summarize key concepts", or "Turn this note into flashcards"!*`,
+      }\n\n*Need a deeper breakdown? Ask me to "Explain this in simple terms", "Summarize key concepts", or "Turn this note into flashcards"!*${tutorSignoff}`,
     };
   }
 }

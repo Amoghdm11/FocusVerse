@@ -291,6 +291,47 @@ export const StatsView: React.FC = () => {
         </div>
       </div>
 
+      {/* Tutor Companion Telemetry Breakdown */}
+      <div className="bg-void-card pixel-border border-arcade-border p-4 shadow-pixel">
+        <div className="flex items-center justify-between pb-2 mb-3 border-b border-arcade-border">
+          <div className="flex items-center gap-2">
+            <span className="font-silkscreen text-xs text-arcade-gold uppercase">
+              TUTOR ECOSYSTEM TELEMETRY &amp; SYNERGY
+            </span>
+            <span className="text-[9px] text-gray-400">
+              // Real performance across active companions
+            </span>
+          </div>
+          <span className="text-[9px] text-arcade-cyan font-pixel">20 COMPANIONS MONITORED</span>
+        </div>
+
+        {Object.keys(tutorTotals).length === 0 ? (
+          <div className="p-8 text-center text-gray-500 border border-dashed border-arcade-border text-xs">
+            No tutor-linked sessions logged yet. Complete study sprints with your companions to view comparative synergy!
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {rpgStore.getTutorAnalytics().slice(0, 6).map((stat) => (
+              <div key={stat.tutorId} className="p-3 bg-void border border-arcade-border/80 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-pixel text-[10px] text-arcade-gold uppercase">{stat.tutorName}</span>
+                    <span className="text-[9px] text-green-400 font-mono">{stat.completionRate}% COMPL</span>
+                  </div>
+                  <div className="text-[10px] text-gray-400">
+                    Focused: <strong className="text-white">{stat.totalMinutes}m</strong> across {stat.totalSessions} session(s)
+                  </div>
+                </div>
+                <div className="mt-2 pt-1 border-t border-arcade-border/40 flex items-center justify-between text-[8px] text-gray-500">
+                  <span>Top Subject: {stat.mostStudiedSubject}</span>
+                  <span>Distractions: {stat.distractionsLogged} total</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Bottom: Detailed Session History Log */}
       <div className="bg-void-card pixel-border border-arcade-border p-4 shadow-pixel">
         <div className="flex items-center justify-between pb-2 mb-3 border-b border-arcade-border">
@@ -310,6 +351,7 @@ export const StatsView: React.FC = () => {
               <thead>
                 <tr className="border-b border-arcade-border text-gray-400 text-[10px]">
                   <th className="py-2 px-3">DATE / TIME</th>
+                  <th className="py-2 px-3">TUTOR</th>
                   <th className="py-2 px-3">DURATION</th>
                   <th className="py-2 px-3">SUBJECT</th>
                   <th className="py-2 px-3">TASK REFERENCE</th>
@@ -322,6 +364,9 @@ export const StatsView: React.FC = () => {
                   <tr key={s.id} className="hover:bg-void/50 transition-colors">
                     <td className="py-2 px-3 text-gray-300">
                       {s.date} <span className="text-[10px] text-gray-500">{new Date(s.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    </td>
+                    <td className="py-2 px-3 font-pixel text-[9px] text-arcade-gold uppercase">
+                      {s.tutorId || '-'}
                     </td>
                     <td className="py-2 px-3 font-pixel text-[10px] text-arcade-gold">
                       {s.durationMinutes} MINS

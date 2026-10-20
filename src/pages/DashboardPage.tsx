@@ -19,6 +19,7 @@ import { Character } from '../types/character';
 import { rpgStore, getTodayDateString } from '../utils/rpgStore';
 import { UserRPGProfile, RPGTask, StudySessionRecord, DailyQuest, DailyReflection } from '../types/rpg';
 import { TUTOR_ARCHETYPES } from '../data/tutorArchetypes';
+import { TUTOR_ECOSYSTEM_PROFILES } from '../data/tutorProfiles';
 import { audioEngine } from '../utils/audioEngine';
 import { NotesWidget } from '../components/NotesWidget';
 
@@ -49,15 +50,28 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
   // Tutor Dialogue Quote
   const [tutorMessage, setTutorMessage] = useState<string>('');
+  const [tutorAffinity, setTutorAffinity] = useState(() => rpgStore.getTutorAffinity(character.id));
+  const [activeChallenge, setActiveChallenge] = useState(() => {
+    const list = rpgStore.getTutorChallenges(character.id);
+    return list.find((c) => !c.completed) || list[0];
+  });
 
   useEffect(() => {
-    // Generate contextual tutor quote based on time & streak
-    const archetypeKey = 'FRIENDLY_COMPANION';
-    const meta = TUTOR_ARCHETYPES[archetypeKey];
-    if (meta) {
-      const msgs = meta.dialogue.greetings;
+    const ecoProfile = TUTOR_ECOSYSTEM_PROFILES[character.id];
+    if (ecoProfile && ecoProfile.dialogue.greetings?.length > 0) {
+      const msgs = ecoProfile.dialogue.greetings;
       setTutorMessage(msgs[Math.floor(Math.random() * msgs.length)]);
+    } else {
+      const archetypeKey = 'FRIENDLY_COMPANION';
+      const meta = TUTOR_ARCHETYPES[archetypeKey];
+      if (meta) {
+        const msgs = meta.dialogue.greetings;
+        setTutorMessage(msgs[Math.floor(Math.random() * msgs.length)]);
+      }
     }
+    setTutorAffinity(rpgStore.getTutorAffinity(character.id));
+    const list = rpgStore.getTutorChallenges(character.id);
+    setActiveChallenge(list.find((c) => !c.completed) || list[0]);
   }, [character]);
 
   const refreshData = () => {
@@ -66,6 +80,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     setTasks(rpgStore.getTasks());
     setSessions(rpgStore.getSessions());
     setQuests(rpgStore.getDailyQuests());
+    setTutorAffinity(rpgStore.getTutorAffinity(character.id));
+    const list = rpgStore.getTutorChallenges(character.id);
+    setActiveChallenge(list.find((c) => !c.completed) || list[0]);
   };
 
   useEffect(() => {
@@ -153,6 +170,31 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   <span>{character.tagline}</span>
                 </div>
               </div>
+
+              {/* Tutor Affinity Gauge & Active Challenge */}
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px]">
+                <div className="p-2 bg-void/80 border border-arcade-border flex items-center justify-between">
+                  <div>
+                    <span className="text-gray-400 font-pixel text-[8px] block">AFFINITY LEVEL</span>
+                    <span className="text-arcade-cyan font-bold font-pixel">LVL {tutorAffinity.affinityLevel} / 5</span>
+                  </div>
+                  <span className="text-[9px] text-gray-400 font-mono">
+                    {tutorAffinity.affinityXp} XP ({tutorAffinity.totalMinutesFocused}m focused)
+                  </span>
+                </div>
+
+                {activeChallenge && (
+                  <div className="p-2 bg-void/80 border border-arcade-gold/50 flex flex-col justify-center">
+                    <span className="text-arcade-gold font-pixel text-[8px] truncate">
+                      🎯 {activeChallenge.title}
+                    </span>
+                    <div className="flex items-center justify-between text-[8px] text-gray-300 font-mono mt-0.5">
+                      <span>{activeChallenge.progress} / {activeChallenge.target}</span>
+                      <span className="text-arcade-gold">+{activeChallenge.xpReward} XP</span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -165,6 +207,16 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               </span>
             </div>
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  audioEngine.playClick();
+                  onNavigate('TUTORS');
+                }}
+                className="pixel-btn px-2.5 py-1 text-[10px] text-arcade-gold hover:text-white"
+                title="Manage Study Squads & Presets"
+              >
+                SQUADS & PRESETS
+              </button>
               <button
                 onClick={() => {
                   audioEngine.playClick();

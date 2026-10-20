@@ -5,6 +5,7 @@ import { audioEngine } from '../utils/audioEngine';
 import { UserFocusAction } from './AudioCodeFooter';
 import { rpgStore } from '../utils/rpgStore';
 import { RPGTask } from '../types/rpg';
+import { tutorDialogueService } from '../utils/tutorDialogueService';
 
 export type TimerType = 'POMODORO' | 'STOPWATCH' | 'COUNTDOWN';
 export type PomoPhase = 'FOCUS' | 'SHORT_BREAK' | 'LONG_BREAK';
@@ -131,6 +132,12 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
     setTotalDurationMs(dur * 1000);
     setTimeLeftMs(dur * 1000);
     onActionChange(phase === 'FOCUS' ? 'IDLE' : 'BREAK');
+
+    if (phase === 'SHORT_BREAK' || phase === 'LONG_BREAK') {
+      tutorDialogueService.triggerEvent('BREAK_START', character?.id);
+    } else {
+      tutorDialogueService.triggerEvent('BREAK_RETURN', character?.id);
+    }
   };
 
   // Change focus preset duration
@@ -152,6 +159,7 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
       setIsRunning(false);
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
       onActionChange('IDLE');
+      tutorDialogueService.triggerEvent('SESSION_PAUSE', character?.id);
     } else {
       // Start
       setIsRunning(true);
@@ -161,6 +169,14 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
         endTimeRef.current = Date.now() + timeLeftMs;
       }
       onActionChange(pomoPhase === 'FOCUS' || timerType !== 'POMODORO' ? 'FOCUSING' : 'BREAK');
+
+      if (pomoPhase === 'FOCUS' || timerType !== 'POMODORO') {
+        if (timeLeftMs < totalDurationMs) {
+          tutorDialogueService.triggerEvent('SESSION_RESUME', character?.id);
+        } else {
+          tutorDialogueService.triggerEvent('SESSION_START', character?.id);
+        }
+      }
     }
   };
 
@@ -234,6 +250,7 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
     // Only record focus sessions (exclude breaks from focus minutes)
     if (pomoPhase === 'FOCUS' || timerType !== 'POMODORO') {
       const activeTask = tasks.find((t) => t.id === selectedTaskId);
+      const effectiveTutorId = character?.id || 'peter-parker';
 
       // Record to persistent RPG Store
       rpgStore.addSession({
@@ -243,13 +260,21 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
         subject: activeTask?.subject || 'General Study',
         taskId: activeTask?.id,
         taskTitle: activeTask?.title,
-        tutorId: character?.name || 'Tutor',
+        tutorId: effectiveTutorId,
         distractionCount: distractions,
         completed: true,
       });
 
-      // Update local today mins
-      setTodayCompletedMins(rpgStore.getTodayMins());
+      // Trigger tutor completion dialogue
+      tutorDialogueService.triggerEvent('SESSION_COMPLETE', effectiveTutorId);
+
+      // Check daily goal celebration
+      const prevMins = todayCompletedMins;
+      const newTotalMins = rpgStore.getTodayMins();
+      setTodayCompletedMins(newTotalMins);
+      if (newTotalMins >= settings.dailyGoalMinutes && prevMins < settings.dailyGoalMinutes) {
+        tutorDialogueService.triggerEvent('DAILY_GOAL_REACHED', effectiveTutorId);
+      }
 
       // If tied to task, increment actual minutes
       if (activeTask) {
@@ -561,7 +586,13 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
               <button
                 onClick={() => {
                   audioEngine.playClick();
-                  setDistractions((d) => d + 1);
+                  setDistractions((d) => {
+                    const next = d + 1;
+                    if (next >= 3) {
+                      tutorDialogueService.triggerEvent('STRUGGLING_TASK', character?.id);
+                    }
+                    return next;
+                  });
                 }}
                 className="w-5 h-5 border border-red-500/70 text-red-300 hover:bg-red-950 font-bold"
               >

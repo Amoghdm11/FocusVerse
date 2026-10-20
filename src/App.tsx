@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { CHARACTERS } from './data/characters';
 import { Character } from './types/character';
 import { HomePage } from './pages/HomePage';
-import { SelectPage } from './pages/SelectPage';
+import { SelectPage, SpiritFilterType } from './pages/SelectPage';
 import { WorkspacePage } from './pages/WorkspacePage';
-import { AudioCodeFooter, UserFocusAction } from './components/AudioCodeFooter';
+import { CustomAppearanceState } from './utils/pixelSpriteCompositor';
 
 type ViewMode = 'HOME' | 'SELECT' | 'WORKSPACE';
 
@@ -38,6 +38,23 @@ export const App: React.FC = () => {
   const { initialView, foundChar } = getInitialState();
   const [view, setView] = useState<ViewMode>(initialView);
   const [selectedCharacter, setSelectedCharacter] = useState<Character>(foundChar);
+  const [spiritFilter, setSpiritFilter] = useState<SpiritFilterType>('ALL');
+
+  const [playerName, setPlayerName] = useState<string>(() => {
+    try {
+      return localStorage.getItem('focusverse_player_name') || 'TRAINER';
+    } catch (_) {
+      return 'TRAINER';
+    }
+  });
+
+  const [customAppearance, setCustomAppearance] = useState<CustomAppearanceState | null>(() => {
+    try {
+      const saved = localStorage.getItem('focusverse_custom_appearance');
+      if (saved) return JSON.parse(saved);
+    } catch (_) {}
+    return null;
+  });
 
   const [archetypeMode, setArchetypeMode] = useState<boolean>(() => {
     try {
@@ -46,8 +63,6 @@ export const App: React.FC = () => {
       return false;
     }
   });
-
-  const [homeAction, setHomeAction] = useState<UserFocusAction>('IDLE');
 
   // Sync hash when view or character changes
   useEffect(() => {
@@ -88,14 +103,56 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
+  // Sync hash with view state
+  useEffect(() => {
+    if (view === 'WORKSPACE') {
+      if (!window.location.hash.includes('#workspace')) window.location.hash = '#workspace';
+    } else if (view === 'SELECT') {
+      if (!window.location.hash.includes('#select')) window.location.hash = '#select';
+    } else if (view === 'HOME') {
+      if (!window.location.hash.includes('#home')) window.location.hash = '#home';
+    }
+  }, [view]);
+
   const handleLaunchQuickSession = (char: Character) => {
     setSelectedCharacter(char);
     setView('WORKSPACE');
   };
 
-  const handleSelectCharacter = (char: Character) => {
+  const handleSelectCharacter = (
+    char: Character,
+    name?: string,
+    appearance?: CustomAppearanceState
+  ) => {
     setSelectedCharacter(char);
+    if (name && name.trim()) {
+      setPlayerName(name.trim());
+      try {
+        localStorage.setItem('focusverse_player_name', name.trim());
+      } catch (_) {}
+    }
+    if (appearance) {
+      setCustomAppearance(appearance);
+      try {
+        localStorage.setItem('focusverse_custom_appearance', JSON.stringify(appearance));
+      } catch (_) {}
+    }
     setView('WORKSPACE');
+  };
+
+  const handleSelectSpirit = (spirit: 'girl' | 'boy') => {
+    setSpiritFilter(spirit);
+    const targetId = spirit === 'girl' ? 'cozy-study-girl' : 'late-night-study-boy';
+    const found = CHARACTERS.find((c) => c.id === targetId);
+    if (found) {
+      setSelectedCharacter(found);
+    }
+    setView('SELECT');
+  };
+
+  const handleOpenRoster = () => {
+    setSpiritFilter(selectedCharacter.genderOrSpirit === 'girl' ? 'girl' : 'boy');
+    setView('SELECT');
   };
 
   const handleToggleArchetypeMode = () => {
@@ -105,46 +162,37 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-void text-gray-100 font-mono flex flex-col relative selection:bg-arcade-gold selection:text-black">
       {view === 'HOME' && (
-        <>
-          <HomePage
-            onSelectCompanion={() => setView('SELECT')}
-            onLaunchQuickSession={handleLaunchQuickSession}
-            archetypeMode={archetypeMode}
-            onToggleArchetypeMode={handleToggleArchetypeMode}
-          />
-          {/* Bottom Persistent Bar on Home page */}
-          <AudioCodeFooter
-            character={selectedCharacter}
-            currentAction={homeAction}
-            timerMode="OVERVIEW"
-          />
-        </>
+        <HomePage
+          onSelectCompanion={handleOpenRoster}
+          onLaunchQuickSession={handleLaunchQuickSession}
+          onSelectSpirit={handleSelectSpirit}
+          archetypeMode={archetypeMode}
+          onToggleArchetypeMode={handleToggleArchetypeMode}
+        />
       )}
 
       {view === 'SELECT' && (
-        <>
-          <SelectPage
-            onSelectCharacter={handleSelectCharacter}
-            onBackToHome={() => setView('HOME')}
-            archetypeMode={archetypeMode}
-            onToggleArchetypeMode={handleToggleArchetypeMode}
-            initialCharacter={selectedCharacter}
-            onPreviewCharacterChange={(char) => setSelectedCharacter(char)}
-          />
-          {/* Bottom Persistent Bar on Select page */}
-          <AudioCodeFooter
-            character={selectedCharacter}
-            currentAction="IDLE"
-            timerMode="ROSTER SELECTION"
-          />
-        </>
+        <SelectPage
+          onSelectCharacter={handleSelectCharacter}
+          onBackToHome={() => setView('HOME')}
+          archetypeMode={archetypeMode}
+          onToggleArchetypeMode={handleToggleArchetypeMode}
+          initialCharacter={selectedCharacter}
+          initialSpirit={spiritFilter}
+          onPreviewCharacterChange={(char) => setSelectedCharacter(char)}
+        />
       )}
 
       {view === 'WORKSPACE' && (
         <WorkspacePage
           character={selectedCharacter}
+          playerName={playerName}
+          customAppearance={customAppearance}
           onSelectAnotherCharacter={(char) => setSelectedCharacter(char)}
-          onBackToRoster={() => setView('SELECT')}
+          onBackToRoster={() => {
+            setSpiritFilter(selectedCharacter.genderOrSpirit === 'girl' ? 'girl' : 'boy');
+            setView('SELECT');
+          }}
           archetypeMode={archetypeMode}
           onToggleArchetypeMode={handleToggleArchetypeMode}
         />
@@ -154,3 +202,4 @@ export const App: React.FC = () => {
 };
 
 export default App;
+

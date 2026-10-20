@@ -159,11 +159,11 @@ export const CosmicGlobe: React.FC<CosmicGlobeProps> = ({ onNodeClick }) => {
       {/* Canvas Globe */}
       <canvas
         ref={canvasRef}
-        className="block pixel-border bg-[#0E0B1C]/90 shadow-pixel"
+        className="block pixel-border bg-[#121026]/75 backdrop-blur-md border border-white/15 shadow-2xl hover:border-arcade-cyan/50 transition-colors"
       />
 
       {/* Tactical Telemetry Caption */}
-      <div className="mt-2 flex items-center justify-between w-full max-w-[380px] px-2 text-[10px] font-mono text-gray-400 bg-void-card border border-arcade-border">
+      <div className="mt-2 flex items-center justify-between w-full max-w-[380px] px-2.5 py-1 text-[10px] font-mono text-gray-400 bg-[#121026]/75 backdrop-blur-md border border-white/15 shadow-sm">
         <span>ORBIT: [GEO-STATIONARY]</span>
         <span className="text-arcade-gold font-bold">20 WORLDS ONLINE</span>
         <span className="text-arcade-cyan">FPS: 60</span>

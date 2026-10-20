@@ -6,11 +6,15 @@ import { RotateCw, RotateCcw, ZoomIn, ZoomOut, Sparkles, Sun } from 'lucide-reac
 interface CharacterVoxelStageProps {
   character: Character;
   archetypeMode?: boolean;
+  fullScreen?: boolean;
+  className?: string;
 }
 
 export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
   character,
   archetypeMode = false,
+  fullScreen = true,
+  className = '',
 }) => {
   const mountRef = useRef<HTMLDivElement | null>(null);
   const [autoRotate, setAutoRotate] = useState<boolean>(true);
@@ -21,12 +25,16 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
   // References to keep Three.js animation and scene state
   const sceneRef = useRef<THREE.Scene | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const mainStageGroupRef = useRef<THREE.Group | null>(null);
   const characterGroupRef = useRef<THREE.Group | null>(null);
   const pedestalGroupRef = useRef<THREE.Group | null>(null);
+  const ringMeshRef = useRef<THREE.Mesh | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const animFrameIdRef = useRef<number | null>(null);
+  const dirLightRef = useRef<THREE.DirectionalLight | null>(null);
   const spotlightRef = useRef<THREE.SpotLight | null>(null);
   const rimLightRef = useRef<THREE.PointLight | null>(null);
+  const starPointsRef = useRef<THREE.Points | null>(null);
 
   // Rotation and momentum tracking
   const rotationVelocityRef = useRef<number>(0);
@@ -52,20 +60,20 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
       return;
     }
 
-    const width = container.clientWidth || 400;
-    const height = container.clientHeight || 500;
+    const width = fullScreen ? window.innerWidth : (container.clientWidth || 400);
+    const height = fullScreen ? window.innerHeight : (container.clientHeight || 500);
 
     // 1. Scene
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
     // Subtle cosmic void fog
-    scene.fog = new THREE.FogExp2('#0B0914', 0.04);
+    scene.fog = new THREE.FogExp2('#0B0914', 0.035);
 
     // 2. Camera: Framed with golden ratio padding
-    const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
-    camera.position.set(0, 2.6, 9.2);
-    camera.lookAt(0, 1.85, 0);
+    const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100);
+    camera.position.set(0, 1.25, 12.0);
+    camera.lookAt(0, 1.10, 0);
     cameraRef.current = camera;
 
     // 3. Renderer
@@ -80,12 +88,31 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // 4. Lighting Setup
+    // Helper: Compute X position for rightmost stage anchoring
+    const computeTargetX = (w: number, h: number) => {
+      if (!fullScreen || w < 1024) return 0;
+      const aspect = w / h;
+      const visibleHalfWidth = Math.tan((36 * Math.PI) / 360) * 12.0 * aspect;
+      return visibleHalfWidth * 0.28; // ~64% screen horizontal position (centered in open right viewport, zero clipping)
+    };
+
+    const initialTargetX = computeTargetX(width, height);
+
+    // 4. Main Stage Parent Group (Contains pedestal, character, shadow plane)
+    const mainStageGroup = new THREE.Group();
+    mainStageGroup.position.x = initialTargetX;
+    if (fullScreen) {
+      mainStageGroup.scale.set(0.74, 0.74, 0.74);
+    }
+    scene.add(mainStageGroup);
+    mainStageGroupRef.current = mainStageGroup;
+
+    // 5. Lighting Setup
     const ambientLight = new THREE.AmbientLight('#2A2244', 1.8);
     scene.add(ambientLight);
 
     const dirLight = new THREE.DirectionalLight('#FFFFFF', 2.0);
-    dirLight.position.set(4, 7, 5);
+    dirLight.position.set(initialTargetX + 4, 7, 5);
     dirLight.castShadow = true;
     dirLight.shadow.mapSize.width = 1024;
     dirLight.shadow.mapSize.height = 1024;
@@ -93,10 +120,13 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
     dirLight.shadow.camera.far = 25;
     dirLight.shadow.bias = -0.001;
     scene.add(dirLight);
+    dirLightRef.current = dirLight;
 
     // Top dramatic spotlight on character
     const spotlight = new THREE.SpotLight('#FFF8E7', 3.5);
-    spotlight.position.set(0, 8, 2);
+    spotlight.position.set(initialTargetX, 7.5, 3);
+    spotlight.target.position.set(initialTargetX, 1.10, 0);
+    scene.add(spotlight.target);
     spotlight.angle = Math.PI / 5;
     spotlight.penumbra = 0.8;
     spotlight.castShadow = true;
@@ -105,14 +135,34 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
 
     // Back rim light (tinted to character accent)
     const rimLight = new THREE.PointLight(character.palette.accentSecondary, 3.0, 10);
-    rimLight.position.set(0, 2.5, -3.5);
+    rimLight.position.set(initialTargetX, 2.5, -3.5);
     scene.add(rimLight);
     rimLightRef.current = rimLight;
 
-    // 5. Build Pedestal (Minecraft Bedrock dressing room style obsidian & rune platform)
+    // Background cosmic drifting starfield
+    const starGeo = new THREE.BufferGeometry();
+    const starCount = 180;
+    const starPositions = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount * 3; i += 3) {
+      starPositions[i] = (Math.random() - 0.5) * 35;
+      starPositions[i + 1] = Math.random() * 20 - 4;
+      starPositions[i + 2] = (Math.random() - 0.5) * 22;
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+    const starMat = new THREE.PointsMaterial({
+      size: 0.08,
+      color: '#82AAFF',
+      transparent: true,
+      opacity: 0.55,
+    });
+    const starPoints = new THREE.Points(starGeo, starMat);
+    scene.add(starPoints);
+    starPointsRef.current = starPoints;
+
+    // 6. Build Pedestal (Minecraft Bedrock dressing room style obsidian & rune platform)
     const pedestalGroup = new THREE.Group();
     pedestalGroupRef.current = pedestalGroup;
-    scene.add(pedestalGroup);
+    mainStageGroup.add(pedestalGroup);
 
     // Base cylinder
     const baseGeo = new THREE.CylinderGeometry(2.2, 2.4, 0.4, 16);
@@ -132,12 +182,13 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
       color: character.palette.accentGold,
       side: THREE.DoubleSide,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.85,
     });
     const ringMesh = new THREE.Mesh(ringGeo, ringMat);
     ringMesh.rotation.x = -Math.PI / 2;
     ringMesh.position.y = 0.01;
     pedestalGroup.add(ringMesh);
+    ringMeshRef.current = ringMesh;
 
     // Subtle shadow receiver plane on the floor
     const shadowPlaneGeo = new THREE.PlaneGeometry(12, 12);
@@ -146,22 +197,38 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
     shadowPlane.rotation.x = -Math.PI / 2;
     shadowPlane.position.y = -0.41;
     shadowPlane.receiveShadow = true;
-    scene.add(shadowPlane);
+    mainStageGroup.add(shadowPlane);
 
-    // 6. Character Group Container
+    // 7. Character Group Container
     const charGroup = new THREE.Group();
     charGroup.position.y = 0.0;
-    scene.add(charGroup);
+    mainStageGroup.add(charGroup);
     characterGroupRef.current = charGroup;
 
     // Resize Handler
     const handleResize = () => {
       if (!container || !camera || !renderer) return;
-      const w = container.clientWidth;
-      const h = container.clientHeight;
+      const w = fullScreen ? window.innerWidth : (container.clientWidth || 400);
+      const h = fullScreen ? window.innerHeight : (container.clientHeight || 500);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
+
+      const tx = computeTargetX(w, h);
+      if (mainStageGroupRef.current) {
+        mainStageGroupRef.current.position.x = tx;
+      }
+      if (spotlightRef.current) {
+        spotlightRef.current.position.x = tx;
+        spotlightRef.current.target.position.set(tx, 1.10, 0);
+        spotlightRef.current.target.updateMatrixWorld();
+      }
+      if (rimLightRef.current) {
+        rimLightRef.current.position.x = tx;
+      }
+      if (dirLightRef.current) {
+        dirLightRef.current.position.x = tx + 4;
+      }
     };
 
     window.addEventListener('resize', handleResize);
@@ -173,6 +240,11 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
       animFrameIdRef.current = requestAnimationFrame(animate);
       const delta = clock.getDelta();
       const elapsed = clock.getElapsedTime();
+
+      // Background stars rotation
+      if (starPointsRef.current) {
+        starPointsRef.current.rotation.y = elapsed * 0.015;
+      }
 
       // Apply rotation & momentum
       if (charGroup) {
@@ -235,6 +307,11 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
       rimLightRef.current.color.set(character.palette.accentSecondary);
     }
 
+    // Update Rune Ring on pedestal
+    if (ringMeshRef.current) {
+      (ringMeshRef.current.material as THREE.MeshBasicMaterial).color.set(character.palette.accentGold);
+    }
+
     // Build the Voxel Rig for this character
     buildVoxelCharacter(charGroup, character);
   }, [character]);
@@ -242,9 +319,10 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
   // Adjust Camera Zoom
   useEffect(() => {
     if (cameraRef.current) {
-      cameraRef.current.position.z = 7.5 / zoomLevel;
+      const baseZ = fullScreen ? 12.0 : 7.5;
+      cameraRef.current.position.z = baseZ / zoomLevel;
     }
-  }, [zoomLevel]);
+  }, [zoomLevel, fullScreen]);
 
   // Pointer / Touch Drag handlers for 360 degree rotation
   const handlePointerDown = (e: React.PointerEvent) => {
@@ -279,8 +357,88 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
     }
   };
 
+  if (fullScreen) {
+    return (
+      <div className={`fixed inset-0 w-screen h-screen z-0 overflow-hidden select-none pointer-events-auto bg-[#090714] ${className}`}>
+        {/* 3D WebGL Canvas Container */}
+        {webglSupported ? (
+          <div
+            ref={mountRef}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            className="w-full h-full cursor-grab active:cursor-grabbing touch-none"
+          />
+        ) : (
+          /* 2D High-Fidelity Fallback if WebGL is disabled */
+          <div className="flex flex-col items-center justify-center p-6 text-center h-full">
+            <div
+              className="w-48 h-64 border-4 p-4 flex items-center justify-center mb-4 shadow-pixel"
+              style={{
+                borderColor: character.palette.borderPrimary,
+                backgroundColor: character.palette.bgVoid,
+              }}
+            >
+              <div className="font-pixel text-4xl text-arcade-gold animate-bounce">
+                {character.name.charAt(0)}
+              </div>
+            </div>
+            <span className="text-xs font-mono text-arcade-gold uppercase font-bold">
+              {character.name} // 2D STAGE PREVIEW
+            </span>
+          </div>
+        )}
+
+        {/* Atmospheric Stage Vignette & Top Light Cone */}
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,rgba(245,194,66,0.06)_0%,transparent_65%)]" />
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_bottom,transparent_45%,rgba(11,9,20,0.65)_100%)]" />
+
+        {/* Floating Camera Controls Pill in bottom-right corner above footer */}
+        <div className="fixed bottom-10 right-4 sm:right-6 z-20 flex items-center gap-1.5 backdrop-blur-md bg-[#0E0B1C]/90 border-2 border-[#3E356B] p-1.5 shadow-[4px_4px_0px_rgba(0,0,0,0.6)]">
+          <button
+            onClick={() => setAutoRotate(!autoRotate)}
+            className={`px-2 py-1 text-[10px] font-mono font-bold flex items-center gap-1 border transition-all ${
+              autoRotate
+                ? 'border-arcade-gold bg-arcade-gold/20 text-arcade-gold'
+                : 'border-arcade-border text-gray-400 hover:text-white'
+            }`}
+            title="Toggle Auto 360° Spin"
+          >
+            <RotateCw size={12} className={autoRotate ? 'animate-spin' : ''} />
+            <span className="hidden sm:inline">{autoRotate ? 'AUTO-SPIN ON' : 'SPIN'}</span>
+          </button>
+
+          <button
+            onClick={resetFront}
+            className="pixel-btn px-2 py-1 text-[10px] font-mono text-gray-300 hover:text-arcade-gold"
+            title="Reset Front View"
+          >
+            <RotateCcw size={12} />
+            <span className="hidden sm:inline">FRONT</span>
+          </button>
+
+          <button
+            onClick={() => setZoomLevel((z) => Math.min(1.4, z + 0.15))}
+            className="pixel-btn p-1 text-gray-300 hover:text-arcade-cyan"
+            title="Zoom In"
+          >
+            <ZoomIn size={12} />
+          </button>
+
+          <button
+            onClick={() => setZoomLevel((z) => Math.max(0.7, z - 0.15))}
+            className="pixel-btn p-1 text-gray-300 hover:text-arcade-cyan"
+            title="Zoom Out"
+          >
+            <ZoomOut size={12} />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="relative w-full h-[320px] sm:h-[420px] md:h-[520px] flex items-center justify-center select-none overflow-hidden rounded-none border-2 border-arcade-border bg-[#0B0818] shadow-pixel">
+    <div className={`relative w-full h-[320px] sm:h-[420px] md:h-[520px] flex items-center justify-center select-none overflow-hidden rounded-none border-2 border-arcade-border bg-[#0B0818] shadow-pixel ${className}`}>
       {/* 3D WebGL Canvas Container */}
       {webglSupported ? (
         <div
@@ -313,16 +471,6 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
       {/* Atmospheric Stage Vignette & Top Light Cone */}
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,rgba(245,194,66,0.15)_0%,transparent_65%)]" />
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_bottom,transparent_40%,rgba(11,9,20,0.8)_100%)]" />
-
-      {/* Minecraft PE Style Stage Floor Grid Crosshairs */}
-      <div className="absolute top-3 left-3 text-[10px] font-mono text-arcade-cyan/80 pointer-events-none flex items-center gap-2">
-        <span className="w-2 h-2 bg-arcade-cyan animate-pulse" />
-        <span>DRESSING STAGE // 3D VOXEL RIG</span>
-      </div>
-
-      <div className="absolute top-3 right-3 text-[10px] font-mono text-gray-500 pointer-events-none">
-        DRAG TO ROTATE 360°
-      </div>
 
       {/* Stage Interactive Floating Controls */}
       <div className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-void-darkest/90 border border-arcade-border p-1 shadow-pixel z-20">
@@ -363,13 +511,6 @@ export const CharacterVoxelStage: React.FC<CharacterVoxelStageProps> = ({
         >
           <ZoomOut size={12} />
         </button>
-      </div>
-
-      {/* Universe Tag Badge */}
-      <div className="absolute bottom-3 left-3 pointer-events-none">
-        <div className="px-2.5 py-1 bg-void-darkest/95 border border-arcade-border text-[10px] font-mono text-arcade-gold shadow-pixel">
-          &gt; {character.universe}
-        </div>
       </div>
     </div>
   );

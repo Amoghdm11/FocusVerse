@@ -60,7 +60,7 @@ FocusVerse is an immersive, retro-futuristic productivity environment inspired b
 ### 4. Global Credits Footer (`Footer.tsx`)
 * Persistent dark pixel-arcade footer displayed across all pages:
   * `FOCUSVERSE // PIXEL PRODUCTIVITY SANCTUARY`
-  * `Crafted with ♥ • Credits: AmorSin & Beezsy79`
+  * `Crafted with ♥ • Credits: AmorSin, Beezsy79 & 02Yuzu02`
 
 ---
 
@@ -96,7 +96,53 @@ npm run build
 npm run preview
 ```
 
+### Running the Test Suite
+```bash
+# Unit & core logic verification (38/38 passing):
+npx tsx scripts/test-core-logic.ts
+
+# Full end-to-end browser automation audit (Headless Edge / Puppeteer):
+node scripts/verify-all-views.js
+```
+
+---
+
+## ✦ Major Upgrades Overview
+
+### 1. Tutor Selection System (`TutorsView.tsx`)
+- **"SELECT TUTOR" Primary Button:** Replaced the prominent "Create Tutor" CTA with a dedicated "SELECT TUTOR" action that opens the interactive study companion roster modal (`CHOOSE YOUR STUDY COMPANION`).
+- **Comprehensive Roster:** Displays 5 Core Archetypes (Strict Mentor, Friendly Companion, Chill Companion, Competitive Coach, Wise Mentor), 20 Canon Heroes, and user-crafted custom tutors.
+- **Preview & Active Indicator:** Real-time preview card with personality, quote, preferred timer duration, audio profile, and clear `[✓ ACTIVE]` badges.
+- **Global Synchronization:** Selecting a tutor updates the active companion across the Navigation HUD, Study Timer, Dashboard, tutor dialogue, and session records, persisting in `localStorage`.
+- **Secondary Custom Companion Creator:** "+ Craft Custom Tutor" remains available as an accessible secondary action.
+
+### 2. AI-Powered Knowledge Workspace & Flashcards (`NotesAndFlashcardsView.tsx`)
+- **2-Column Note Architecture:** Preserves notes list on left and markdown-enabled editor on right with search, subject filtering, duplicate, pin/unpin, and markdown preview mode.
+- **AI Notebook Assistant Panel:** Side-by-side retro panel featuring contextual Q&A grounded on note contents.
+- **Quick Action Prompts:** "💡 Simple terms", "📋 Summarize", "❓ Practice Quiz", and "🃏 Flashcards".
+- **AI Service Abstraction (`aiService.ts`):** Supports live Google Gemini API (`gemini-1.5-flash`) via user-provided API key stored securely in local browser storage, with an intelligent local semantic analyzer fallback that parses headings, definitions, and formulas when no API key is provided.
+- **Draft Flashcard Approval Workflow:** Generates card drafts with an interactive review modal allowing users to edit, toggle approval, select a target deck, and click `[✓ APPROVE & SAVE TO DECK]` before cards enter spaced repetition.
+- **Direct Focus Session:** "FOCUS ON THIS" button turns any note into a high-priority study task and transitions directly to the Study Timer.
+
+### 3. Dedicated Music & Ambience Center (`MusicCenter.tsx`)
+- **Inline Dashboard Integration:** The awkward floating top-left audio popover has been eliminated; replaced by a large, dedicated "MUSIC & AMBIENCE CENTER" panel embedded directly within the Study Timer layout.
+- **Single Active Playback Manager:** Manages ambient procedural soundscapes (rain, lo-fi, space, sonar, matrix, fire, wind, cat purr), 8-bit chiptune synthesizer, Minecraft sandbox tracks, and YouTube embeds without overlapping audio.
+- **Sound Controls:** Master mute button, volume sliders, favorites list (`localStorage`), and real-time status telemetry (`STANDBY`, `PLAYING // AMBIENCE`, `PLAYING // MINECRAFT`).
+
+### 4. YouTube Integration & "SANDBOX & PIXEL WORLDS" Collection (`minecraftTracks.ts`)
+- **Official Minecraft Study Collection:** Curated C418 tracks (Sweden, Subwoofer Lullaby, Wet Hands, Mice on Venus, Danny, Cave Ambience, 1-Hour Mix) using authorized YouTube embeds and procedural audio fallbacks.
+- **Player Modes:**
+  - **Video Mode:** Embedded YouTube player container.
+  - **Audio-Focused Mode:** Compact player keeping the timer, tasks, and scratchpad completely unobstructed.
+- **Safe YouTube URL Parser:** Validates standard `watch?v=`, `youtu.be/`, and embed URLs with strict identifier verification and external discovery links.
+
+### 5. Full-Body Character Selection & Customization Menu (`SpiderManCustomizationMenu.tsx` & `pixelSpriteCompositor.ts`)
+- **Spider-Man Suit Locker Customization:** Interactive suit locker menu featuring full-body 64x96 pixel-art preview on a holographic pedestal with retro scanlines and neon podium.
+- **Layered Pixel Sprite Compositor:** Real-time layering for suits, hairstyles, hair colors, skin tones, and gear loadouts.
+- **Player Callsign Sync:** Customizable trainer name synced across the entire app, navigation HUD, and companion stages.
+- **Pixel Transition & Intro Select:** Canvas pixel mosaic dissolve wipe transition and Pokémon-inspired intro selection engine.
+
 ---
 
 ## ✦ Credits
-Crafted with ♥ • Credits: **AmorSin** & **Beezsy79**
+Crafted with ♥ • Credits: **AmorSin**, **Beezsy79** & **02Yuzu02**

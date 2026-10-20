@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Sparkles, ShieldCheck, Lock, ChevronLeft } from 'lucide-react';
+import { Play, Sparkles, ShieldCheck, Lock, ChevronLeft, LayoutDashboard } from 'lucide-react';
 import { CHARACTERS } from '../data/characters';
 import { Character } from '../types/character';
 import { CosmicGlobe } from '../components/CosmicGlobe';
@@ -12,6 +12,7 @@ interface HomePageProps {
   onSelectCompanion: () => void;
   onLaunchQuickSession: (character: Character) => void;
   onSelectSpirit?: (spirit: 'girl' | 'boy') => void;
+  onEnterDashboard?: () => void;
   archetypeMode: boolean;
   onToggleArchetypeMode: () => void;
 }
@@ -20,6 +21,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   onSelectCompanion,
   onLaunchQuickSession,
   onSelectSpirit,
+  onEnterDashboard,
   archetypeMode,
   onToggleArchetypeMode,
 }) => {
@@ -122,8 +124,8 @@ export const HomePage: React.FC<HomePageProps> = ({
               </div>
             </div>
 
-            {/* Primary Action Button (Single Clean Button - "View All" Removed) */}
-            <div className="flex items-center justify-center lg:justify-start pt-1 w-full max-w-xl">
+            {/* Primary Action Buttons */}
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-1 w-full max-w-xl">
               <button
                 onClick={() => {
                   audioEngine.playClick();
@@ -134,6 +136,20 @@ export const HomePage: React.FC<HomePageProps> = ({
                 <Play size={14} fill="currentColor" />
                 <span>► LAUNCH QUICK SESSION ►</span>
               </button>
+
+              {onEnterDashboard && (
+                <button
+                  onClick={() => {
+                    audioEngine.playClick();
+                    onEnterDashboard();
+                  }}
+                  className="pixel-btn w-full sm:w-auto px-5 py-3.5 font-silkscreen text-xs uppercase flex items-center justify-center gap-2 border border-arcade-border text-arcade-cyan hover:text-white hover:border-arcade-cyan hover:scale-105 transition-all"
+                  title="Enter the full RPG study dashboard"
+                >
+                  <LayoutDashboard size={14} />
+                  <span>DASHBOARD ➔</span>
+                </button>
+              )}
             </div>
           </div>
 

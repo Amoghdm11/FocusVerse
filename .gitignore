@@ -29,3 +29,7 @@ yarn-error.log*
 
 # Temporary test scripts
 test_interaction.cjs
+
+# Update zips & archives
+updates/
+*.zip

@@ -32,6 +32,8 @@ import { TUTOR_ARCHETYPES, CORE_TUTOR_PROFILES } from '../src/data/tutorArchetyp
 import { TUTOR_ECOSYSTEM_PROFILES, DEFAULT_STUDY_SQUADS, DEFAULT_FOCUS_PRESETS } from '../src/data/tutorProfiles.ts';
 import { CHARACTERS } from '../src/data/characters.ts';
 import { tutorDialogueService } from '../src/utils/tutorDialogueService.ts';
+import { youtubeService } from '../src/utils/youtubeService.ts';
+import { CURATED_TRACKS, DEFAULT_PLAYLISTS } from '../src/data/curatedMusicCatalog.ts';
 
 async function runTests() {
   console.log('--- STARTING FOCUSVERSE COMPREHENSIVE AUDIT & LOGIC SUITE ---');
@@ -300,6 +302,69 @@ Dijkstra algorithm calculates the shortest path from a single source node to all
   const mutedResult = tutorDialogueService.triggerEvent('SESSION_START', 'peter-parker');
   assert(mutedResult === null, 'Dialogue returns null when muted');
   rpgStore.saveSettings(savedSettings); // restore
+
+  // 19. SPOTIFY-STYLE YOUTUBE MUSIC SERVICE & PLAYLISTS
+  assert(CURATED_TRACKS.length >= 20, 'Curated catalog has at least 20 real YouTube tracks');
+  assert(DEFAULT_PLAYLISTS.length >= 7, 'At least 7 default playlists initialized (Minecraft, Lofi, Piano, OST, Ambient, Rain, Synth)');
+  
+  // URL ID Extraction
+  assert(youtubeService.extractVideoId('aBkTkxKDduc') === 'aBkTkxKDduc', 'Raw 11-char video ID extracted');
+  assert(youtubeService.extractVideoId('https://www.youtube.com/watch?v=ha3KQ8gB83w') === 'ha3KQ8gB83w', 'Standard YouTube watch URL extracted');
+  assert(youtubeService.extractVideoId('https://youtu.be/mUYsp5So298') === 'mUYsp5So298', 'Shortened youtu.be URL extracted');
+  assert(youtubeService.extractVideoId('https://www.youtube.com/embed/5qap5aO4i9A') === '5qap5aO4i9A', 'Embed URL extracted');
+
+  // Playlists CRUD
+  const initPlCount = youtubeService.getPlaylists().length;
+  assert(initPlCount >= 7, 'Initial playlists loaded');
+  const customPl = youtubeService.createPlaylist('Late Night Calculus Mix', '⚡', 'Intense math sprints');
+  assert(customPl.name === 'Late Night Calculus Mix', 'Custom playlist created');
+  assert(youtubeService.getPlaylists().length === initPlCount + 1, 'Custom playlist persisted');
+
+  // Add & Remove Track from Playlist
+  const sampleTrack = CURATED_TRACKS[0];
+  youtubeService.addTrackToPlaylist(customPl.id, sampleTrack);
+  const foundPl = youtubeService.getPlaylists().find((p) => p.id === customPl.id);
+  assert(foundPl?.tracks.length === 1, 'Track added to playlist');
+  assert(foundPl?.tracks[0].videoId === sampleTrack.videoId, 'Track video ID matches in playlist');
+  youtubeService.removeTrackFromPlaylist(customPl.id, foundPl!.tracks[0].id);
+  const foundPlAfter = youtubeService.getPlaylists().find((p) => p.id === customPl.id);
+  assert(foundPlAfter?.tracks.length === 0, 'Track removed from playlist');
+  youtubeService.deletePlaylist(customPl.id);
+  assert(youtubeService.getPlaylists().length === initPlCount, 'Playlist deleted cleanly');
+
+  // Queue Operations
+  const initQueue = youtubeService.getQueue();
+  assert(initQueue.length > 0, 'Queue initialized with tracks');
+  youtubeService.saveQueue([CURATED_TRACKS[0], CURATED_TRACKS[1]]);
+  assert(youtubeService.getQueue().length === 2, 'Queue saved and retrieved accurately');
+
+  // Favorites (Liked Tracks)
+  const isFavBefore = youtubeService.isFavorite(CURATED_TRACKS[2].videoId);
+  const nowFav = youtubeService.toggleFavorite(CURATED_TRACKS[2]);
+  assert(nowFav !== isFavBefore, 'Favorite state toggled');
+  assert(youtubeService.isFavorite(CURATED_TRACKS[2].videoId) === nowFav, 'Favorite check returns current state');
+  // Toggle back
+  youtubeService.toggleFavorite(CURATED_TRACKS[2]);
+
+  // Recently Played
+  youtubeService.addRecentlyPlayed(CURATED_TRACKS[3]);
+  const recents = youtubeService.getRecentlyPlayed();
+  assert(recents.length > 0 && recents[0].videoId === CURATED_TRACKS[3].videoId, 'Recently played track tracked at index 0');
+
+  // Search
+  const searchMinecraft = await youtubeService.searchYouTube('C418 Sweden');
+  assert(searchMinecraft.length > 0, 'Search for C418 Sweden returned real tracks');
+  assert(searchMinecraft[0].videoId === 'aBkTkxKDduc', 'Accurate C418 Sweden track matched');
+
+  // Settings
+  youtubeService.saveVolume(85);
+  assert(youtubeService.getVolume() === 85, 'Volume persisted accurately');
+  youtubeService.savePlayerMode('VIDEO');
+  assert(youtubeService.getPlayerMode() === 'VIDEO', 'Player mode persisted');
+  youtubeService.saveRepeat('ALL');
+  assert(youtubeService.getRepeat() === 'ALL', 'Repeat mode persisted');
+  youtubeService.saveShuffle(true);
+  assert(youtubeService.getShuffle() === true, 'Shuffle setting persisted');
 
   console.log(`\nTEST RESULTS: ${passed} passed, ${failed} failed.`);
   if (failed > 0) {

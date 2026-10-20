@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, RotateCcw, Flag, Award, Clock, Flame, ChevronRight } from 'lucide-react';
+import { Play, Pause, RotateCcw, Flag, Award, Clock, Flame, ChevronRight, CheckSquare, AlertTriangle, Coffee } from 'lucide-react';
 import { Character } from '../types/character';
 import { audioEngine } from '../utils/audioEngine';
 import { UserFocusAction } from './AudioCodeFooter';
+import { rpgStore } from '../utils/rpgStore';
+import { RPGTask } from '../types/rpg';
+import { tutorDialogueService } from '../utils/tutorDialogueService';
 
 export type TimerType = 'POMODORO' | 'STOPWATCH' | 'COUNTDOWN';
 export type PomoPhase = 'FOCUS' | 'SHORT_BREAK' | 'LONG_BREAK';
@@ -11,6 +14,7 @@ interface TimerWidgetProps {
   character?: Character | null;
   onActionChange: (action: UserFocusAction) => void;
   onModeChange?: (mode: string) => void;
+  initialTask?: RPGTask | null;
 }
 
 interface CompletedBlock {
@@ -25,6 +29,7 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
   character,
   onActionChange,
   onModeChange,
+  initialTask,
 }) => {
   const [timerType, setTimerType] = useState<TimerType>('POMODORO');
   const [pomoPhase, setPomoPhase] = useState<PomoPhase>('FOCUS');
@@ -43,16 +48,16 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
   const [stopwatchMs, setStopwatchMs] = useState(0);
   const [laps, setLaps] = useState<number[]>([]);
 
+  // Distraction Counter
+  const [distractions, setDistractions] = useState<number>(0);
+
+  // Task Association
+  const [tasks, setTasks] = useState<RPGTask[]>(rpgStore.getTasks());
+  const [selectedTaskId, setSelectedTaskId] = useState<string>(initialTask?.id || '');
+
   // Daily Goal state
-  const [dailyGoalMins, setDailyGoalMins] = useState(100);
-  const [todayCompletedMins, setTodayCompletedMins] = useState(() => {
-    try {
-      const saved = localStorage.getItem('focusverse_today_mins');
-      return saved ? parseInt(saved, 10) : 45;
-    } catch (_) {
-      return 45;
-    }
-  });
+  const [settings] = useState(rpgStore.getSettings());
+  const [todayCompletedMins, setTodayCompletedMins] = useState<number>(() => rpgStore.getTodayMins());
 
   // Completed Session Notes (Musical Focus Song)
   const [sessionNotes, setSessionNotes] = useState<CompletedBlock[]>(() => {
@@ -68,18 +73,46 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
 
   // Retro Sunset Victory Animation
   const [showVictory, setShowVictory] = useState(false);
+  const [breakOffered, setBreakOffered] = useState(false);
 
   // Timestamp references for drift-free timing
   const endTimeRef = useRef<number>(0);
   const stopwatchStartRef = useRef<number>(0);
   const animFrameRef = useRef<number | null>(null);
 
+  // Update selected task when initialTask changes
+  useEffect(() => {
+    if (initialTask) {
+      setSelectedTaskId(initialTask.id);
+    }
+  }, [initialTask]);
+
+  // Handle visibility change (tab switches, sleep wake)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && isRunning) {
+        if (timerType === 'STOPWATCH') {
+          const now = Date.now();
+          setStopwatchMs(now - stopwatchStartRef.current);
+        } else {
+          const remaining = Math.max(0, endTimeRef.current - Date.now());
+          setTimeLeftMs(remaining);
+          if (remaining <= 0) {
+            handleCompletion();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isRunning, timerType]);
+
   useEffect(() => {
     try {
-      localStorage.setItem('focusverse_today_mins', todayCompletedMins.toString());
       localStorage.setItem('focusverse_session_notes', JSON.stringify(sessionNotes));
     } catch (_) {}
-  }, [todayCompletedMins, sessionNotes]);
+  }, [sessionNotes]);
 
   // Sync mode with parent
   useEffect(() => {
@@ -99,6 +132,23 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
     setTotalDurationMs(dur * 1000);
     setTimeLeftMs(dur * 1000);
     onActionChange(phase === 'FOCUS' ? 'IDLE' : 'BREAK');
+
+    if (phase === 'SHORT_BREAK' || phase === 'LONG_BREAK') {
+      tutorDialogueService.triggerEvent('BREAK_START', character?.id);
+    } else {
+      tutorDialogueService.triggerEvent('BREAK_RETURN', character?.id);
+    }
+  };
+
+  // Change focus preset duration
+  const selectFocusPreset = (mins: number) => {
+    audioEngine.playClick();
+    setIsRunning(false);
+    setFocusDur(mins * 60);
+    if (pomoPhase === 'FOCUS' || timerType !== 'POMODORO') {
+      setTotalDurationMs(mins * 60 * 1000);
+      setTimeLeftMs(mins * 60 * 1000);
+    }
   };
 
   // Start / Pause
@@ -109,6 +159,7 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
       setIsRunning(false);
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
       onActionChange('IDLE');
+      tutorDialogueService.triggerEvent('SESSION_PAUSE', character?.id);
     } else {
       // Start
       setIsRunning(true);
@@ -118,6 +169,14 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
         endTimeRef.current = Date.now() + timeLeftMs;
       }
       onActionChange(pomoPhase === 'FOCUS' || timerType !== 'POMODORO' ? 'FOCUSING' : 'BREAK');
+
+      if (pomoPhase === 'FOCUS' || timerType !== 'POMODORO') {
+        if (timeLeftMs < totalDurationMs) {
+          tutorDialogueService.triggerEvent('SESSION_RESUME', character?.id);
+        } else {
+          tutorDialogueService.triggerEvent('SESSION_START', character?.id);
+        }
+      }
     }
   };
 
@@ -183,27 +242,72 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
   const handleCompletion = () => {
     setIsRunning(false);
     setShowVictory(true);
+    setBreakOffered(true);
     onActionChange('COMPLETED');
 
-    // Add minutes to daily goal
     const minutesAdded = Math.round(totalDurationMs / (60 * 1000));
-    setTodayCompletedMins((prev) => prev + minutesAdded);
 
-    // Add a note to the Focus Song
-    const noteNames = ['C4', 'D4', 'E4', 'G4', 'A4', 'C5', 'D5', 'E5'];
-    const freqs = character?.synthNotes || [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
-    const pickIdx = sessionNotes.length % freqs.length;
-    const newBlock: CompletedBlock = {
-      id: Date.now().toString(),
-      noteName: `NOTE ${sessionNotes.length + 1} (${noteNames[pickIdx % noteNames.length]})`,
-      freq: freqs[pickIdx],
-      durationMinutes: minutesAdded,
-      timestamp: Date.now(),
-    };
-    setSessionNotes((prev) => [...prev, newBlock]);
+    // Only record focus sessions (exclude breaks from focus minutes)
+    if (pomoPhase === 'FOCUS' || timerType !== 'POMODORO') {
+      const activeTask = tasks.find((t) => t.id === selectedTaskId);
+      const effectiveTutorId = character?.id || 'peter-parker';
+
+      // Record to persistent RPG Store
+      rpgStore.addSession({
+        durationMinutes: minutesAdded,
+        plannedMinutes: Math.round(totalDurationMs / 60000),
+        timerType,
+        subject: activeTask?.subject || 'General Study',
+        taskId: activeTask?.id,
+        taskTitle: activeTask?.title,
+        tutorId: effectiveTutorId,
+        distractionCount: distractions,
+        completed: true,
+      });
+
+      // Trigger tutor completion dialogue
+      tutorDialogueService.triggerEvent('SESSION_COMPLETE', effectiveTutorId);
+
+      // Check daily goal celebration
+      const prevMins = todayCompletedMins;
+      const newTotalMins = rpgStore.getTodayMins();
+      setTodayCompletedMins(newTotalMins);
+      if (newTotalMins >= settings.dailyGoalMinutes && prevMins < settings.dailyGoalMinutes) {
+        tutorDialogueService.triggerEvent('DAILY_GOAL_REACHED', effectiveTutorId);
+      }
+
+      // If tied to task, increment actual minutes
+      if (activeTask) {
+        rpgStore.updateTask(activeTask.id, {
+          actualMinutes: (activeTask.actualMinutes || 0) + minutesAdded,
+          sessionsCount: (activeTask.sessionsCount || 0) + 1,
+        });
+      }
+
+      // Add a note to the Focus Song
+      const noteNames = ['C4', 'D4', 'E4', 'G4', 'A4', 'C5', 'D5', 'E5'];
+      const freqs = character?.synthNotes || [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
+      const pickIdx = sessionNotes.length % freqs.length;
+      const newBlock: CompletedBlock = {
+        id: Date.now().toString(),
+        noteName: `NOTE ${sessionNotes.length + 1} (${noteNames[pickIdx % noteNames.length]})`,
+        freq: freqs[pickIdx],
+        durationMinutes: minutesAdded,
+        timestamp: Date.now(),
+      };
+      setSessionNotes((prev) => [...prev, newBlock]);
+    }
 
     // Play Victory Jingle
     audioEngine.playVictoryJingle(character?.synthNotes);
+
+    // Desktop Notification
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('FocusSprint Completed! ★', {
+        body: `${minutesAdded} minutes of deep focus logged in FocusVerse!`,
+        icon: '/favicon.ico',
+      });
+    }
   };
 
   // Format Helpers
@@ -222,19 +326,22 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;
   };
 
-  // Calculate percentage for Binary Search / Square-wave cursor
+  // Progress Percent
   const progressPercent =
     totalDurationMs > 0 ? Math.min(100, Math.max(0, ((totalDurationMs - timeLeftMs) / totalDurationMs) * 100)) : 0;
 
   // Segmented progress bar (20 blocks)
+  const dailyGoalMins = settings.dailyGoalMinutes || 100;
   const goalPercent = Math.min(100, Math.round((todayCompletedMins / dailyGoalMins) * 100));
   const activeSegments = Math.round((goalPercent / 100) * 20);
+
+  const activeTask = tasks.find((t) => t.id === selectedTaskId);
 
   return (
     <div className="relative bg-void-card pixel-border border-arcade-border p-3.5 shadow-pixel">
       {/* RETRO SUNSET VICTORY STRIPES OVERLAY */}
       {showVictory && (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/90 p-4 border-2 border-arcade-gold">
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/90 p-4 border-2 border-arcade-gold animate-fadeIn">
           {/* 3 Horizontal Retro Victory Sunset Bands */}
           <div className="w-full h-8 bg-[#7A283B] mb-1 victory-band" />
           <div className="w-full h-8 bg-[#B85A32] mb-1 victory-band" style={{ animationDelay: '0.2s' }} />
@@ -243,28 +350,58 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
           {/* Glowing Badge */}
           <div className="relative px-4 py-2 bg-void-darkest border-2 border-arcade-gold shadow-pixel text-center">
             <div className="font-pixel text-xs text-arcade-gold tracking-widest uppercase mb-1 animate-pulse">
-              ★ SESSION COMPLETE // FOUND ★
+              ★ SPRINT COMPLETE // FOCUS BANKED ★
             </div>
             <p className="text-[11px] font-mono text-gray-300">
-              +{Math.round(totalDurationMs / 60000)}m logged • Musical Note Synthesized
+              +{Math.round(totalDurationMs / 60000)}m logged • +{Math.round(totalDurationMs / 60000) * 2 + 20} XP Earned
             </p>
+            {activeTask && (
+              <p className="text-[10px] font-mono text-arcade-cyan mt-1">
+                Linked Task: {activeTask.title}
+              </p>
+            )}
           </div>
 
-          <button
-            onClick={() => {
-              audioEngine.playClick();
-              setShowVictory(false);
-              resetTimer();
-            }}
-            className="mt-4 pixel-btn-primary px-4 py-1.5 text-xs uppercase font-silkscreen"
-          >
-            RESUME WORKSPACE ▶
-          </button>
+          {/* Break Options Prompt */}
+          {breakOffered && (
+            <div className="mt-3 flex items-center gap-2">
+              <button
+                onClick={() => {
+                  setShowVictory(false);
+                  setBreakOffered(false);
+                  selectPomoPhase('SHORT_BREAK');
+                }}
+                className="pixel-btn px-2.5 py-1 text-[10px] text-green-300 border-green-500"
+              >
+                ☕ 5M REST
+              </button>
+              <button
+                onClick={() => {
+                  setShowVictory(false);
+                  setBreakOffered(false);
+                  selectPomoPhase('LONG_BREAK');
+                }}
+                className="pixel-btn px-2.5 py-1 text-[10px] text-arcade-cyan border-arcade-cyan"
+              >
+                🏖️ 15M BREAK
+              </button>
+              <button
+                onClick={() => {
+                  setShowVictory(false);
+                  setBreakOffered(false);
+                  resetTimer();
+                }}
+                className="pixel-btn-primary px-3 py-1 text-[10px] font-pixel text-black"
+              >
+                NEXT FOCUS ▶
+              </button>
+            </div>
+          )}
         </div>
       )}
 
       {/* Mode Navigation Tabs */}
-      <div className="grid grid-cols-3 gap-1 mb-3 text-[10px] font-silkscreen select-none">
+      <div className="grid grid-cols-3 gap-1 mb-2 text-[10px] font-silkscreen select-none">
         {(['POMODORO', 'STOPWATCH', 'COUNTDOWN'] as TimerType[]).map((mode) => (
           <button
             key={mode}
@@ -284,12 +421,30 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
         ))}
       </div>
 
+      {/* Focus Presets (15, 25, 45, 50, 90 mins) */}
+      <div className="flex items-center justify-between gap-1 mb-3 text-[9px] font-mono select-none">
+        <span className="text-gray-500 text-[8px] font-pixel">PRESETS:</span>
+        {[15, 25, 45, 50, 90].map((mins) => (
+          <button
+            key={mins}
+            onClick={() => selectFocusPreset(mins)}
+            className={`px-1.5 py-0.5 border ${
+              focusDur === mins * 60 && pomoPhase === 'FOCUS'
+                ? 'border-arcade-gold bg-amber-950/60 text-arcade-gold font-bold'
+                : 'border-arcade-border text-gray-400 hover:text-white'
+            }`}
+          >
+            {mins}M
+          </button>
+        ))}
+      </div>
+
       {/* Pomodoro Sub-Phases */}
       {timerType === 'POMODORO' && (
         <div className="flex gap-1 mb-3 text-[9px] font-mono select-none">
           {(
             [
-              { key: 'FOCUS', label: 'FOCUS (25M)' },
+              { key: 'FOCUS', label: `FOCUS (${Math.round(focusDur / 60)}M)` },
               { key: 'SHORT_BREAK', label: 'REST (5M)' },
               { key: 'LONG_BREAK', label: 'LONG (15M)' },
             ] as const
@@ -325,12 +480,20 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
           {timerType === 'STOPWATCH' ? formatStopwatch(stopwatchMs) : formatTime(timeLeftMs)}
         </div>
 
-        <div className="text-[9px] font-mono text-gray-500 uppercase tracking-wider mt-1">
-          STATUS: <span className={isRunning ? 'text-green-400 font-bold' : 'text-gray-400'}>{isRunning ? 'RUNNING' : 'PAUSED'}</span> // DRIFT: 0.00MS
+        {/* Active Task Link Banner */}
+        {activeTask && (
+          <div className="mt-1 px-2 py-0.5 bg-void border border-arcade-border text-[9px] text-arcade-cyan truncate">
+            TARGET: <span className="text-white font-bold">{activeTask.title}</span> ({activeTask.subject})
+          </div>
+        )}
+
+        <div className="text-[9px] font-mono text-gray-500 uppercase tracking-wider mt-1.5 flex items-center justify-between px-1">
+          <span>STATUS: <span className={isRunning ? 'text-green-400 font-bold' : 'text-gray-400'}>{isRunning ? 'RUNNING' : 'PAUSED'}</span></span>
+          <span className="text-arcade-gold">DRIFT-FREE TIMESTAMP</span>
         </div>
       </div>
 
-      {/* Binary Search / Square-Wave Interactive Progress Tracker */}
+      {/* Square-Wave Interactive Progress Tracker */}
       <div className="mb-3 space-y-1">
         <div className="flex items-center justify-between text-[9px] font-mono text-arcade-cyan select-none">
           <span>[ LO: 0x00 ]</span>
@@ -340,16 +503,13 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
 
         {/* Track Line with Moving Pixel Node Cursor */}
         <div className="relative h-4 bg-void-darkest border border-arcade-border overflow-hidden">
-          {/* Cyan Dashed Baseline */}
           <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 border-t border-dashed border-[#2A234E]" />
 
-          {/* Progress fill */}
           <div
             className="absolute top-0 bottom-0 left-0 bg-arcade-gold/20 border-r-2 border-arcade-gold transition-all duration-100"
             style={{ width: `${progressPercent}%` }}
           />
 
-          {/* Node Cursor */}
           <div
             className="absolute top-0 bottom-0 w-2.5 bg-arcade-gold border border-black transition-all duration-100 flex items-center justify-center"
             style={{ left: `calc(${progressPercent}% - 5px)` }}
@@ -392,6 +552,57 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
         </button>
       </div>
 
+      {/* Distraction Counter & Task Link Row */}
+      <div className="grid grid-cols-2 gap-2 mb-3 border border-arcade-border/60 p-2 bg-void text-[10px] font-mono">
+        {/* Task selector */}
+        <div>
+          <span className="text-gray-400 block mb-0.5 text-[8px] font-pixel">LINK TO TASK:</span>
+          <select
+            value={selectedTaskId}
+            onChange={(e) => setSelectedTaskId(e.target.value)}
+            className="w-full bg-void-darkest border border-arcade-border text-white text-[10px] p-1 outline-none truncate"
+          >
+            <option value="">(No specific task)</option>
+            {tasks.filter((t) => !t.completed).map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.title}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Distraction counter */}
+        <div>
+          <span className="text-gray-400 block mb-0.5 text-[8px] font-pixel">DISTRACTIONS:</span>
+          <div className="flex items-center justify-between">
+            <span className="text-arcade-gold font-bold text-xs">{distractions}</span>
+            <div className="flex gap-1">
+              <button
+                onClick={() => setDistractions((d) => Math.max(0, d - 1))}
+                className="w-5 h-5 border border-arcade-border text-gray-400 hover:text-white"
+              >
+                -
+              </button>
+              <button
+                onClick={() => {
+                  audioEngine.playClick();
+                  setDistractions((d) => {
+                    const next = d + 1;
+                    if (next >= 3) {
+                      tutorDialogueService.triggerEvent('STRUGGLING_TASK', character?.id);
+                    }
+                    return next;
+                  });
+                }}
+                className="w-5 h-5 border border-red-500/70 text-red-300 hover:bg-red-950 font-bold"
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Laps Display (when Stopwatch mode has laps) */}
       {timerType === 'STOPWATCH' && laps.length > 0 && (
         <div className="mb-3 max-h-24 overflow-y-auto space-y-1 border border-arcade-border/60 p-1.5 bg-void-darkest text-[10px] font-mono">
@@ -416,7 +627,6 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
           </span>
         </div>
 
-        {/* 20 Discrete Pixel Segments */}
         <div className="grid grid-cols-20 gap-0.5 h-3 bg-void-darkest border border-arcade-border p-0.5">
           {Array.from({ length: 20 }).map((_, idx) => (
             <div
@@ -444,7 +654,7 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
               Complete your first block to generate a song note.
             </span>
           ) : (
-            sessionNotes.map((b, idx) => (
+            sessionNotes.map((b) => (
               <button
                 key={b.id}
                 onClick={() => audioEngine.playVictoryJingle([b.freq])}

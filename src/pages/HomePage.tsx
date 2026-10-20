@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Sparkles, Lock, ChevronLeft } from 'lucide-react';
+import { Play, Sparkles, Lock, ChevronLeft, LayoutDashboard } from 'lucide-react';
 import { CHARACTERS } from '../data/characters';
 import { Character } from '../types/character';
 import { CosmicGlobe } from '../components/CosmicGlobe';
@@ -14,6 +14,7 @@ interface HomePageProps {
   onSelectCompanion: () => void;
   onLaunchQuickSession: (character: Character) => void;
   onSelectSpirit?: (spirit: 'girl' | 'boy') => void;
+  onEnterDashboard?: () => void;
   archetypeMode: boolean;
   onToggleArchetypeMode: () => void;
 }
@@ -22,6 +23,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   onSelectCompanion,
   onLaunchQuickSession,
   onSelectSpirit,
+  onEnterDashboard,
   archetypeMode,
   onToggleArchetypeMode,
 }) => {
@@ -111,49 +113,45 @@ export const HomePage: React.FC<HomePageProps> = ({
 
             {/* Segmented Synergy-Style Modular Live Counter Blocks */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full max-w-xl select-none">
-              <div className="group relative bg-[#121026]/80 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-pixel transition-all hover:border-arcade-gold hover:shadow-[0_0_15px_rgba(245,194,66,0.25)]">
-                <div className="absolute top-1 right-1.5 text-[8px] font-mono text-gray-500 group-hover:text-arcade-gold">
-                  [01]
+              <div className="group relative bg-[#121026]/80 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-lg hover:border-arcade-gold/60 transition-all">
+                <div className="font-pixel text-lg sm:text-xl text-arcade-gold group-hover:scale-105 transition-transform">
+                  20
                 </div>
-                <div className="font-pixel text-lg sm:text-xl text-arcade-gold">20</div>
-                <div className="font-silkscreen text-[9px] text-gray-400 mt-1 uppercase tracking-wider group-hover:text-white transition-colors">
-                  WORLDS ROSTER
-                </div>
-              </div>
-
-              <div className="group relative bg-[#121026]/80 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-pixel transition-all hover:border-arcade-cyan hover:shadow-[0_0_15px_rgba(92,225,230,0.25)]">
-                <div className="absolute top-1 right-1.5 text-[8px] font-mono text-gray-500 group-hover:text-arcade-cyan">
-                  [02]
-                </div>
-                <div className="font-pixel text-lg sm:text-xl text-arcade-cyan">4</div>
-                <div className="font-silkscreen text-[9px] text-gray-400 mt-1 uppercase tracking-wider group-hover:text-white transition-colors">
-                  FLOW TOOLS
+                <div className="text-[9px] font-mono text-gray-400 uppercase tracking-widest mt-0.5">
+                  TUTORS
                 </div>
               </div>
 
-              <div className="group relative bg-[#121026]/80 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-pixel transition-all hover:border-arcade-pink hover:shadow-[0_0_15px_rgba(255,0,127,0.25)]">
-                <div className="absolute top-1 right-1.5 text-[8px] font-mono text-gray-500 group-hover:text-arcade-pink">
-                  [03]
+              <div className="group relative bg-[#121026]/80 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-lg hover:border-arcade-cyan/60 transition-all">
+                <div className="font-pixel text-lg sm:text-xl text-arcade-cyan group-hover:scale-105 transition-transform">
+                  100%
                 </div>
-                <div className="font-pixel text-lg sm:text-xl text-arcade-pink">100%</div>
-                <div className="font-silkscreen text-[9px] text-gray-400 mt-1 uppercase tracking-wider group-hover:text-white transition-colors">
-                  SYNTH CHIPTUNE
+                <div className="text-[9px] font-mono text-gray-400 uppercase tracking-widest mt-0.5">
+                  DRIFT-FREE
                 </div>
               </div>
 
-              <div className="group relative bg-[#121026]/80 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-pixel transition-all hover:border-green-400 hover:shadow-[0_0_15px_rgba(74,222,128,0.25)]">
-                <div className="absolute top-1 right-1.5 text-[8px] font-mono text-gray-500 group-hover:text-green-400">
-                  [04]
+              <div className="group relative bg-[#121026]/80 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-lg hover:border-arcade-pink/60 transition-all">
+                <div className="font-pixel text-lg sm:text-xl text-arcade-pink group-hover:scale-105 transition-transform">
+                  8
                 </div>
-                <div className="font-pixel text-lg sm:text-xl text-green-400">0</div>
-                <div className="font-silkscreen text-[9px] text-gray-400 mt-1 uppercase tracking-wider group-hover:text-white transition-colors">
-                  DISTRACTIONS
+                <div className="text-[9px] font-mono text-gray-400 uppercase tracking-widest mt-0.5">
+                  SOUNDSCAPES
+                </div>
+              </div>
+
+              <div className="group relative bg-[#121026]/80 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-lg hover:border-green-400/60 transition-all">
+                <div className="font-pixel text-lg sm:text-xl text-green-400 group-hover:scale-105 transition-transform">
+                  60 FPS
+                </div>
+                <div className="text-[9px] font-mono text-gray-400 uppercase tracking-widest mt-0.5">
+                  CANVAS
                 </div>
               </div>
             </div>
 
-            {/* Primary Action Button (Single Clean Button - "View All" Removed) */}
-            <div className="flex items-center justify-center lg:justify-start pt-1 w-full max-w-xl">
+            {/* Tactical Launch CTA Bar */}
+            <div className="pt-2 flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
               <button
                 onClick={() => {
                   audioEngine.playClick();
@@ -164,6 +162,20 @@ export const HomePage: React.FC<HomePageProps> = ({
                 <Play size={14} fill="currentColor" />
                 <span>► LAUNCH QUICK SESSION ►</span>
               </button>
+
+              {onEnterDashboard && (
+                <button
+                  onClick={() => {
+                    audioEngine.playClick();
+                    onEnterDashboard();
+                  }}
+                  className="pixel-btn w-full sm:w-auto px-5 py-3.5 font-silkscreen text-xs uppercase flex items-center justify-center gap-2 border border-arcade-border text-arcade-cyan hover:text-white hover:border-arcade-cyan hover:scale-105 transition-all"
+                  title="Enter the full RPG study dashboard"
+                >
+                  <LayoutDashboard size={14} />
+                  <span>DASHBOARD ➔</span>
+                </button>
+              )}
             </div>
           </div>
 

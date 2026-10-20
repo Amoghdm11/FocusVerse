@@ -2,18 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ShieldCheck, Dices, Search, Filter } from 'lucide-react';
 import { CHARACTERS } from '../data/characters';
 import { Character } from '../types/character';
-import { CharacterVoxelStage } from '../components/CharacterVoxelStage';
 import { CharacterInfoPanel } from '../components/CharacterInfoPanel';
 import { PixelFaceAvatar } from '../components/PixelFaceAvatar';
 import { Footer } from '../components/Footer';
 import { audioEngine } from '../utils/audioEngine';
+import { SpiderManCustomizationMenu } from '../components/SpiderManCustomizationMenu';
+import { CustomAppearanceState, getAppearanceForCharacter } from '../utils/pixelSpriteCompositor';
+import { FullBodyPixelSprite } from '../components/FullBodyPixelSprite';
 
 export type SpiritGenderType = 'boy' | 'girl';
 export type SpiritToggleOption = 'gender-only' | 'pets-only' | 'both';
 export type SpiritFilterType = 'boy' | 'girl' | 'ALL' | 'neutral';
 
-interface SelectPageProps {
-  onSelectCharacter: (character: Character) => void;
+export interface SelectPageProps {
+  onSelectCharacter: (
+    character: Character,
+    playerName?: string,
+    customAppearance?: CustomAppearanceState
+  ) => void;
   onBackToHome: () => void;
   archetypeMode: boolean;
   onToggleArchetypeMode: () => void;
@@ -31,6 +37,11 @@ export const SelectPage: React.FC<SelectPageProps> = ({
   initialSpirit = 'boy',
   onPreviewCharacterChange,
 }) => {
+  const gender: 'boy' | 'girl' = initialSpirit === 'girl' ? 'girl' : 'boy';
+
+  // Toggle between 2D Suit Locker Customizer and 3D Voxel Roster Stage
+  const [displayMode, setDisplayMode] = useState<'customizer' | 'voxel'>('customizer');
+
   // 1. Strict Gender Determination (Locked based on Homepage choice: 'boy' or 'girl')
   const [chosenGender, setChosenGender] = useState<SpiritGenderType>(() => {
     if (initialSpirit === 'girl') return 'girl';
@@ -178,21 +189,50 @@ export const SelectPage: React.FC<SelectPageProps> = ({
     handleSelectCompanion(available[randomIndex]);
   };
 
+  // If in customizer mode, display SpiderMan Customization Menu
+  if (displayMode === 'customizer') {
+    return (
+      <SpiderManCustomizationMenu
+        initialCharacter={initialCharacter || selectedCharacter}
+        initialGender={gender}
+        onBackToHome={onBackToHome}
+        onSwitchTo3DStage={() => {
+          audioEngine.playClick();
+          setDisplayMode('voxel');
+        }}
+        onConfirmAppearance={(char, appearance, playerName) => {
+          onSelectCharacter(char, playerName, appearance);
+        }}
+        archetypeMode={archetypeMode}
+      />
+    );
+  }
+
+  // 2D Sprite Stage and Companion Roster View
   return (
     <div className="relative w-screen h-screen overflow-hidden select-none bg-[#090714] text-gray-200">
       {/* ========================================================================= */}
-      {/* LAYER 0 (z-0): UNBOXED FULL-SCREEN 3D BACKGROUND PLANE                    */}
-      {/* Character rig and pedestal stand proudly on the right side (~71% width)   */}
+      {/* LAYER 0 (z-0): 2D SPRITE STAGE & HOLOGRAPHIC PEDESTAL (RIGHT SIDE)       */}
       {/* ========================================================================= */}
-      <CharacterVoxelStage
-        character={selectedCharacter}
-        archetypeMode={archetypeMode}
-        fullScreen={true}
-      />
+      <div className="absolute inset-0 flex items-center justify-end pr-12 lg:pr-32 pointer-events-none z-0">
+        <div className="relative pointer-events-auto transform hover:scale-105 transition-transform duration-300">
+          <FullBodyPixelSprite
+            appearance={getAppearanceForCharacter(selectedCharacter)}
+            size={420}
+            showPlatform={true}
+            platformColor={selectedCharacter.palette?.borderPrimary || '#F5C242'}
+            animated={true}
+            onClick={() => {
+              audioEngine.playClick();
+              audioEngine.playVictoryJingle(selectedCharacter.synthNotes);
+            }}
+            title={`Click ${selectedCharacter.name} for focus melody`}
+          />
+        </div>
+      </div>
 
       {/* ========================================================================= */}
       {/* LAYER 1 (z-20): TOP FLOATING TACTICAL HUD BAR                             */}
-      {/* Stretches full-width across the viewport without max-w constraints       */}
       {/* ========================================================================= */}
       <header className="fixed top-2 left-2 right-2 z-20 flex items-center justify-between gap-2 px-3 py-1.5 backdrop-blur-md bg-[#0E0B1C]/85 border-2 border-[#3E356B] text-xs font-mono shadow-[6px_6px_0px_rgba(0,0,0,0.65)]">
         {/* Left: Return Home & Dressing Room Status */}
@@ -208,6 +248,17 @@ export const SelectPage: React.FC<SelectPageProps> = ({
             <ChevronLeft size={14} />
             <span className="hidden sm:inline">[ ◀ RETURN HOME ]</span>
             <span className="sm:hidden">HOME</span>
+          </button>
+
+          <button
+            onClick={() => {
+              audioEngine.playClick();
+              setDisplayMode('customizer');
+            }}
+            className="pixel-btn px-2.5 py-1 text-[10px] text-arcade-cyan hover:text-white flex items-center gap-1.5 border border-arcade-cyan/60"
+            title="Open 16-Bit Suit Locker & Full Sprite Customizer"
+          >
+            <span>[ 🎽 CUSTOMIZE SUIT & SPRITE ]</span>
           </button>
 
           <div className="flex items-center gap-2 text-[10px] text-gray-400">
@@ -273,9 +324,6 @@ export const SelectPage: React.FC<SelectPageProps> = ({
 
       {/* ========================================================================= */}
       {/* LAYER 2 (z-20): FLOATING POP-UPS ANCHORED FLUSH TO FAR-LEFT EDGE          */}
-      {/* 1. Leftmost Roster Pop-Up at left-2 (w-[340px])                           */}
-      {/* 2. Details Pop-Up immediately to right at left-[352px] (w-[350px])       */}
-      {/* Entire center and right side is free for the 3D plane!                   */}
       {/* ========================================================================= */}
       
       {/* 1. LEFTMOST POP-UP WINDOW: CHARACTER CHOOSING ROSTER */}
@@ -285,240 +333,239 @@ export const SelectPage: React.FC<SelectPageProps> = ({
           mobileTab === 'roster' ? 'flex' : 'hidden lg:flex'
         }`}
       >
-          {/* Top of Leftmost Pop-up: Spirit / Pet Toggle */}
-          <div className="pb-2.5 border-b border-[#241E3E] space-y-2">
-            <div className="flex items-center justify-between text-[10px] font-mono">
-              <span className="text-gray-400 font-bold uppercase flex items-center gap-1">
-                <Filter size={11} className="text-arcade-gold" />
-                SPIRIT POOL:
-              </span>
-              <span className="text-[10px] text-gray-400">
-                SHOWING: <strong className="text-arcade-gold">{filteredCharacters.length}</strong> COMPANIONS
-              </span>
-            </div>
-
-            {/* Strict Spirit Toggle Pills (Only chosen gender + pets) */}
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {chosenGender === 'boy' ? (
-                <>
-                  <button
-                    onClick={() => {
-                      audioEngine.playClick();
-                      setSpiritToggle('gender-only');
-                    }}
-                    className={`px-2 py-1 text-[9px] font-pixel border transition-all ${
-                      spiritToggle === 'gender-only'
-                        ? 'border-arcade-cyan bg-arcade-cyan text-black shadow-pixel-sm font-bold'
-                        : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-arcade-cyan'
-                    }`}
-                  >
-                    [ ♂ BOY SPIRITS ]
-                  </button>
-                  <button
-                    onClick={() => {
-                      audioEngine.playClick();
-                      setSpiritToggle('pets-only');
-                    }}
-                    className={`px-2 py-1 text-[9px] font-pixel border transition-all ${
-                      spiritToggle === 'pets-only'
-                        ? 'border-amber-400 bg-amber-400 text-black shadow-pixel-sm font-bold'
-                        : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-amber-400'
-                    }`}
-                  >
-                    [ 🐾 PETS ]
-                  </button>
-                  <button
-                    onClick={() => {
-                      audioEngine.playClick();
-                      setSpiritToggle('both');
-                    }}
-                    className={`px-2 py-1 text-[9px] font-pixel border transition-all ${
-                      spiritToggle === 'both'
-                        ? 'border-arcade-gold bg-arcade-gold text-black shadow-pixel-sm font-bold'
-                        : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-arcade-gold'
-                    }`}
-                  >
-                    [ BOY + PETS ]
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => {
-                      audioEngine.playClick();
-                      setSpiritToggle('gender-only');
-                    }}
-                    className={`px-2 py-1 text-[9px] font-pixel border transition-all ${
-                      spiritToggle === 'gender-only'
-                        ? 'border-[#E07A5F] bg-[#E07A5F] text-black shadow-pixel-sm font-bold'
-                        : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-[#E07A5F]'
-                    }`}
-                  >
-                    [ ♀ GIRL SPIRITS ]
-                  </button>
-                  <button
-                    onClick={() => {
-                      audioEngine.playClick();
-                      setSpiritToggle('pets-only');
-                    }}
-                    className={`px-2 py-1 text-[9px] font-pixel border transition-all ${
-                      spiritToggle === 'pets-only'
-                        ? 'border-amber-400 bg-amber-400 text-black shadow-pixel-sm font-bold'
-                        : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-amber-400'
-                    }`}
-                  >
-                    [ 🐾 PETS ]
-                  </button>
-                  <button
-                    onClick={() => {
-                      audioEngine.playClick();
-                      setSpiritToggle('both');
-                    }}
-                    className={`px-2 py-1 text-[9px] font-pixel border transition-all ${
-                      spiritToggle === 'both'
-                        ? 'border-arcade-gold bg-arcade-gold text-black shadow-pixel-sm font-bold'
-                        : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-arcade-gold'
-                    }`}
-                  >
-                    [ GIRL + PETS ]
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* Category Filter Pills & Search Input */}
-            <div className="flex flex-col gap-1.5 pt-1">
-              <div className="flex flex-wrap gap-1 text-[9px] font-mono">
-                {categoryTabs.map((cat) => {
-                  const isActive = selectedCategory === cat.id;
-                  return (
-                    <button
-                      key={cat.id}
-                      onClick={() => {
-                        audioEngine.playClick();
-                        setSelectedCategory(cat.id);
-                      }}
-                      className={`px-1.5 py-0.5 border uppercase font-bold transition-all ${
-                        isActive
-                          ? 'border-arcade-gold bg-arcade-gold/20 text-arcade-gold shadow-pixel-sm'
-                          : 'border-arcade-border/80 bg-void-darkest text-gray-400 hover:text-white'
-                      }`}
-                    >
-                      {cat.label}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Compact Search Input */}
-              <div className="flex items-center gap-1.5 bg-void-darkest border border-arcade-border px-2 py-1 text-xs font-mono w-full">
-                <Search size={11} className="text-arcade-gold shrink-0" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="> filter_companion..."
-                  className="bg-transparent text-gray-200 placeholder-gray-600 outline-none w-full text-[10px]"
-                />
-              </div>
-            </div>
+        {/* Top of Leftmost Pop-up: Spirit / Pet Toggle */}
+        <div className="pb-2.5 border-b border-[#241E3E] space-y-2">
+          <div className="flex items-center justify-between text-[10px] font-mono">
+            <span className="text-gray-400 font-bold uppercase flex items-center gap-1">
+              <Filter size={11} className="text-arcade-gold" />
+              SPIRIT POOL:
+            </span>
+            <span className="text-[10px] text-gray-400">
+              SHOWING: <strong className="text-arcade-gold">{filteredCharacters.length}</strong> COMPANIONS
+            </span>
           </div>
 
-          {/* Scrollable Body: 2-Column Vertical Roster Grid */}
-          <div className="flex-1 overflow-y-auto pr-1 mt-2.5 space-y-2">
-            {filteredCharacters.length === 0 ? (
-              <div className="text-center py-8 text-xs font-mono text-gray-500">
-                // No companions match the current filters.
-              </div>
+          {/* Strict Spirit Toggle Pills (Only chosen gender + pets) */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {chosenGender === 'boy' ? (
+              <>
+                <button
+                  onClick={() => {
+                    audioEngine.playClick();
+                    setSpiritToggle('gender-only');
+                  }}
+                  className={`px-2 py-1 text-[9px] font-pixel border transition-all ${
+                    spiritToggle === 'gender-only'
+                      ? 'border-arcade-cyan bg-arcade-cyan text-black shadow-pixel-sm font-bold'
+                      : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-arcade-cyan'
+                  }`}
+                >
+                  [ ♂ BOY SPIRITS ]
+                </button>
+                <button
+                  onClick={() => {
+                    audioEngine.playClick();
+                    setSpiritToggle('pets-only');
+                  }}
+                  className={`px-2 py-1 text-[9px] font-pixel border transition-all ${
+                    spiritToggle === 'pets-only'
+                      ? 'border-amber-400 bg-amber-400 text-black shadow-pixel-sm font-bold'
+                      : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-amber-400'
+                  }`}
+                >
+                  [ 🐾 PETS ]
+                </button>
+                <button
+                  onClick={() => {
+                    audioEngine.playClick();
+                    setSpiritToggle('both');
+                  }}
+                  className={`px-2 py-1 text-[9px] font-pixel border transition-all ${
+                    spiritToggle === 'both'
+                      ? 'border-arcade-gold bg-arcade-gold text-black shadow-pixel-sm font-bold'
+                      : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-arcade-gold'
+                  }`}
+                >
+                  [ BOY + PETS ]
+                </button>
+              </>
             ) : (
-              <div className="grid grid-cols-2 gap-2">
-                {filteredCharacters.map((char) => {
-                  const isSelected = char.id === selectedCharacter.id;
-                  const isFav = favorites.includes(char.id);
-
-                  return (
-                    <button
-                      key={char.id}
-                      onClick={() => {
-                        audioEngine.playClick();
-                        handleSelectCompanion(char);
-                        if (window.innerWidth < 1024) {
-                          setMobileTab('details');
-                        }
-                      }}
-                      className={`p-2 flex flex-col items-center text-center transition-all border relative select-none ${
-                        isSelected
-                          ? 'border-arcade-gold bg-amber-950/40 text-arcade-gold shadow-[0_0_12px_rgba(245,194,66,0.35)]'
-                          : 'border-arcade-border/80 bg-void-darkest/90 text-gray-300 hover:border-arcade-gold/60 hover:text-white'
-                      }`}
-                    >
-                      {/* Top Bar inside card: Index and Favorite Star */}
-                      <div className="w-full flex items-center justify-between text-[9px] font-mono mb-1 text-gray-500">
-                        <span className={isSelected ? 'text-arcade-gold font-bold' : ''}>
-                          {char.index}
-                        </span>
-                        {isFav && <span className="text-arcade-gold">★</span>}
-                      </div>
-
-                      {/* 64x64 Full-Face Pixel Art Sprite (Displayed at 64x64px, Zero Inner Padding) */}
-                      <div className="my-1 flex items-center justify-center">
-                        <PixelFaceAvatar
-                          characterId={char.id}
-                          size={64}
-                          className={`w-16 h-16 border-2 transition-all p-0 ${
-                            isSelected
-                              ? 'border-arcade-gold shadow-[0_0_10px_rgba(245,194,66,0.6)]'
-                              : 'border-[#3E356B] hover:border-arcade-gold/50'
-                          }`}
-                          title={char.name}
-                        />
-                      </div>
-
-                      {/* Character Title */}
-                      <div className="w-full mt-1 px-0.5">
-                        <div className={`font-pixel text-[11px] leading-tight line-clamp-1 ${
-                          isSelected ? 'text-white' : 'text-gray-300'
-                        }`}>
-                          {archetypeMode
-                            ? char.archetypeName.split('/')[0].trim()
-                            : char.name.split('(')[0].trim()}
-                        </div>
-                        <div className="text-[9px] font-mono text-gray-500 uppercase truncate mt-0.5">
-                          {char.category.split('&')[0].trim()}
-                        </div>
-                      </div>
-
-                      {/* Active Cursor Marker */}
-                      {isSelected && (
-                        <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-arcade-gold border border-black animate-pulse" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
+              <>
+                <button
+                  onClick={() => {
+                    audioEngine.playClick();
+                    setSpiritToggle('gender-only');
+                  }}
+                  className={`px-2 py-1 text-[9px] font-pixel border transition-all ${
+                    spiritToggle === 'gender-only'
+                      ? 'border-[#E07A5F] bg-[#E07A5F] text-black shadow-pixel-sm font-bold'
+                      : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-[#E07A5F]'
+                  }`}
+                >
+                  [ ♀ GIRL SPIRITS ]
+                </button>
+                <button
+                  onClick={() => {
+                    audioEngine.playClick();
+                    setSpiritToggle('pets-only');
+                  }}
+                  className={`px-2 py-1 text-[9px] font-pixel border transition-all ${
+                    spiritToggle === 'pets-only'
+                      ? 'border-amber-400 bg-amber-400 text-black shadow-pixel-sm font-bold'
+                      : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-amber-400'
+                  }`}
+                >
+                  [ 🐾 PETS ]
+                </button>
+                <button
+                  onClick={() => {
+                    audioEngine.playClick();
+                    setSpiritToggle('both');
+                  }}
+                  className={`px-2 py-1 text-[9px] font-pixel border transition-all ${
+                    spiritToggle === 'both'
+                      ? 'border-arcade-gold bg-arcade-gold text-black shadow-pixel-sm font-bold'
+                      : 'border-arcade-border bg-void-darkest text-gray-400 hover:text-white hover:border-arcade-gold'
+                  }`}
+                >
+                  [ GIRL + PETS ]
+                </button>
+              </>
             )}
           </div>
-        </section>
 
-        {/* ===================================================================== */}
-        {/* 2. CENTER-LEFT FLOATING POP-UP: CHARACTER DESCRIPTION & LAUNCH CARD   */}
-        {/* Docked immediately to the right of Roster at left-[352px]            */}
-        {/* ===================================================================== */}
-        <section
-          key={selectedCharacter.id}
-          aria-label="Companion Details Window"
-          className={`fixed left-2 lg:left-[352px] top-14 bottom-11 w-[calc(100vw-16px)] sm:w-[350px] z-20 flex-col pointer-events-auto overflow-y-auto custom-scrollbar animate-fadeIn shrink-0 ${
-            mobileTab === 'details' ? 'flex' : 'hidden lg:flex'
-          }`}
-        >
-          <CharacterInfoPanel
-            character={selectedCharacter}
-            onEnterWorkspace={onSelectCharacter}
-            isFavorite={favorites.includes(selectedCharacter.id)}
-            onToggleFavorite={toggleFavorite}
-            archetypeMode={archetypeMode}
-          />
-        </section>
+          {/* Category Filter Pills & Search Input */}
+          <div className="flex flex-col gap-1.5 pt-1">
+            <div className="flex flex-wrap gap-1 text-[9px] font-mono">
+              {categoryTabs.map((cat) => {
+                const isActive = selectedCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      audioEngine.playClick();
+                      setSelectedCategory(cat.id);
+                    }}
+                    className={`px-1.5 py-0.5 border uppercase font-bold transition-all ${
+                      isActive
+                        ? 'border-arcade-gold bg-arcade-gold/20 text-arcade-gold shadow-pixel-sm'
+                        : 'border-arcade-border/80 bg-void-darkest text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Compact Search Input */}
+            <div className="flex items-center gap-1.5 bg-void-darkest border border-arcade-border px-2 py-1 text-xs font-mono w-full">
+              <Search size={11} className="text-arcade-gold shrink-0" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="> filter_companion..."
+                className="bg-transparent text-gray-200 placeholder-gray-600 outline-none w-full text-[10px]"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Scrollable Body: 2-Column Vertical Roster Grid */}
+        <div className="flex-1 overflow-y-auto pr-1 mt-2.5 space-y-2">
+          {filteredCharacters.length === 0 ? (
+            <div className="text-center py-8 text-xs font-mono text-gray-500">
+              // No companions match the current filters.
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-2">
+              {filteredCharacters.map((char) => {
+                const isSelected = char.id === selectedCharacter.id;
+                const isFav = favorites.includes(char.id);
+
+                return (
+                  <button
+                    key={char.id}
+                    onClick={() => {
+                      audioEngine.playClick();
+                      handleSelectCompanion(char);
+                      if (window.innerWidth < 1024) {
+                        setMobileTab('details');
+                      }
+                    }}
+                    className={`p-2 flex flex-col items-center text-center transition-all border relative select-none ${
+                      isSelected
+                        ? 'border-arcade-gold bg-amber-950/40 text-arcade-gold shadow-[0_0_12px_rgba(245,194,66,0.35)]'
+                        : 'border-arcade-border/80 bg-void-darkest/90 text-gray-300 hover:border-arcade-gold/60 hover:text-white'
+                    }`}
+                  >
+                    {/* Top Bar inside card: Index and Favorite Star */}
+                    <div className="w-full flex items-center justify-between text-[9px] font-mono mb-1 text-gray-500">
+                      <span className={isSelected ? 'text-arcade-gold font-bold' : ''}>
+                        {char.index}
+                      </span>
+                      {isFav && <span className="text-arcade-gold">★</span>}
+                    </div>
+
+                    {/* 64x64 Full-Face Pixel Art Sprite */}
+                    <div className="my-1 flex items-center justify-center">
+                      <PixelFaceAvatar
+                        characterId={char.id}
+                        size={64}
+                        className={`w-16 h-16 border-2 transition-all p-0 ${
+                          isSelected
+                            ? 'border-arcade-gold shadow-[0_0_10px_rgba(245,194,66,0.6)]'
+                            : 'border-[#3E356B] hover:border-arcade-gold/50'
+                        }`}
+                        title={char.name}
+                      />
+                    </div>
+
+                    {/* Character Title */}
+                    <div className="w-full mt-1 px-0.5">
+                      <div className={`font-pixel text-[11px] leading-tight line-clamp-1 ${
+                        isSelected ? 'text-white' : 'text-gray-300'
+                      }`}>
+                        {archetypeMode
+                          ? char.archetypeName.split('/')[0].trim()
+                          : char.name.split('(')[0].trim()}
+                      </div>
+                      <div className="text-[9px] font-mono text-gray-500 uppercase truncate mt-0.5">
+                        {char.category.split('&')[0].trim()}
+                      </div>
+                    </div>
+
+                    {/* Active Cursor Marker */}
+                    {isSelected && (
+                      <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-arcade-gold border border-black animate-pulse" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ===================================================================== */}
+      {/* 2. CENTER-LEFT FLOATING POP-UP: CHARACTER DESCRIPTION & LAUNCH CARD   */}
+      {/* ===================================================================== */}
+      <section
+        key={selectedCharacter.id}
+        aria-label="Companion Details Window"
+        className={`fixed left-2 lg:left-[352px] top-14 bottom-11 w-[calc(100vw-16px)] sm:w-[350px] z-20 flex-col pointer-events-auto overflow-y-auto custom-scrollbar animate-fadeIn shrink-0 ${
+          mobileTab === 'details' ? 'flex' : 'hidden lg:flex'
+        }`}
+      >
+        <CharacterInfoPanel
+          character={selectedCharacter}
+          onEnterWorkspace={(char) => onSelectCharacter(char)}
+          isFavorite={favorites.includes(selectedCharacter.id)}
+          onToggleFavorite={toggleFavorite}
+          archetypeMode={archetypeMode}
+        />
+      </section>
 
       {/* ========================================================================= */}
       {/* LAYER 3 (z-20): GLOBAL CREDITS FOOTER                                     */}
@@ -529,3 +576,5 @@ export const SelectPage: React.FC<SelectPageProps> = ({
     </div>
   );
 };
+
+export default SelectPage;

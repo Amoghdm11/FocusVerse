@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Play, Sparkles, ShieldCheck, Lock, ChevronLeft, LayoutDashboard } from 'lucide-react';
+import { Play, Sparkles, Lock, ChevronLeft, LayoutDashboard } from 'lucide-react';
 import { CHARACTERS } from '../data/characters';
 import { Character } from '../types/character';
 import { CosmicGlobe } from '../components/CosmicGlobe';
 import { SpiritCard } from '../components/SpiritCard';
 import { Footer } from '../components/Footer';
 import { HomeAmbientBackground } from '../components/HomeAmbientBackground';
+import { RetroHUDHeader } from '../components/RetroHUDHeader';
+import { AnnouncementTicker } from '../components/AnnouncementTicker';
 import { audioEngine } from '../utils/audioEngine';
 
 interface HomePageProps {
@@ -27,6 +29,31 @@ export const HomePage: React.FC<HomePageProps> = ({
 }) => {
   const [isLockedIn, setIsLockedIn] = useState(false);
 
+  // Settings states persisted in localStorage
+  const [crtOverlay, setCrtOverlay] = useState(() => {
+    return localStorage.getItem('focusverse_crt_overlay') === 'true';
+  });
+
+  const [parallaxEnabled, setParallaxEnabled] = useState(() => {
+    return localStorage.getItem('focusverse_parallax') !== 'false';
+  });
+
+  const handleToggleCrt = () => {
+    setCrtOverlay((prev) => {
+      const next = !prev;
+      localStorage.setItem('focusverse_crt_overlay', String(next));
+      return next;
+    });
+  };
+
+  const handleToggleParallax = () => {
+    setParallaxEnabled((prev) => {
+      const next = !prev;
+      localStorage.setItem('focusverse_parallax', String(next));
+      return next;
+    });
+  };
+
   const handleSpiritChoice = (spirit: 'girl' | 'boy') => {
     if (onSelectSpirit) {
       onSelectSpirit(spirit);
@@ -36,96 +63,95 @@ export const HomePage: React.FC<HomePageProps> = ({
   };
 
   return (
-    <div className="relative min-h-screen text-gray-200 flex flex-col justify-between selection:bg-arcade-gold selection:text-black overflow-x-hidden">
-      {/* --- LIVING ANIMATED BACKGROUND (Twilight Aurora, Canvas Starfield & Floating Orbs) --- */}
-      <HomeAmbientBackground />
+    <div
+      className={`relative min-h-screen text-gray-200 flex flex-col justify-between selection:bg-arcade-gold selection:text-black overflow-x-hidden ${
+        crtOverlay ? 'crt-overlay' : ''
+      }`}
+    >
+      {/* --- LIVING ANIMATED BACKGROUND (Nebula, Starfield, Constellations, Skyline, Aircraft & Mountains) --- */}
+      <HomeAmbientBackground enableParallax={parallaxEnabled} />
 
-      {/* Top Copyright-Safe Mode & Kernel Status Banner */}
-      <div className="w-full px-4 pt-3 max-w-7xl mx-auto relative z-10">
-        <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-1.5 bg-[#0D0B1E]/80 backdrop-blur-md border border-white/15 text-[11px] font-mono select-none shadow-sm">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 bg-green-400 animate-ping" />
-            <span className="text-arcade-gold font-bold">FOCUSVERSE KERNEL v2.6</span>
-            <span className="text-gray-500">|</span>
-            <span className="text-gray-400">STATUS: [ONLINE &amp; CALIBRATED]</span>
-          </div>
-
-          <button
-            onClick={() => {
-              audioEngine.playClick();
-              onToggleArchetypeMode();
-            }}
-            className={`px-2 py-0.5 border text-[10px] flex items-center gap-1.5 transition-all ${
-              archetypeMode
-                ? 'border-arcade-cyan bg-cyan-950/60 text-arcade-cyan'
-                : 'border-arcade-border text-gray-400 hover:text-white'
-            }`}
-            title="Toggle Copyright-Safe RPG Archetype Names"
-          >
-            <ShieldCheck size={12} />
-            <span>SAFE MODE: {archetypeMode ? 'ON (ORIGINAL ARCHETYPES)' : 'OFF (CANON)'}</span>
-          </button>
-        </div>
-      </div>
+      {/* --- RETRO HUD COMMAND CONSOLE TOP BAR --- */}
+      <RetroHUDHeader
+        archetypeMode={archetypeMode}
+        onToggleArchetypeMode={onToggleArchetypeMode}
+        crtOverlay={crtOverlay}
+        onToggleCrtOverlay={handleToggleCrt}
+        parallaxEnabled={parallaxEnabled}
+        onToggleParallax={handleToggleParallax}
+      />
 
       {/* --- BALANCED 2-COLUMN SPLIT CONTAINER --- */}
-      <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 md:py-10 flex-1 flex items-center relative z-10">
+      <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-4 md:py-8 flex-1 flex items-center relative z-10">
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* ========================================================= */}
           {/* LEFT COLUMN: BRAND, GLOBE & TELEMETRY (lg:col-span-7)     */}
           {/* ========================================================= */}
-          <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left space-y-6">
+          <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left space-y-5">
             
-            {/* Top Narrative Dialog Banner */}
-            <div className="inline-block relative px-4 py-2 bg-[#121026]/80 backdrop-blur-md pixel-border border border-arcade-gold/40 shadow-pixel">
-              <div className="font-pixel text-[10px] sm:text-xs text-arcade-gold tracking-wider uppercase">
-                &gt; &quot;8.2 billion people. 20 worlds to find your focus.&quot;
-              </div>
+            {/* Rotating Typewriter Announcement Ticker */}
+            <div className="w-full flex justify-center lg:justify-start">
+              <AnnouncementTicker />
             </div>
 
-            {/* Main Brand Title (Cleanly Breathing Above Globe - Description Removed) */}
-            <div>
-              <h1 className="font-pixel text-3xl sm:text-5xl md:text-6xl text-white tracking-tight uppercase drop-shadow-[0_4px_20px_rgba(245,194,66,0.35)]">
+            {/* Main Brand Title (Cleanly Breathing Above Globe) */}
+            <div className="space-y-1">
+              <div className="text-[10px] font-mono text-arcade-cyan tracking-widest uppercase flex items-center justify-center lg:justify-start gap-2">
+                <span className="w-1.5 h-1.5 bg-arcade-cyan rounded-full animate-ping" />
+                <span>INTERACTIVE PRODUCTIVITY SANCTUARY</span>
+              </div>
+              <h1 className="font-pixel text-3xl sm:text-5xl md:text-6xl text-white tracking-tight uppercase drop-shadow-[0_4px_24px_rgba(245,194,66,0.38)]">
                 FOCUS<span className="text-arcade-gold">VERSE</span>
               </h1>
             </div>
 
-            {/* Rotating Pixel Globe / Node Visualizer */}
+            {/* Rotating Pixel Globe / Interactive World Telemetry Node Visualizer */}
             <div className="w-full flex justify-center lg:justify-start">
               <CosmicGlobe onNodeClick={() => onSelectCompanion()} />
             </div>
 
-            {/* Segmented Synergy-Style Live Counter Blocks (Glassmorphic) */}
+            {/* Segmented Synergy-Style Modular Live Counter Blocks */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full max-w-xl select-none">
-              <div className="bg-[#121026]/75 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-pixel transition-all hover:border-arcade-gold hover:shadow-[0_0_15px_rgba(245,194,66,0.2)]">
-                <div className="font-pixel text-lg sm:text-xl text-arcade-gold">20</div>
-                <div className="font-silkscreen text-[9px] text-gray-400 mt-1 uppercase tracking-wider">
-                  WORLDS ROSTER
+              <div className="group relative bg-[#121026]/80 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-lg hover:border-arcade-gold/60 transition-all">
+                <div className="font-pixel text-lg sm:text-xl text-arcade-gold group-hover:scale-105 transition-transform">
+                  20
+                </div>
+                <div className="text-[9px] font-mono text-gray-400 uppercase tracking-widest mt-0.5">
+                  TUTORS
                 </div>
               </div>
-              <div className="bg-[#121026]/75 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-pixel transition-all hover:border-arcade-cyan hover:shadow-[0_0_15px_rgba(92,225,230,0.2)]">
-                <div className="font-pixel text-lg sm:text-xl text-arcade-cyan">4</div>
-                <div className="font-silkscreen text-[9px] text-gray-400 mt-1 uppercase tracking-wider">
-                  FLOW TOOLS
+
+              <div className="group relative bg-[#121026]/80 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-lg hover:border-arcade-cyan/60 transition-all">
+                <div className="font-pixel text-lg sm:text-xl text-arcade-cyan group-hover:scale-105 transition-transform">
+                  100%
+                </div>
+                <div className="text-[9px] font-mono text-gray-400 uppercase tracking-widest mt-0.5">
+                  DRIFT-FREE
                 </div>
               </div>
-              <div className="bg-[#121026]/75 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-pixel transition-all hover:border-arcade-pink hover:shadow-[0_0_15px_rgba(255,0,127,0.2)]">
-                <div className="font-pixel text-lg sm:text-xl text-arcade-pink">100%</div>
-                <div className="font-silkscreen text-[9px] text-gray-400 mt-1 uppercase tracking-wider">
-                  SYNTH CHIPTUNE
+
+              <div className="group relative bg-[#121026]/80 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-lg hover:border-arcade-pink/60 transition-all">
+                <div className="font-pixel text-lg sm:text-xl text-arcade-pink group-hover:scale-105 transition-transform">
+                  8
+                </div>
+                <div className="text-[9px] font-mono text-gray-400 uppercase tracking-widest mt-0.5">
+                  SOUNDSCAPES
                 </div>
               </div>
-              <div className="bg-[#121026]/75 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-pixel transition-all hover:border-green-400 hover:shadow-[0_0_15px_rgba(74,222,128,0.2)]">
-                <div className="font-pixel text-lg sm:text-xl text-green-400">0</div>
-                <div className="font-silkscreen text-[9px] text-gray-400 mt-1 uppercase tracking-wider">
-                  DISTRACTIONS
+
+              <div className="group relative bg-[#121026]/80 backdrop-blur-md pixel-border border border-white/15 p-3 text-center shadow-lg hover:border-green-400/60 transition-all">
+                <div className="font-pixel text-lg sm:text-xl text-green-400 group-hover:scale-105 transition-transform">
+                  60 FPS
+                </div>
+                <div className="text-[9px] font-mono text-gray-400 uppercase tracking-widest mt-0.5">
+                  CANVAS
                 </div>
               </div>
             </div>
 
-            {/* Primary Action Buttons */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-1 w-full max-w-xl">
+            {/* Tactical Launch CTA Bar */}
+            <div className="pt-2 flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
               <button
                 onClick={() => {
                   audioEngine.playClick();

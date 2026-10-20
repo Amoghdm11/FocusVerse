@@ -57,6 +57,7 @@ export interface SpiderManCustomizationMenuProps {
   initialGender?: 'boy' | 'girl';
   initialPlayerName?: string;
   onBackToHome: () => void;
+  onSwitchTo3DStage?: () => void;
   onConfirmAppearance: (
     character: Character,
     appearance: CustomAppearanceState,
@@ -70,6 +71,7 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
   initialGender = 'boy',
   initialPlayerName = 'TRAINER',
   onBackToHome,
+  onSwitchTo3DStage,
   onConfirmAppearance,
   archetypeMode = false,
 }) => {
@@ -347,6 +349,19 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
             <span className="hidden sm:inline">[ ◀ HOME ]</span>
             <span className="sm:hidden">HOME</span>
           </button>
+
+          {onSwitchTo3DStage && (
+            <button
+              onClick={() => {
+                audioEngine.playClick();
+                onSwitchTo3DStage();
+              }}
+              className="pixel-btn px-2.5 py-1 text-xs text-arcade-gold hover:text-white flex items-center gap-1.5 border border-arcade-gold/50"
+              title="Switch to 3D Voxel Companion Roster"
+            >
+              <span>[ 🪐 3D STAGE ]</span>
+            </button>
+          )}
 
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 bg-arcade-cyan animate-ping inline-block" />

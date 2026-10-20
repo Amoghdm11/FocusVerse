@@ -110,8 +110,8 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
 
   // Sync if initialCharacter changes
   useEffect(() => {
-    if (initialCharacter && initialCharacter.id !== selectedCharacter.id) {
-      handleSelectCharacter(initialCharacter);
+    if (initialCharacter) {
+      handleSelectCharacter(initialCharacter, false);
     }
   }, [initialCharacter]);
 
@@ -120,9 +120,11 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
     OUTFIT_CATALOG.find((s) => s.id === appearance.outfit) || OUTFIT_CATALOG[0];
 
   // Select a character from the roster and adapt loadout
-  const handleSelectCharacter = (char: Character) => {
-    audioEngine.playClick();
-    audioEngine.playVictoryJingle(char.synthNotes);
+  const handleSelectCharacter = (char: Character, playSound: boolean = true) => {
+    if (playSound) {
+      audioEngine.playClick();
+      audioEngine.playVictoryJingle(char.synthNotes);
+    }
     setSelectedCharacter(char);
 
     const charGender: CharacterGender = char.genderOrSpirit === 'girl' ? 'girl' : 'boy';

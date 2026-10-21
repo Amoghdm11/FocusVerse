@@ -41,6 +41,8 @@ import { audioEngine } from '../utils/audioEngine';
 export type { YouTubePlayerMode };
 
 interface MusicCenterProps {
+  openRequest?: number;
+  soundscapeControls?: React.ReactNode;
   initialAmbienceProfile?: string;
   onAudioStateChange?: (isPlaying: boolean, trackName: string) => void;
 }
@@ -55,6 +57,8 @@ declare global {
 
 export const MusicCenter: React.FC<MusicCenterProps> = ({
   initialAmbienceProfile,
+  openRequest = 0,
+  soundscapeControls,
   onAudioStateChange,
 }) => {
   // --- PLAYER PERSISTED STATE ---
@@ -69,8 +73,31 @@ export const MusicCenter: React.FC<MusicCenterProps> = ({
   const [playerMode, setPlayerMode] = useState<YouTubePlayerMode>(() => youtubeService.getPlayerMode());
   const [isShuffle, setIsShuffle] = useState<boolean>(() => youtubeService.getShuffle());
   const [repeatMode, setRepeatMode] = useState<RepeatMode>(() => youtubeService.getRepeat());
-  const [isExpanded, setIsExpanded] = useState<boolean>(true);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<PlayerTab>('PLAYER');
+  const musicRoot = useRef<HTMLDivElement>(null);
+  const returnFocus = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (!openRequest) return;
+    returnFocus.current = document.activeElement as HTMLElement;
+    setActiveTab('LIBRARY');
+    setIsExpanded(true);
+  }, [openRequest]);
+  useEffect(() => {
+    if (!isExpanded) return;
+    musicRoot.current?.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+    musicRoot.current?.querySelector<HTMLButtonElement>('[aria-label="Close music player"]')?.focus();
+    const key = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { setIsExpanded(false); returnFocus.current?.focus(); }
+    };
+    const outside = (event: PointerEvent) => {
+      if (event.target instanceof Node && !musicRoot.current?.contains(event.target)) setIsExpanded(false);
+    };
+    document.addEventListener('keydown', key);
+    document.addEventListener('pointerdown', outside);
+    return () => { document.removeEventListener('keydown', key); document.removeEventListener('pointerdown', outside); };
+  }, [isExpanded]);
+
 
   // --- PLAYLISTS & FAVORITES STATE ---
   const [playlists, setPlaylists] = useState<YouTubePlaylist[]>(() => youtubeService.getPlaylists());
@@ -299,7 +326,11 @@ export const MusicCenter: React.FC<MusicCenterProps> = ({
   // --- CONTROLS: PLAY, PAUSE, NEXT, PREV, SEEK, VOLUME ---
   const handleTogglePlay = () => {
     audioEngine.playClick();
-    if (!playerRef.current) return;
+    if (!playerRef.current || typeof playerRef.current.playVideo !== 'function') {
+      setErrorMessage('YouTube is not ready. Check your connection, or play a room soundscape above.');
+      setIsExpanded(true);
+      return;
+    }
 
     try {
       if (isPlaying) {
@@ -307,7 +338,7 @@ export const MusicCenter: React.FC<MusicCenterProps> = ({
         setIsPlaying(false);
       } else {
         playerRef.current.playVideo();
-        setIsPlaying(true);
+        // Playback state comes from the actual YouTube state event.
       }
     } catch (_) {}
   };
@@ -586,166 +617,26 @@ export const MusicCenter: React.FC<MusicCenterProps> = ({
   const isCurrentFavorited = currentTrack ? youtubeService.isFavorite(currentTrack.videoId) : false;
 
   return (
-    <div className="bg-void-card pixel-border border-arcade-border shadow-[0_4px_20px_rgba(0,0,0,0.6)] font-mono text-xs text-gray-200 overflow-hidden select-none">
-      {/* ======================================================== */}
-      {/* 1. COMPACT PLAYER HEADER (REQ 6)                         */}
-      {/* ======================================================== */}
-      <div className="px-3.5 py-2.5 bg-void-darkest border-b border-arcade-border flex flex-wrap items-center justify-between gap-2.5">
-        {/* Left: Icon, Title, and Pulse Indicator */}
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          <div className="w-6 h-6 bg-void border border-arcade-gold flex items-center justify-center text-xs shrink-0 shadow-pixel-sm">
-            <Music size={13} className="text-arcade-gold animate-pulse" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="font-silkscreen text-[11px] text-white uppercase tracking-wider truncate">
-                YOUTUBE MUSIC &amp; AMBIENCE CENTER
-              </span>
-              <span
-                className={`px-1.5 py-0.2 border text-[8px] font-pixel ${
-                  isPlaying
-                    ? 'border-green-500 bg-green-950/80 text-green-300 animate-pulse'
-                    : 'border-arcade-border bg-void text-gray-400'
-                }`}
-              >
-                {isPlaying ? '● PLAYING' : '■ PAUSED'}
-              </span>
-              <span className="px-1.5 py-0.2 border border-arcade-cyan/70 bg-cyan-950/40 text-arcade-cyan text-[8px] font-pixel hidden sm:inline">
-                {playerMode === 'VIDEO' ? 'MODE: VIDEO' : 'MODE: AUDIO'}
-              </span>
-            </div>
-            <p className="text-[10px] text-arcade-gold font-pixel truncate mt-0.5">
-              &gt; {currentTrack ? `${currentTrack.title} [${currentTrack.channel}]` : 'NO TRACK LOADED'}
-            </p>
-          </div>
-        </div>
-
-        {/* Right: Quick Controls, Queue Pill & Expand Toggle */}
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Quick Volume & Mute */}
-          <div className="hidden sm:flex items-center gap-1.5 px-2 py-0.5 bg-void border border-arcade-border">
-            <button
-              onClick={handleToggleMute}
-              className="text-gray-400 hover:text-white"
-              title={isMuted ? 'Unmute' : 'Mute'}
-            >
-              {isMuted || volume === 0 ? (
-                <VolumeX size={12} className="text-red-400" />
-              ) : (
-                <Volume2 size={12} className="text-arcade-cyan" />
-              )}
-            </button>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={isMuted ? 0 : volume}
-              onChange={handleVolumeChange}
-              className="w-14 h-1 accent-arcade-cyan bg-void-darkest cursor-pointer"
-              title={`Volume: ${isMuted ? 0 : volume}%`}
-            />
-          </div>
-
-          {/* Queue Count Pill */}
-          <button
-            onClick={() => {
-              setIsExpanded(true);
-              setActiveTab('QUEUE');
-            }}
-            className="px-2 py-1 bg-void border border-arcade-border hover:border-arcade-gold text-[9px] font-pixel text-gray-300 hover:text-white flex items-center gap-1"
-            title="View Up Next Queue"
-          >
-            <ListMusic size={11} className="text-arcade-gold" />
-            <span>QUEUE: {queue.length}</span>
-          </button>
-
-          {/* Video / Audio Toggle */}
-          <button
-            onClick={handleToggleMode}
-            className={`p-1 border text-[9px] flex items-center gap-1 ${
-              playerMode === 'VIDEO'
-                ? 'border-arcade-cyan bg-cyan-950/70 text-arcade-cyan font-bold'
-                : 'border-arcade-border bg-void text-gray-400 hover:text-white'
-            }`}
-            title={playerMode === 'VIDEO' ? 'Switch to Audio-focused Mode' : 'Switch to Video Mode'}
-          >
-            {playerMode === 'VIDEO' ? <Video size={12} /> : <Headphones size={12} />}
-          </button>
-
-          {/* Expand / Collapse Button */}
-          <button
-            onClick={() => {
-              audioEngine.playClick();
-              setIsExpanded(!isExpanded);
-            }}
-            className="pixel-btn p-1 text-gray-400 hover:text-white"
-            title={isExpanded ? 'Collapse Music Center' : 'Expand Full Studio'}
-          >
-            {isExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-          </button>
-        </div>
+    <div ref={musicRoot} className={`workspace-music ${isExpanded ? 'music-is-expanded' : ''} font-mono text-xs text-gray-200 select-none`}>
+      <div className="music-dock">
+        <div className="dock-track"><div className="dock-cover">{currentTrack?.thumbnail ? <img src={currentTrack.thumbnail} alt=""/> : <Music size={22}/>}</div><div><span className="dock-eyebrow">FOCUS RADIO</span><strong>{currentTrack?.title || 'Your study soundtrack'}</strong><small>{currentTrack?.channel || 'Open the library to pick a playlist'}</small></div><button onClick={handleToggleFavoriteCurrent} title="Like current track" aria-pressed={isCurrentFavorited}><Heart size={16} fill={isCurrentFavorited ? 'currentColor' : 'none'}/></button></div>
+        <div className="dock-transport"><div className="dock-buttons">
+          <button onClick={handleToggleShuffle} title="Shuffle" aria-pressed={isShuffle}><Shuffle size={15}/></button>
+          <button onClick={handlePrevTrack} title="Previous Track"><SkipBack size={17}/></button>
+          <button onClick={handleTogglePlay} title={isPlaying ? 'Pause' : 'Play'} className="dock-play">{isPlaying ? <Pause size={18}/> : <Play size={18} fill="currentColor"/>}</button>
+          <button onClick={handleNextTrack} title="Next Track"><SkipForward size={17}/></button>
+          <button onClick={handleCycleRepeat} title={`Repeat: ${repeatMode}`} aria-pressed={repeatMode !== 'OFF'}><Repeat size={15}/>{repeatMode === 'ONE' && '1'}</button>
+        </div><div className="dock-seek"><span>{formatTime(currentTime)}</span><input aria-label="Track progress" type="range" min="0" max={duration || 100} step="0.5" value={currentTime} onChange={handleSeek}/><span>{formatTime(duration)}</span></div></div>
+        <div className="dock-options"><button onClick={handleToggleMute} title={isMuted ? 'Unmute' : 'Mute'}>{isMuted ? <VolumeX size={16}/> : <Volume2 size={16}/>}</button><input aria-label="Music volume" type="range" min="0" max="100" value={isMuted ? 0 : volume} onChange={handleVolumeChange}/><button onClick={() => { setActiveTab('QUEUE'); setIsExpanded(!isExpanded || activeTab !== 'QUEUE'); }} title="View Up Next Queue"><ListMusic size={18}/></button><button className="dock-library" onClick={() => { setActiveTab('LIBRARY'); setIsExpanded(!isExpanded); }} aria-expanded={isExpanded}>{isExpanded ? 'CLOSE' : 'LIBRARY'} {isExpanded ? <ChevronDown size={12}/> : <ChevronUp size={12}/>}</button></div>
       </div>
-
-      {/* ======================================================== */}
-      {/* COLLAPSED NOW PLAYING STRIP (WHEN EXPANDED === FALSE)    */}
-      {/* ======================================================== */}
-      {!isExpanded && (
-        <div className="p-3 bg-void/80 flex items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2.5 min-w-0">
-            {currentTrack?.thumbnail && (
-              <img
-                src={currentTrack.thumbnail}
-                alt=""
-                className="w-9 h-9 object-cover border border-arcade-border shrink-0 shadow-pixel-sm"
-              />
-            )}
-            <div className="min-w-0">
-              <span className="text-white font-bold text-[11px] truncate block">
-                {currentTrack ? currentTrack.title : 'Ready to stream'}
-              </span>
-              <span className="text-[9px] text-gray-400 truncate block">
-                {currentTrack ? currentTrack.channel : 'Search YouTube or select a playlist'}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={handlePrevTrack}
-              className="p-1 border border-arcade-border text-gray-400 hover:text-white"
-              title="Previous Track"
-            >
-              <SkipBack size={13} />
-            </button>
-            <button
-              onClick={handleTogglePlay}
-              className="p-1.5 bg-arcade-gold text-black border border-arcade-gold font-bold hover:bg-yellow-400"
-              title={isPlaying ? 'Pause' : 'Play'}
-            >
-              {isPlaying ? <Pause size={14} /> : <Play size={14} className="fill-current" />}
-            </button>
-            <button
-              onClick={handleNextTrack}
-              className="p-1 border border-arcade-border text-gray-400 hover:text-white"
-              title="Next Track"
-            >
-              <SkipForward size={13} />
-            </button>
-            <button
-              onClick={() => setIsExpanded(true)}
-              className="pixel-btn px-2 py-1 text-[9px] text-arcade-gold font-pixel ml-1"
-            >
-              EXPAND STUDIO &gt;
-            </button>
-          </div>
-        </div>
-      )}
-
+      {errorMessage && <div className="dock-error" role="status">{errorMessage}<button onClick={handleNextTrack}>Skip track →</button></div>}
       {/* ======================================================== */}
       {/* 2. EXPANDED SPOTIFY-INSPIRED STUDIO (REQ 2, 3, 4, 5)     */}
       {/* ======================================================== */}
-      {isExpanded && (
-        <div className="p-3.5 space-y-3.5 bg-void-card/90">
+      {(
+        <div role="region" aria-label="Computer music player" className="music-library-panel p-3.5 space-y-3.5" style={{ display: isExpanded ? undefined : 'none' }}>
+          <div className="music-library-heading"><strong>AFTER HOURS · MUSIC & SOUNDS</strong><button aria-label="Close music player" onClick={() => { setIsExpanded(false); returnFocus.current?.focus(); }}>Close ×</button></div>
+          {soundscapeControls}
           {/* Subtabs for Responsive Navigation */}
           <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-arcade-border/60">
             <div className="flex items-center gap-1.5">

@@ -1,0 +1,168 @@
+{
+  "version": 1,
+  "imageRoot": "../",
+  "frameWidth": 32,
+  "frameHeight": 48,
+  "anchor": {
+    "x": 16,
+    "y": 45,
+    "unit": "pixels"
+  },
+  "preview": {
+    "file": "preview/spiderman-64x96.png",
+    "width": 64,
+    "height": 96
+  },
+  "animations": {
+    "idle": {
+      "sheet": "gameplay/idle.png",
+      "frames": [
+        "frames/idle/00.png",
+        "frames/idle/01.png",
+        "frames/idle/02.png",
+        "frames/idle/03.png",
+        "frames/idle/04.png",
+        "frames/idle/05.png"
+      ],
+      "frameCount": 6,
+      "durationsMs": [
+        240,
+        240,
+        240,
+        240,
+        240,
+        240
+      ],
+      "loop": true,
+      "anchor": {
+        "x": 16,
+        "y": 45
+      }
+    },
+    "walk-down": {
+      "sheet": "gameplay/walk-down.png",
+      "frames": [
+        "frames/walk-down/00.png",
+        "frames/walk-down/01.png",
+        "frames/walk-down/02.png",
+        "frames/walk-down/03.png",
+        "frames/walk-down/04.png",
+        "frames/walk-down/05.png"
+      ],
+      "frameCount": 6,
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "loop": true,
+      "anchor": {
+        "x": 16,
+        "y": 45
+      }
+    },
+    "walk-up": {
+      "sheet": "gameplay/walk-up.png",
+      "frames": [
+        "frames/walk-up/00.png",
+        "frames/walk-up/01.png",
+        "frames/walk-up/02.png",
+        "frames/walk-up/03.png",
+        "frames/walk-up/04.png",
+        "frames/walk-up/05.png"
+      ],
+      "frameCount": 6,
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "loop": true,
+      "anchor": {
+        "x": 16,
+        "y": 45
+      }
+    },
+    "walk-left": {
+      "sheet": "gameplay/walk-left.png",
+      "frames": [
+        "frames/walk-left/00.png",
+        "frames/walk-left/01.png",
+        "frames/walk-left/02.png",
+        "frames/walk-left/03.png",
+        "frames/walk-left/04.png",
+        "frames/walk-left/05.png"
+      ],
+      "frameCount": 6,
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "loop": true,
+      "anchor": {
+        "x": 16,
+        "y": 45
+      }
+    },
+    "walk-right": {
+      "sheet": "gameplay/walk-right.png",
+      "frames": [
+        "frames/walk-right/00.png",
+        "frames/walk-right/01.png",
+        "frames/walk-right/02.png",
+        "frames/walk-right/03.png",
+        "frames/walk-right/04.png",
+        "frames/walk-right/05.png"
+      ],
+      "frameCount": 6,
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "loop": true,
+      "anchor": {
+        "x": 16,
+        "y": 45
+      }
+    },
+    "study": {
+      "sheet": "gameplay/study.png",
+      "frames": [
+        "frames/study/00.png",
+        "frames/study/01.png",
+        "frames/study/02.png",
+        "frames/study/03.png",
+        "frames/study/04.png",
+        "frames/study/05.png"
+      ],
+      "frameCount": 6,
+      "durationsMs": [
+        180,
+        180,
+        180,
+        180,
+        180,
+        180
+      ],
+      "loop": true,
+      "anchor": {
+        "x": 16,
+        "y": 45
+      }
+    }
+  }
+}

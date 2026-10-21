@@ -1,32 +1,27 @@
 @echo off
-setlocal enabledelayedexpansion
 title FocusVerse // Production Local Preview
+set "PATH=C:\Program Files\nodejs;%PATH%"
 cd /d "%~dp0"
+
+where npm >nul 2>nul
+if %ERRORLEVEL% neq 0 (
+    echo [ERROR] Node.js / npm was not found in PATH or at C:\Program Files\nodejs.
+    echo Please ensure Node.js is installed from https://nodejs.org/ and restart your terminal.
+    echo.
+    pause
+    exit /b 1
+)
+
+if not exist "node_modules\" (
+    echo ============================================================
+    echo   First run detected: Installing dependencies...
+    echo ============================================================
+    call npm install
+)
 
 echo ============================================================
 echo   FOCUSVERSE // BUILDING PRODUCTION BUNDLE & PREVIEW
 echo ============================================================
-
-set "PATH=%~dp0node_modules\.bin;C:\Program Files\nodejs;%ProgramFiles%\nodejs;%PATH%"
-set "PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC"
-
-if not exist "%~dp0node_modules\vite\bin\vite.js" (
-  echo [FOCUSVERSE] Dependencies not detected. Installing packages...
-  call npm install
-)
-
-if exist "%~dp0node_modules\typescript\bin\tsc" (
-  node "%~dp0node_modules\typescript\bin\tsc"
-) else (
-  call npx tsc
-)
-
-if exist "%~dp0node_modules\vite\bin\vite.js" (
-  node "%~dp0node_modules\vite\bin\vite.js" build
-  node "%~dp0node_modules\vite\bin\vite.js" preview --port 4173 --host
-) else (
-  call npx vite build
-  call npx vite preview --port 4173 --host
-)
-
+call npm run build
+call npm run preview -- --port 4173 --host
 pause

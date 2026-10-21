@@ -60,7 +60,7 @@ FocusVerse is an immersive, retro-futuristic productivity environment inspired b
 ### 4. Global Credits Footer (`Footer.tsx`)
 * Persistent dark pixel-arcade footer displayed across all pages:
   * `FOCUSVERSE // PIXEL PRODUCTIVITY SANCTUARY`
-  * `Crafted with ♥ • Credits: AmorSin, Beezsy79, 02Yuzu02 & Amoghdm11`
+  * `Crafted with ♥ • Credits: AmorSin, Beezsy79 & 02Yuzu02`
 
 ---
 
@@ -96,7 +96,6 @@ npm run build
 npm run preview
 ```
 
-<<<<<<< HEAD
 ### Running the Test Suite
 ```bash
 # Unit & core logic verification (38/38 passing):
@@ -146,4 +145,4 @@ node scripts/verify-all-views.js
 ---
 
 ## ✦ Credits
-Crafted with ♥ • Credits: **AmorSin**, **Beezsy79**, **02Yuzu02** & **Amoghdm11**
+Crafted with ♥ • Credits: **AmorSin**, **Beezsy79** & **02Yuzu02**

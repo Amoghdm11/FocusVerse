@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Maximize2, Minimize2, ShieldCheck, Sliders, Sparkles, Volume2, VolumeX, Music, Eye } from 'lucide-react';
+import { ChevronLeft, Maximize2, Minimize2, ShieldCheck, Volume2, VolumeX, Music, Eye } from 'lucide-react';
 import { Character } from '../types/character';
 import { CHARACTERS } from '../data/characters';
 import { EnvironmentFX } from '../components/EnvironmentFX';
 import { PixelEmblem } from '../components/PixelEmblems';
-import { PixelCharacterSprite } from '../components/PixelCharacterSprite';
-import { FullBodyPixelSprite } from '../components/FullBodyPixelSprite';
-import { CustomAppearanceState, OUTFIT_CATALOG } from '../utils/pixelSpriteCompositor';
+import { CustomAppearanceState } from '../utils/pixelSpriteCompositor';
+import { SpiderStudyRoom } from '../components/SpiderStudyRoom';
+import { RoomToolPanel } from '../components/RoomToolPanel';
+import { isSpiderManCostume } from '../utils/spidermanAssets';
+import { StudyEnvironment } from '../components/StudyEnvironment';
 import { TimerWidget } from '../components/TimerWidget';
 import { TodoWidget } from '../components/TodoWidget';
 import { NotesWidget } from '../components/NotesWidget';
@@ -43,15 +45,19 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
   initialTask,
   hideHeader = false,
 }) => {
+  const spiderRoom = customAppearance ? isSpiderManCostume(customAppearance) : character.id === 'peter-parker';
+  const [roomPanel, setRoomPanel] = useState<'notes' | 'tasks' | null>(null);
+  const [musicRequest, setMusicRequest] = useState(0);
+  const [taskCompletion, setTaskCompletion] = useState(0);
+  useEffect(() => () => { audioEngine.stopAmbience(); audioEngine.stopSynth(); }, []);
   const [zenMode, setZenMode] = useState(false);
-  const [dimmerOpacity, setDimmerOpacity] = useState(0.65);
+  const [dimmerOpacity, setDimmerOpacity] = useState(0.25);
   const [showDimmerSlider, setShowDimmerSlider] = useState(false);
   const [currentAction, setCurrentAction] = useState<UserFocusAction>('IDLE');
   const [timerModeReadout, setTimerModeReadout] = useState('POMODORO');
   const [companionBubble, setCompanionBubble] = useState<string | null>(null);
 
   // Compact Header Audio Controls
-  const [showAudioPopover, setShowAudioPopover] = useState(false);
   const [isAmbiencePlaying, setIsAmbiencePlaying] = useState(false);
   const [isSynthPlaying, setIsSynthPlaying] = useState(false);
   const [ambienceVol, setAmbienceVol] = useState(0.4);
@@ -120,7 +126,7 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
 
   return (
     <div
-      className="relative min-h-screen text-gray-200 flex flex-col justify-between selection:bg-arcade-gold selection:text-black overflow-x-hidden"
+      className="focus-workspace relative min-h-screen text-gray-200 flex flex-col justify-between selection:bg-arcade-gold selection:text-black overflow-x-hidden"
       style={{ backgroundColor: '#0B0914' }}
     >
       {/* Dynamic Ambient Background + Particle Dimmer */}
@@ -133,7 +139,7 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
       {/* --- TOP HUD BAR --- */}
       {!hideHeader && (
         <header className="relative z-30 px-3 py-2 bg-void-darkest/95 border-b-2 border-arcade-border shadow-[0_2px_12px_rgba(0,0,0,0.6)] backdrop-blur-sm select-none">
-          <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+          <div className="workspace-toolbar mx-auto flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
             {/* Left: Back to Roster + Player Name Badge + Character Selector */}
             <div className="flex items-center gap-2">
               <button
@@ -207,7 +213,7 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
                 <button
                   onClick={() => {
                     audioEngine.playClick();
-                    setShowAudioPopover(!showAudioPopover);
+                    setMusicRequest(n => n + 1);
                   }}
                   className={`pixel-btn px-2.5 py-1 text-xs flex items-center gap-1.5 border ${
                     isAmbiencePlaying || isSynthPlaying
@@ -220,98 +226,7 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
                   <span className="hidden sm:inline font-pixel text-[9px]">AUDIO</span>
                 </button>
 
-                {/* Floating Retro Audio Popover Panel */}
-                {showAudioPopover && (
-                  <div className="absolute right-0 top-full mt-2 w-72 bg-void-darkest border-2 border-arcade-border p-3 shadow-2xl z-50 animate-fadeIn text-xs font-mono">
-                    <div className="flex items-center justify-between pb-2 mb-2 border-b border-arcade-border font-pixel text-[10px] text-arcade-gold">
-                      <span>AUDIO CONTROLS</span>
-                      <button
-                        onClick={toggleMute}
-                        className={`p-1 border ${
-                          isMuted ? 'border-red-500 text-red-400' : 'border-arcade-border text-gray-300'
-                        }`}
-                        title="Master Mute"
-                      >
-                        {isMuted ? <VolumeX size={12} /> : <Volume2 size={12} />}
-                      </button>
-                    </div>
 
-                    {/* Ambience Procedural Generator */}
-                    <div className="space-y-2 mb-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] text-gray-300">Ambience Generator</span>
-                        <button
-                          onClick={toggleAmbience}
-                          className={`px-2 py-0.5 text-[9px] font-pixel border ${
-                            isAmbiencePlaying
-                              ? 'bg-arcade-gold text-black border-arcade-gold'
-                              : 'bg-void border-arcade-border text-gray-400 hover:text-white'
-                          }`}
-                        >
-                          {isAmbiencePlaying ? 'RUNNING' : 'OFF'}
-                        </button>
-                      </div>
-
-                      <select
-                        value={activeProfile}
-                        onChange={(e) => handleProfileSelect(e.target.value)}
-                        className="w-full bg-void-dark border border-arcade-border px-2 py-1 text-[11px] text-gray-200"
-                      >
-                        <option value="rain">Cyberpunk Rainfall</option>
-                        <option value="lofi">Late Night Lo-Fi Study</option>
-                        <option value="space">Deep Cosmic Void</option>
-                        <option value="wind">Mountain Temple Wind</option>
-                        <option value="matrix">Matrix Code Rain</option>
-                        <option value="sonar">Submarine Sonar Ping</option>
-                        <option value="fire">Cozy Campfire Crackle</option>
-                        <option value="purr">Warm Cat Purr</option>
-                      </select>
-
-                      <div className="flex items-center gap-2 text-[10px] text-gray-400">
-                        <span>Vol:</span>
-                        <input
-                          type="range"
-                          min="0"
-                          max="1"
-                          step="0.05"
-                          value={ambienceVol}
-                          onChange={(e) => handleAmbienceVol(parseFloat(e.target.value))}
-                          className="w-full accent-arcade-gold h-1 bg-void"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Chiptune Melodic Synthesizer */}
-                    <div className="space-y-2 pt-2 border-t border-arcade-border/50">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] text-gray-300">8-Bit Synthesizer</span>
-                        <button
-                          onClick={toggleSynth}
-                          className={`px-2 py-0.5 text-[9px] font-pixel border ${
-                            isSynthPlaying
-                              ? 'bg-arcade-cyan text-black border-arcade-cyan'
-                              : 'bg-void border-arcade-border text-gray-400 hover:text-white'
-                          }`}
-                        >
-                          {isSynthPlaying ? 'RUNNING' : 'OFF'}
-                        </button>
-                      </div>
-
-                      <div className="flex items-center gap-2 text-[10px] text-gray-400">
-                        <span>Vol:</span>
-                        <input
-                          type="range"
-                          min="0"
-                          max="1"
-                          step="0.05"
-                          value={synthVol}
-                          onChange={(e) => handleSynthVol(parseFloat(e.target.value))}
-                          className="w-full accent-arcade-cyan h-1 bg-void"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Dimmer Slider Toggle */}
@@ -378,7 +293,7 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
       )}
 
       {/* --- MAIN WORKSPACE BODY --- */}
-      <main className="relative z-20 flex-1 max-w-7xl mx-auto w-full p-3 sm:p-4 md:p-6 flex flex-col justify-start">
+      <main className="workspace-main relative z-20 flex-1 mx-auto w-full p-3 sm:p-4 md:p-6 flex flex-col justify-start">
         {/* Zen Mode Notice Banner */}
         {zenMode && (
           <div className="mb-4 text-center">
@@ -427,9 +342,9 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
         )}
 
         {/* 12-Column Responsive Workspace Grid */}
-        <div className={`grid grid-cols-1 ${zenMode ? '' : 'lg:grid-cols-12'} gap-4 items-start`}>
+        <div className={`workspace-grid ${spiderRoom ? 'spider-workspace' : ''} ${zenMode ? 'workspace-zen' : ''}`}>
           {/* Left Column: Focus Study Timer + 2D In-Game Focus Companion Stage */}
-          <div className={`${zenMode ? 'w-full' : 'lg:col-span-5'} space-y-4`}>
+          <div className={"workspace-timer space-y-4"}>
             <TimerWidget
               character={character}
               onActionChange={(action) => setCurrentAction(action)}
@@ -437,98 +352,21 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
               initialTask={initialTask}
             />
 
-            {/* 2D In-Game Focus Companion Stage Card */}
-            <div className="bg-void-darkest border-2 border-arcade-border p-3.5 shadow-pixel relative overflow-hidden select-none">
-              <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#241E3E] text-[10px] font-mono">
-                <span className="text-arcade-gold font-pixel text-[9px] flex items-center gap-1.5">
-                  <span className="w-2 h-2 bg-green-400 animate-ping inline-block" />
-                  FLOW COMPANION
-                </span>
-                <span className="text-gray-400 font-mono text-[9px]">
-                  SYNC: <strong className="text-arcade-cyan">100%</strong>
-                </span>
-              </div>
-
-              <div className="flex items-center gap-3">
-                {/* 2D Pixel Sprite with Interactive Bobbing & Platform */}
-                <div className="relative shrink-0">
-                  {customAppearance ? (
-                    <FullBodyPixelSprite
-                      appearance={customAppearance}
-                      size={96}
-                      showPlatform={true}
-                      platformColor={character.palette.borderPrimary}
-                      animated={true}
-                      onClick={handleCompanionClick}
-                      title="Click hero for focus melody"
-                    />
-                  ) : (
-                    <PixelCharacterSprite
-                      characterId={character.id}
-                      size={80}
-                      showPlatform={true}
-                      platformColor={character.palette.borderPrimary}
-                      platformGlow={character.palette.borderPrimary}
-                      statusAura={isAmbiencePlaying || isSynthPlaying}
-                      animated={true}
-                      onClick={handleCompanionClick}
-                      title="Click companion for focus quote & melody"
-                    />
-                  )}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 text-[9px] font-mono text-gray-500 uppercase">
-                    <span>{character.index}</span>
-                    <span>•</span>
-                    <span className="truncate">
-                      {customAppearance
-                        ? OUTFIT_CATALOG.find((s) => s.id === customAppearance.outfit)?.focusMod || character.universe
-                        : character.universe}
-                    </span>
-                  </div>
-
-                  <h3 className="font-pixel text-xs text-white uppercase truncate mt-0.5 mb-1">
-                    {customAppearance
-                      ? OUTFIT_CATALOG.find((s) => s.id === customAppearance.outfit)?.name || character.name
-                      : archetypeMode
-                      ? character.archetypeName.split('/')[0]
-                      : character.name.split('(')[0]}
-                  </h3>
-
-                  <p className="text-[10px] font-mono text-gray-300 line-clamp-2 italic leading-relaxed">
-                    {companionBubble
-                      ? `"${companionBubble}"`
-                      : customAppearance
-                      ? OUTFIT_CATALOG.find((s) => s.id === customAppearance.outfit)?.description || character.quote
-                      : character.quote}
-                  </p>
-
-                  <div className="mt-2 flex items-center justify-between gap-2 text-[9px] font-mono">
-                    <button
-                      onClick={handleCompanionClick}
-                      className="pixel-btn px-2 py-0.5 text-arcade-gold text-[9px] flex items-center gap-1 hover:scale-105 transition-transform"
-                    >
-                      <Sparkles size={10} />
-                      <span>TAP TO MOTIVATE</span>
-                    </button>
-                    <span className="text-arcade-cyan font-pixel text-[8px] truncate">
-                      TRAINER: {playerName.toUpperCase()}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+          </div>
+          <div className="workspace-scene">
+            {spiderRoom ? <SpiderStudyRoom action={currentAction} completion={taskCompletion} onMusic={() => setMusicRequest(n => n + 1)} onNotes={() => setRoomPanel('notes')} onTasks={() => setRoomPanel('tasks')} /> : <StudyEnvironment character={character} appearance={customAppearance} studying={currentAction === 'FOCUSING'} onCompanionClick={handleCompanionClick} />}
+            <div className="scene-companion-note"><span className="text-arcade-cyan">{archetypeMode ? character.archetypeName.split('/')[0] : character.name.split('(')[0]}</span><p>{companionBubble || character.quote}</p></div>
+            <TutorDialogueBanner activeCharacter={character} inline />
           </div>
 
           {/* Center & Right Columns: Todo List, Scratchpad & Music Center (7 Cols, Hidden in Zen) */}
-          {!zenMode && (
-            <div className="lg:col-span-7 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {!zenMode && !spiderRoom && (
+            <div className="workspace-tools space-y-4">
+              <div className="grid grid-cols-1 gap-4">
                 {/* To-Do List Widget */}
                 <div>
                   <TodoWidget
-                    onTaskAction={() => setCurrentAction('TASK_ACTION')}
+                    onTaskComplete={() => setTaskCompletion(n => n + 1)}
                     accentColor={character.palette.accentGold}
                   />
                 </div>
@@ -540,13 +378,26 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
               </div>
 
               {/* Dedicated Large MUSIC & AMBIENCE CENTER */}
-              <MusicCenter initialAmbienceProfile={character.ambienceProfile} />
+
             </div>
           )}
         </div>
 
         {/* Global Floating Tutor Dialogue Banner */}
-        <TutorDialogueBanner activeCharacter={character} />
+        {spiderRoom && <>
+          <RoomToolPanel open={roomPanel === 'notes'} title="Study notebook" onClose={() => setRoomPanel(null)}><NotesWidget accentColor={character.palette.accentSecondary}/></RoomToolPanel>
+          <RoomToolPanel open={roomPanel === 'tasks'} title="Task board" onClose={() => setRoomPanel(null)}><TodoWidget onTaskComplete={() => setTaskCompletion(n => n + 1)} accentColor={character.palette.accentGold}/></RoomToolPanel>
+        </>}
+        <MusicCenter initialAmbienceProfile={character.ambienceProfile} openRequest={musicRequest} soundscapeControls={<div className="room-soundscapes" aria-label="Room soundscapes">
+          <strong>ROOM SOUNDS</strong>
+          <label>Soundscape <select aria-label="Room soundscape" value={activeProfile} onChange={e => handleProfileSelect(e.target.value)}>{['rain','lofi','fire','space','wind','purr','matrix','sonar'].map(p => <option key={p} value={p}>{p}</option>)}</select></label>
+          <button onClick={toggleAmbience} aria-pressed={isAmbiencePlaying}>{isAmbiencePlaying ? 'Pause soundscape' : 'Play soundscape'}</button>
+          <label>Volume <input aria-label="Soundscape volume" type="range" min="0" max="1" step="0.01" value={ambienceVol} onChange={e => handleAmbienceVol(Number(e.target.value))}/></label>
+          <button onClick={toggleSynth} aria-pressed={isSynthPlaying}>{isSynthPlaying ? 'Pause synthesizer' : 'Play synthesizer'}</button>
+          <label>Synth volume <input aria-label="Synth volume" type="range" min="0" max="1" step="0.05" value={synthVol} onChange={e => handleSynthVol(Number(e.target.value))}/></label>
+          <button onClick={toggleMute} aria-pressed={isMuted}>{isMuted ? 'Unmute room audio' : 'Mute room audio'}</button>
+          <span role="status">{isAmbiencePlaying ? `Playing ${activeProfile}` : 'Soundscape paused'}</span>
+        </div>} />
       </main>
 
       {/* Global Credits Footer */}

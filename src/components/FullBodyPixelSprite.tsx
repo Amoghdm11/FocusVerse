@@ -1,3 +1,4 @@
+import { isSpiderManCostume, loadSpiderManPreview } from '../utils/spidermanAssets';
 import React, { useEffect, useRef } from 'react';
 import { CustomAppearanceState, PixelSpriteCompositor } from '../utils/pixelSpriteCompositor';
 
@@ -34,6 +35,15 @@ export const FullBodyPixelSprite: React.FC<FullBodyPixelSpriteProps> = ({
     const compositor = compositorRef.current;
     compositor.composite(appearance);
     compositor.renderToCanvas(canvas);
+    let cancelled = false;
+    if (isSpiderManCostume(appearance)) {
+      loadSpiderManPreview().then(pixels => {
+        if (cancelled) return;
+        compositor.composite(appearance, pixels);
+        compositor.renderToCanvas(canvas);
+      }).catch(error => console.warn(error));
+    }
+    return () => { cancelled = true; };
   }, [
     appearance.gender,
     appearance.outfit,
@@ -44,7 +54,8 @@ export const FullBodyPixelSprite: React.FC<FullBodyPixelSpriteProps> = ({
   ]);
 
   // Width is 64/96 of height (native 64x96 aspect ratio = 2:3)
-  const displayWidth = Math.round((size * 64) / 96);
+  const displayHeight = isSpiderManCostume(appearance) ? Math.max(96, Math.floor(size / 96) * 96) : size;
+  const displayWidth = Math.round((displayHeight * 64) / 96);
 
   return (
     <div
@@ -61,7 +72,7 @@ export const FullBodyPixelSprite: React.FC<FullBodyPixelSpriteProps> = ({
         }`}
         style={{
           width: displayWidth,
-          height: size,
+          height: displayHeight,
         }}
       >
         <canvas

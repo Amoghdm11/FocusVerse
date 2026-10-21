@@ -391,7 +391,11 @@ export class PixelSpriteCompositor {
   // COMPOSITING PASSES
   // ==========================================================================
 
-  composite(state: CustomAppearanceState) {
+  composite(state: CustomAppearanceState, costume?: ImageData) {
+    if (costume && state.outfit === 'arachnid-suit' && state.accessory === 'hero-mask') {
+      this.buffer.set(costume.data);
+      return;
+    }
     this.clear();
 
     const skin = this.getSkinPalette(state.skinTone);

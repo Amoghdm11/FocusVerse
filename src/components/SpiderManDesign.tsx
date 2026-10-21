@@ -1,0 +1,57 @@
+import React from 'react';
+
+/** Shared proportions and details for every masked Peter Parker surface. */
+export const SPIDER_PALETTE = {
+  red: '#df354b', redLight: '#ff6660', redDark: '#922b48',
+  blue: '#2855a0', blueDark: '#182e62', blueLight: '#4389c6',
+  ink: '#161b35', web: '#241d32', lens: '#f5f6e9',
+};
+const p = SPIDER_PALETTE;
+export function SpiderMask({ back = false, side = false }: { back?: boolean; side?: boolean }) {
+  return <g stroke={p.ink} strokeWidth=".65" strokeLinejoin="round" shapeRendering="geometricPrecision">
+    {/* Rounded cranium, gently tapered cheeks and a short, rounded jaw. */}
+    <path d="M0 0C-5.7 0-8.5 3.6-8.5 9C-8.5 13-6.8 17-4.4 19.6C-3 21.1-1.6 21.7 0 21.7C1.6 21.7 3 21.1 4.4 19.6C6.8 17 8.5 13 8.5 9C8.5 3.6 5.7 0 0 0Z" fill={p.red}/>
+    <path d="M4.4 1.1C7 3.5 7.3 6.5 7.2 9.5C7 14 4.5 18.7 1.2 21.5C4 21 8.5 15.3 8.5 9C8.5 5.3 7.1 2.5 4.4 1.1Z" fill={p.redDark} stroke="none"/>
+    <path d="M-6.2 4.5Q-4.5 1.8-1.2 1.5" stroke={p.redLight} strokeWidth=".5" fill="none"/>
+    <g fill="none" stroke={p.web} strokeWidth=".36" strokeLinecap="round">
+      <path d="M0 .3V21.4M-5.6 2L0 10L5.6 2M-8.1 6L0 10L8.1 6M-8.1 12L0 10L8.1 12M-6.4 16.6L0 10L6.4 16.6M-3.5 20.3L0 10L3.5 20.3"/>
+      <path d="M-7.2 4.3Q-4.3 5.6-3.4 5.2Q0 6.6 3.4 5.2Q4.3 5.6 7.2 4.3M-8.4 8.5Q-4.5 10.5 0 8.1Q4.5 10.5 8.4 8.5M-7.7 13.7Q-4.3 16.1 0 13.7Q4.3 16.1 7.7 13.7M-5.7 17.5Q-3 19.1 0 17.4Q3 19.1 5.7 17.5"/>
+    </g>
+    {!back && <g fill={p.lens} strokeWidth=".95">
+      {!side && <path d="M-7 7.4Q-4.8 8.1-1.3 10.3L-1.8 13.7Q-3.3 15.3-5 13.4Q-6.7 11.5-7 7.4Z"/>}
+      <path d={side ? 'M-5.7 7.5Q-.5 8.8 4.5 10.1L2 14Q-.5 15.3-2.8 13.3Q-5 11.2-5.7 7.5Z' : 'M7 7.4Q4.8 8.1 1.3 10.3L1.8 13.7Q3.3 15.3 5 13.4Q6.7 11.5 7 7.4Z'}/>
+    </g>}
+  </g>;
+}
+export function SpiderEmblem({ back = false }: { back?: boolean }) {
+  return <g stroke={back ? p.red : p.ink} fill={back ? p.red : p.ink} strokeWidth=".8">
+    <ellipse cx="0" cy="0" rx="1.3" ry="2.6"/><circle cy="-3" r=".9"/>
+    <path d="M-1-2L-4-4L-5-7M1-2L4-4L5-7M-1-1L-5-2L-6-4M1-1L5-2L6-4M-1 1L-5 3L-6 6M1 1L5 3L6 6M-1 2L-3 5L-3 8M1 2L3 5L3 8" fill="none"/>
+  </g>;
+}
+export function SpiderManDesign({ direction = 'down', frame = 0, studying = false, portrait = false }: {
+  direction?: string; frame?: number; studying?: boolean; portrait?: boolean;
+}) {
+  const back = direction === 'up';
+  const side = direction === 'left' || direction === 'right';
+  const stride = [0, 2, 3, 0, -2, -3][frame % 6];
+  return <svg xmlns="http://www.w3.org/2000/svg" viewBox={portrait ? '17 0 30 30' : '0 0 64 96'} width="64" height={portrait ? 64 : 96} role="img" aria-label="Spider-Man" shapeRendering="geometricPrecision">
+    <g transform={direction === 'right' ? 'translate(64 0) scale(-1 1)' : undefined} stroke={p.ink} strokeWidth=".8" strokeLinejoin="round">
+      <g transform={`translate(32 0) scale(${side ? .78 : 1} 1) translate(-32 0)`}>
+        <g transform={`translate(0 ${stride})`}><path d="M22 54L31 55L29 76L28 88H20L21 73Z" fill={p.blue}/><path d="M21 73H29L28 88L26 92H16V89L20 85Z" fill={p.red}/><path d="M23 76L23 87M21 80H28M20 85H28" stroke={p.web} fill="none" strokeWidth=".5"/></g>
+        <g transform={`translate(0 ${-stride})`}><path d="M33 55L42 54L43 73L44 88H36L35 76Z" fill={p.blueDark}/><path d="M35 73H43L44 85L48 89V92H38L36 88Z" fill={p.red}/><path d="M40 76L41 87M36 80H43M37 85H44" stroke={p.web} fill="none" strokeWidth=".5"/></g>
+        <path d="M22 27L27 24H37L42 27L46 33L42 46L40 57H24L22 46L18 33Z" fill={back ? p.blue : p.red}/>
+        <path d="M22 36L27 42L26 54H38L37 42L42 36V49L40 58H24L22 49Z" fill={p.blue}/>
+        <path d="M24 54H40V58H24Z" fill={p.red}/>
+        {!back && <path d="M27 26L30 34L29 46M37 26L34 34L35 46M23 30Q32 35 41 30M23 35Q32 40 41 35M27 42Q32 45 37 42" fill="none" stroke={p.web} strokeWidth=".5"/>}
+        <g transform="translate(32 36)"><SpiderEmblem back={back}/></g>
+        <path d={studying ? 'M20 28L16 30L14 42L22 50L26 46L21 39L24 32Z' : `M20 28L16 30L13 44L12 ${58-stride}L17 ${60-stride}L20 45L24 32Z`} fill={p.red}/>
+        <path d={studying ? 'M44 28L48 30L50 42L42 50L38 46L43 39L40 32Z' : `M44 28L48 30L51 44L52 ${58+stride}L47 ${60+stride}L44 45L40 32Z`} fill={p.red}/>
+        <path d="M18 34L16 43M46 34L48 43M15 39H21M43 39H49M14 48H19M45 48H50M13 53H18M46 53H51" fill="none" stroke={p.web} strokeWidth=".55"/>
+        <path d="M28 21H36V27H28Z" fill={p.redDark}/>
+        <g transform="translate(32 2)"><SpiderMask back={back} side={side}/></g>
+        {studying && <g><path d="M22 46L32 48L42 46V57L32 59L22 57Z" fill="#e4c994"/><path d="M32 49V58M24 50L30 51M34 51L40 50M24 53L30 54M34 54L40 53" stroke="#806747" fill="none"/></g>}
+      </g>
+    </g>
+  </svg>;
+}

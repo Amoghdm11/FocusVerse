@@ -1,0 +1,7 @@
+Tool: built-in image_gen.imagegen (not CLI).
+Original output: /Users/shreeshaks/.codex/generated_images/01a15d6a-8b9d-71c2-888a-9f7162685429/exec-94560396-d3cc-451d-8c19-bf67cf6ae2d4.png
+Project asset: public/assets/room/queens-night.jpg
+Postprocessing: resized to 1000 pixels wide, opaque JPEG quality 90.
+
+Prompt:
+Use case: stylized-concept. Asset type: opaque game environment background layer, landscape 3:2. Create a beautifully composed nighttime Queens New York cityscape, viewed from an upstairs apartment, NO window frame, NO interior, NO people, NO text. Retro adventure game illustration, crisp deliberately pixel-inspired geometric edges, layered midnight indigo rooftops, water towers, distant Manhattan silhouettes, scattered tiny warm amber windows, dusky blue clouds and small pale moon upper right, muted burgundy foreground buildings, atmospheric depth. Restrained warm amber and deep navy palette. Calm autumn night for a cozy study game. Original illustration. Save the generated image for use in the project.

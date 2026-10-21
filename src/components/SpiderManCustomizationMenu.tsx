@@ -35,8 +35,7 @@ import {
   HairColorId,
   SkinToneId,
   AccessoryId,
-  CharacterGender,
-  getAppearanceForCharacter
+  CharacterGender
 } from '../utils/pixelSpriteCompositor';
 import { FullBodyPixelSprite } from './FullBodyPixelSprite';
 import { PixelTransitionOverlay } from './PixelTransitionOverlay';
@@ -58,7 +57,6 @@ export interface SpiderManCustomizationMenuProps {
   initialGender?: 'boy' | 'girl';
   initialPlayerName?: string;
   onBackToHome: () => void;
-  onSwitchTo3DStage?: () => void;
   onConfirmAppearance: (
     character: Character,
     appearance: CustomAppearanceState,
@@ -72,7 +70,6 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
   initialGender = 'boy',
   initialPlayerName = 'TRAINER',
   onBackToHome,
-  onSwitchTo3DStage,
   onConfirmAppearance,
   archetypeMode = false,
 }) => {
@@ -114,7 +111,9 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
   // Sync if initialCharacter changes
   useEffect(() => {
     if (initialCharacter) {
-      handleSelectCharacter(initialCharacter, false);
+      const saved = localStorage.getItem('focusverse_custom_appearance');
+      const savedCharacter = localStorage.getItem('focusverse_appearance_owner') || localStorage.getItem('focusverse_selected_char');
+      if (!saved || savedCharacter !== initialCharacter.id) handleSelectCharacter(initialCharacter, false);
     }
   }, [initialCharacter]);
 
@@ -130,8 +129,80 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
     }
     setSelectedCharacter(char);
 
-    const newAppearance = getAppearanceForCharacter(char, playerName);
-    setAppearance(newAppearance);
+    const charGender: CharacterGender = char.genderOrSpirit === 'girl' ? 'girl' : 'boy';
+    const defaults = charGender === 'girl' ? DEFAULT_GIRL_CUSTOM : DEFAULT_BOY_CUSTOM;
+
+    let outfit: OutfitId = defaults.outfit;
+    let hairStyle: HairStyleId = defaults.hairStyle;
+    let hairColor: HairColorId = defaults.hairColor;
+    let accessory: AccessoryId = defaults.accessory;
+
+    if (char.id === 'peter-parker' || char.id === 'miles-morales') {
+      if (char.id === 'peter-parker') accessory = 'hero-mask';
+      outfit = 'arachnid-suit';
+      hairStyle = 'study-tousle';
+      hairColor = 'chestnut';
+    } else if (char.id === 'gwen-stacy') {
+      outfit = 'arachnid-suit';
+      hairStyle = 'cyber-bob';
+      hairColor = 'platinum';
+    } else if (char.id === 'bruce-wayne') {
+      outfit = 'stealth-ops';
+      hairStyle = 'sleek-undercut';
+      hairColor = 'black';
+      accessory = 'hero-mask';
+    } else if (char.id === 'tony-stark') {
+      outfit = 'cyber-ronin';
+      hairStyle = 'sleek-undercut';
+      hairColor = 'black';
+      accessory = 'cyber-visor';
+    } else if (char.id === 'gojo-satoru') {
+      outfit = 'cyber-ronin';
+      hairStyle = 'anime-spikes';
+      hairColor = 'platinum';
+      accessory = 'cyber-visor';
+    } else if (char.id === 'naruto-uzumaki' || char.id === 'son-goku') {
+      outfit = 'retro-arcade';
+      hairStyle = 'anime-spikes';
+      hairColor = char.id === 'naruto-uzumaki' ? 'blonde' : 'black';
+    } else if (char.id === 'neo' || char.id === 'officer-k') {
+      outfit = 'stealth-ops';
+      hairStyle = 'sleek-undercut';
+      hairColor = 'black';
+      accessory = 'cyber-visor';
+    } else if (char.id === 'elsa') {
+      outfit = 'scholar-blazer';
+      hairStyle = 'high-ponytail';
+      hairColor = 'platinum';
+    } else if (char.id === 'wednesday-addams') {
+      outfit = 'scholar-blazer';
+      hairStyle = 'cascading-waves';
+      hairColor = 'black';
+    } else if (char.id === 'hermione-granger') {
+      outfit = 'scholar-blazer';
+      hairStyle = 'cascading-waves';
+      hairColor = 'chestnut';
+    } else if (char.id === 'cozy-study-girl') {
+      outfit = 'study-hoodie';
+      hairStyle = 'cozy-buns';
+      hairColor = 'chestnut';
+      accessory = 'headphones';
+    } else if (char.id === 'late-night-study-boy') {
+      outfit = 'study-hoodie';
+      hairStyle = 'study-tousle';
+      hairColor = 'black';
+      accessory = 'headphones';
+    }
+
+    setAppearance({
+      gender: charGender,
+      outfit,
+      hairStyle,
+      hairColor,
+      skinTone: 'fair',
+      accessory,
+      playerName,
+    });
 
     const charShortName = char.name.split('(')[0].trim();
     setSpeechBubble(`Character ${charShortName} selected!`);
@@ -279,19 +350,6 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
             <span className="hidden sm:inline">[ ◀ HOME ]</span>
             <span className="sm:hidden">HOME</span>
           </button>
-
-          {onSwitchTo3DStage && (
-            <button
-              onClick={() => {
-                audioEngine.playClick();
-                onSwitchTo3DStage();
-              }}
-              className="pixel-btn px-2.5 py-1 text-xs text-arcade-gold hover:text-white flex items-center gap-1.5 border border-arcade-gold/50"
-              title="Switch to 3D Voxel Companion Roster"
-            >
-              <span>[ 🪐 3D STAGE ]</span>
-            </button>
-          )}
 
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 bg-arcade-cyan animate-ping inline-block" />
@@ -847,6 +905,11 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
         {/* ======================================================================= */}
         <div className="lg:col-span-7 flex flex-col items-center justify-between p-4 sm:p-6 relative overflow-hidden">
           
+          {appearance.outfit === 'arachnid-suit' && appearance.accessory === 'hero-mask' && (
+            <p className="absolute bottom-2 left-4 right-4 text-center text-[10px] text-gray-400 z-20">
+              Full Spider-Man suit equipped. Hair and skin are concealed; choose other gear to show them.
+            </p>
+          )}
           {/* Top-Right Holographic Suit Telemetry Overlay Badge */}
           <div className="w-full flex items-center justify-between text-[10px] font-mono select-none z-10">
             <div className="px-3 py-1.5 bg-[#120E26]/80 border border-arcade-gold/50 backdrop-blur-md shadow-pixel flex items-center gap-2">

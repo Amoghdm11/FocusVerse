@@ -1,3 +1,4 @@
+import { SpiderEmblem, SPIDER_PALETTE } from './SpiderManDesign';
 import React from 'react';
 import { PixelSpriteType, CharacterPalette } from '../types/character';
 
@@ -21,25 +22,7 @@ export const PixelEmblem: React.FC<PixelEmblemProps> = ({
   const renderIcon = () => {
     switch (type) {
       case 'spider-emblem':
-        return (
-          <svg viewBox="0 0 24 24" width={size} height={size} fill="none" className="image-pixelated">
-            {/* Spider Head & Body */}
-            <rect x="10" y="5" width="4" height="4" fill={p1} />
-            <rect x="9" y="10" width="6" height="7" fill={p1} />
-            <rect x="11" y="11" width="2" height="5" fill={p2} />
-            {/* Spider Legs */}
-            <rect x="6" y="4" width="3" height="2" fill={p3} />
-            <rect x="5" y="6" width="2" height="4" fill={p3} />
-            <rect x="15" y="4" width="3" height="2" fill={p3} />
-            <rect x="17" y="6" width="2" height="4" fill={p3} />
-            <rect x="5" y="11" width="4" height="2" fill={p3} />
-            <rect x="3" y="13" width="2" height="5" fill={p3} />
-            <rect x="15" y="11" width="4" height="2" fill={p3} />
-            <rect x="19" y="13" width="2" height="5" fill={p3} />
-            <rect x="7" y="18" width="2" height="4" fill={p1} />
-            <rect x="15" y="18" width="2" height="4" fill={p1} />
-          </svg>
-        );
+        return <svg viewBox="-10 -11 20 24" width={size} height={size} aria-label="Spider emblem"><rect x="-10" y="-11" width="20" height="24" rx="3" fill={SPIDER_PALETTE.red}/><SpiderEmblem/></svg>;
 
       case 'bat-sonar':
         return (

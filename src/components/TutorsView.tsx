@@ -1,3 +1,4 @@
+import { SpiderManTurntable } from './SpiderManTurntable';
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Users, 
@@ -56,9 +57,7 @@ import { Character } from '../types/character';
 import { CHARACTERS } from '../data/characters';
 import { audioEngine } from '../utils/audioEngine';
 import { tutorDialogueService } from '../utils/tutorDialogueService';
-import { FullBodyPixelSprite } from './FullBodyPixelSprite';
-import { PixelFaceAvatar } from './PixelFaceAvatar';
-import { getAppearanceForCharacter } from '../utils/pixelSpriteCompositor';
+import { CharacterVoxelStage } from './CharacterVoxelStage';
 
 export type TutorsTab = 
   | 'ROSTER' 
@@ -86,9 +85,8 @@ export const TutorsView: React.FC<TutorsViewProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<TutorsTab>('ROSTER');
 
-  // --- TAB 1: 2D ROSTER & PROFILES STATE ---
+  // --- TAB 1: 3D ROSTER & PROFILES STATE ---
   const [selectedTutorId, setSelectedTutorId] = useState<string>(activeCharacter.id);
-  const [spriteSpeechBubble, setSpriteSpeechBubble] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [archetypeFilter, setArchetypeFilter] = useState<string>('ALL');
   const [specialtyFilter, setSpecialtyFilter] = useState<string>('ALL');
@@ -391,7 +389,7 @@ export const TutorsView: React.FC<TutorsViewProps> = ({
               TUTOR ECOSYSTEM &amp; STUDY COMPANIONS
             </h1>
             <p className="text-[10px] text-gray-400">
-              Active Tutor: <span className="text-arcade-gold font-bold">{activeCharacter.name}</span> // 20 Tutors • 2D Sprites • Personalities • Squads • Affinity
+              Active Tutor: <span className="text-arcade-gold font-bold">{activeCharacter.name}</span> // 20 3D Models • Personalities • Squads • Affinity
             </p>
           </div>
         </div>
@@ -410,17 +408,17 @@ export const TutorsView: React.FC<TutorsViewProps> = ({
             <span>SELECT TUTOR</span>
           </button>
 
-          {/* Sprite Locker & Roster Stage Button */}
+          {/* 3D Roster Stage Button */}
           <button
             onClick={() => {
               audioEngine.playClick();
               onOpen3DStage();
             }}
             className="pixel-btn px-3 py-1.5 text-xs text-arcade-cyan hover:text-white flex items-center gap-1.5"
-            title="Open Suit Locker & 2D Sprite Customizer"
+            title="Open 3D Voxel Dressing Room for 20 Characters"
           >
-            <Sparkles size={13} className="text-arcade-cyan" />
-            <span>SPRITE ROSTER (20)</span>
+            <Layers size={13} />
+            <span>3D ROSTER (20)</span>
           </button>
 
           {/* Start Focus with Active Companion */}
@@ -444,13 +442,8 @@ export const TutorsView: React.FC<TutorsViewProps> = ({
       {/* ======================================================== */}
       <div className="bg-void-card pixel-border border-arcade-gold p-4 shadow-pixel flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 bg-void border-2 border-arcade-gold flex items-center justify-center shadow-pixel-sm shrink-0 overflow-hidden">
-            <PixelFaceAvatar
-              characterId={activeCharacter.id}
-              size={44}
-              className="w-11 h-11"
-              title={activeCharacter.name}
-            />
+          <div className="w-12 h-12 bg-void border-2 border-arcade-gold flex items-center justify-center text-2xl shadow-pixel-sm shrink-0">
+            {activeCharacter.genderOrSpirit === 'girl' ? '🧙‍♀️' : '👾'}
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
@@ -500,7 +493,7 @@ export const TutorsView: React.FC<TutorsViewProps> = ({
       {/* ======================================================== */}
       <div className="flex items-center gap-1.5 border-b border-arcade-border pb-2 overflow-x-auto scrollbar-none text-xs">
         {[
-          { id: 'ROSTER', label: '2D ROSTER & PROFILES', icon: <Layers size={13} /> },
+          { id: 'ROSTER', label: '3D ROSTER & PROFILES', icon: <Layers size={13} /> },
           { id: 'SQUADS', label: 'STUDY SQUADS (3)', icon: <Users size={13} /> },
           { id: 'PRESETS', label: 'FOCUS PRESETS', icon: <Bookmark size={13} /> },
           { id: 'SUBJECTS', label: 'SUBJECT MAPPING', icon: <Compass size={13} /> },
@@ -599,9 +592,9 @@ export const TutorsView: React.FC<TutorsViewProps> = ({
             <div className="lg:col-span-7 space-y-3">
               <div className="flex items-center justify-between pb-1 border-b border-arcade-border/50 text-[10px]">
                 <span className="font-pixel text-arcade-gold uppercase">
-                  AVAILABLE 2D ROSTER ({filteredCharacters.length} OF 20)
+                  AVAILABLE 3D ROSTER ({filteredCharacters.length} OF 20)
                 </span>
-                <span className="text-gray-400">Click to inspect 2D sprite &amp; loadout</span>
+                <span className="text-gray-400">Click to inspect 3D rig &amp; profile</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[750px] overflow-y-auto pr-1">
@@ -628,15 +621,7 @@ export const TutorsView: React.FC<TutorsViewProps> = ({
                       <div>
                         {/* Top index and active badge */}
                         <div className="flex items-center justify-between gap-1 mb-1.5">
-                          <div className="flex items-center gap-1.5">
-                            <PixelFaceAvatar
-                              characterId={char.id}
-                              size={20}
-                              className="w-5 h-5 border border-arcade-border"
-                              title={char.name}
-                            />
-                            <span className="font-pixel text-[9px] text-arcade-gold">{char.index}</span>
-                          </div>
+                          <span className="font-pixel text-[9px] text-arcade-gold">{char.index}</span>
                           {isCurrent ? (
                             <span className="px-1.5 py-0.5 bg-green-950 border border-green-500 text-green-300 font-pixel text-[8px]">
                               ✓ ACTIVE
@@ -692,12 +677,12 @@ export const TutorsView: React.FC<TutorsViewProps> = ({
               </div>
             </div>
 
-            {/* Right 5 Columns: Interactive 2D Sprite Stage & Deep Profile */}
+            {/* Right 5 Columns: Interactive 3D Voxel Stage & Deep Profile */}
             <div className="lg:col-span-5 bg-void-card pixel-border border-arcade-border p-4 shadow-pixel space-y-4">
               <div className="flex items-center justify-between pb-2 border-b border-arcade-border">
                 <div>
                   <span className="font-pixel text-[9px] text-arcade-cyan uppercase">
-                    2D SPRITE LOADOUT &amp; PROFILE
+                    3D VOXEL MODEL &amp; PROFILE
                   </span>
                   <h3 className="font-silkscreen text-sm text-white mt-0.5">{selectedCharacter.name}</h3>
                 </div>
@@ -716,53 +701,15 @@ export const TutorsView: React.FC<TutorsViewProps> = ({
                 )}
               </div>
 
-              {/* Interactive 2D Pixel Sprite Stage on Holographic Pedestal */}
-              <div className="relative w-full h-72 bg-[#090714] border-2 border-[#241E3E] overflow-hidden flex flex-col items-center justify-center group select-none shadow-[inset_0_0_24px_rgba(0,0,0,0.85)]">
-                {/* Sci-Fi Holographic Void & Grid Background */}
-                <div className="absolute inset-0 pointer-events-none z-0">
-                  <div
-                    className="absolute inset-0 opacity-45 transition-colors duration-500"
-                    style={{
-                      background: `radial-gradient(circle at 50% 60%, ${selectedCharacter.palette?.borderPrimary || '#F5C242'}26 0%, transparent 70%)`
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-[radial-gradient(#261F45_1px,transparent_1px)] [background-size:16px_16px] opacity-35" />
-                </div>
-
-                {/* Speech Bubble on click / greeting */}
-                {spriteSpeechBubble && (
-                  <div className="absolute top-3 px-3 py-1.5 bg-[#0E0B1C]/95 border-2 border-arcade-gold text-arcade-gold font-pixel text-[10px] shadow-[0_0_20px_rgba(245,194,66,0.4)] animate-fadeIn max-w-[280px] text-center z-20">
-                    &gt; &quot;{spriteSpeechBubble}&quot;
-                  </div>
-                )}
-
-                {/* 2D Sprite on Holographic Pedestal */}
-                <div className="relative z-10 transform group-hover:scale-105 transition-transform duration-300">
-                  <FullBodyPixelSprite
-                    appearance={getAppearanceForCharacter(selectedCharacter)}
-                    size={220}
-                    showPlatform={true}
-                    platformColor={selectedCharacter.palette?.borderPrimary || '#F5C242'}
-                    animated={true}
-                    onClick={() => {
-                      audioEngine.playClick();
-                      audioEngine.playVictoryJingle(selectedCharacter.synthNotes);
-                      handlePreviewDialogue('GREETING');
-                      setSpriteSpeechBubble(`"${selectedCharacter.quote}"`);
-                      setTimeout(() => setSpriteSpeechBubble(null), 3500);
-                    }}
-                    title={`Click ${selectedCharacter.name} for focus melody & quote`}
-                  />
-                </div>
-
-                {/* Bottom Telemetry Bar */}
-                <div className="absolute bottom-2 left-2 bg-black/85 px-2 py-0.5 text-[8px] font-pixel text-arcade-cyan border border-arcade-border/60 flex items-center gap-1.5 z-10">
-                  <span className="w-1.5 h-1.5 bg-arcade-cyan animate-pulse rounded-full" />
-                  <span>2D SPRITE // 64×96 NATIVE RESOLUTION</span>
-                </div>
-
-                <div className="absolute bottom-2 right-2 bg-black/85 px-2 py-0.5 text-[8px] font-mono text-gray-400 border border-arcade-border/60 z-10 hidden sm:block">
-                  CLICK SPRITE FOR MELODY
+              {/* Interactive 3D Voxel Model Stage (Scaled-Down Embedded) */}
+              <div className="relative w-full h-64 bg-void border border-arcade-border overflow-hidden">
+                {selectedCharacter.id === 'peter-parker' ? <SpiderManTurntable/> : <CharacterVoxelStage
+                  character={selectedCharacter}
+                  fullScreen={false}
+                  className="w-full h-full"
+                />}
+                <div className="absolute bottom-2 left-2 bg-black/70 px-2 py-0.5 text-[8px] font-pixel text-gray-400 border border-arcade-border/50">
+                  {selectedCharacter.id === 'peter-parker' ? 'SHARED SUIT // FRONT · SIDE · BACK' : '3D INTERACTIVE // DRAG TO ROTATE'}
                 </div>
               </div>
 

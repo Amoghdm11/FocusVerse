@@ -25,10 +25,6 @@ export const Footer: React.FC = () => {
         <strong className="text-arcade-cyan font-bold hover:text-white transition-colors cursor-default">
           Beezsy79
         </strong>
-        <span className="text-gray-500">,</span>
-        <strong className="text-arcade-purple font-bold hover:text-white transition-colors cursor-default">
-          Amoghdm11
-        </strong>
         <span className="text-arcade-gold font-bold">&amp;</span>
         <strong className="text-arcade-gold font-bold hover:text-white transition-colors cursor-default">
           02Yuzu02
@@ -37,3 +33,5 @@ export const Footer: React.FC = () => {
     </footer>
   );
 };
+
+export default Footer;

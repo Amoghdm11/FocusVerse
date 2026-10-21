@@ -3,8 +3,6 @@
 // Classic Pokémon Gen 3–Inspired Pixel-Art Layered Character Customization Engine
 // ============================================================================
 
-import { Character } from '../types/character';
-
 export type CharacterGender = 'boy' | 'girl';
 
 export type HairStyleId =
@@ -98,7 +96,7 @@ export const OUTFIT_CATALOG: SuitMetadata[] = [
     stats: { focus: 98, agility: 100, resilience: 90 },
     themeColor: '#DC2626',
     accentColor: '#FFFFFF',
-    description: 'High-density composite hero suit inspired by the legendary web-slinger. Features white arachnid chest insignia, flexible rib panels, and carbon-reinforced landing boots.',
+    description: 'High-density composite hero suit inspired by the legendary web-slinger. Features a black spider emblem, classic web tracery, and red boots.',
   },
   {
     id: 'cyber-ronin',
@@ -391,7 +389,11 @@ export class PixelSpriteCompositor {
   // COMPOSITING PASSES
   // ==========================================================================
 
-  composite(state: CustomAppearanceState) {
+  composite(state: CustomAppearanceState, costume?: ImageData) {
+    if (costume && state.outfit === 'arachnid-suit' && state.accessory === 'hero-mask') {
+      this.buffer.set(costume.data);
+      return;
+    }
     this.clear();
 
     const skin = this.getSkinPalette(state.skinTone);
@@ -670,13 +672,16 @@ export class PixelSpriteCompositor {
 
   // Outfit 2: Advanced Arachnid Suit (Insomniac Spider-Man Inspired)
   private drawArachnidSuit(gender: CharacterGender) {
-    const redCol = '#DC2626';
+    const redCol = '#df354b';
     const redShadow = '#991B1B';
-    const navyCol = '#1E3A8A';
-    const whiteCol = '#FFFFFF';
+    const navyCol = '#2855a0';
+    const whiteCol = '#161b35';
 
     // Red Chest & Shoulder Armor
     this.fillPolygon([[17, 38], [47, 38], [44, 58], [20, 58]], redCol);
+    // Web tracery also remains visible when the mask is removed.
+    for (let y = 40; y <= 56; y += 4) this.strokeLine(20, y, 44, y, '#241d32', 1);
+    for (const x of [25, 32, 39]) this.strokeLine(x, 38, x, 57, '#241d32', 1);
     // Navy side ribs
     this.fillPolygon([[17, 44], [23, 44], [22, 58], [19, 58]], navyCol);
     this.fillPolygon([[47, 44], [41, 44], [42, 58], [45, 58]], navyCol);
@@ -1041,200 +1046,3 @@ export class PixelSpriteCompositor {
 
 // Global Singleton Instance for quick rendering
 export const spriteCompositor = new PixelSpriteCompositor();
-
-/**
- * Maps any FocusVerse Character to a tailored 2D full-body pixel appearance
- */
-export function getAppearanceForCharacter(
-  char: Character,
-  playerName?: string
-): CustomAppearanceState {
-  const charGender: CharacterGender = char.genderOrSpirit === 'girl' ? 'girl' : 'boy';
-  const defaults = charGender === 'girl' ? DEFAULT_GIRL_CUSTOM : DEFAULT_BOY_CUSTOM;
-
-  let outfit: OutfitId = defaults.outfit;
-  let hairStyle: HairStyleId = defaults.hairStyle;
-  let hairColor: HairColorId = defaults.hairColor;
-  let skinTone: SkinToneId = 'fair';
-  let accessory: AccessoryId = defaults.accessory;
-
-  switch (char.id) {
-    case 'peter-parker':
-      outfit = 'arachnid-suit';
-      hairStyle = 'study-tousle';
-      hairColor = 'chestnut';
-      skinTone = 'fair';
-      break;
-
-    case 'miles-morales':
-      outfit = 'arachnid-suit';
-      hairStyle = 'study-tousle';
-      hairColor = 'black';
-      skinTone = 'espresso';
-      accessory = 'headphones';
-      break;
-
-    case 'gwen-stacy':
-      outfit = 'arachnid-suit';
-      hairStyle = 'cyber-bob';
-      hairColor = 'platinum';
-      skinTone = 'fair';
-      accessory = 'headphones';
-      break;
-
-    case 'bruce-wayne':
-    case 'batman':
-      outfit = 'stealth-ops';
-      hairStyle = 'sleek-undercut';
-      hairColor = 'black';
-      skinTone = 'fair';
-      accessory = 'hero-mask';
-      break;
-
-    case 'tony-stark':
-      outfit = 'cyber-ronin';
-      hairStyle = 'sleek-undercut';
-      hairColor = 'black';
-      skinTone = 'fair';
-      accessory = 'cyber-visor';
-      break;
-
-    case 'gojo-satoru':
-      outfit = 'cyber-ronin';
-      hairStyle = 'anime-spikes';
-      hairColor = 'platinum';
-      skinTone = 'fair';
-      accessory = 'cyber-visor';
-      break;
-
-    case 'levi-ackerman':
-      outfit = 'stealth-ops';
-      hairStyle = 'sleek-undercut';
-      hairColor = 'black';
-      skinTone = 'fair';
-      break;
-
-    case 'l-lawliet':
-      outfit = 'study-hoodie';
-      hairStyle = 'anime-spikes';
-      hairColor = 'black';
-      skinTone = 'fair';
-      break;
-
-    case 'naruto-uzumaki':
-      outfit = 'retro-arcade';
-      hairStyle = 'anime-spikes';
-      hairColor = 'blonde';
-      skinTone = 'warm-tan';
-      break;
-
-    case 'son-goku':
-      outfit = 'retro-arcade';
-      hairStyle = 'anime-spikes';
-      hairColor = 'black';
-      skinTone = 'warm-tan';
-      break;
-
-    case 'neo':
-      outfit = 'stealth-ops';
-      hairStyle = 'sleek-undercut';
-      hairColor = 'black';
-      skinTone = 'fair';
-      accessory = 'cyber-visor';
-      break;
-
-    case 'officer-k':
-      outfit = 'cyber-ronin';
-      hairStyle = 'sleek-undercut';
-      hairColor = 'chestnut';
-      skinTone = 'fair';
-      break;
-
-    case 'elsa':
-      outfit = 'scholar-blazer';
-      hairStyle = 'high-ponytail';
-      hairColor = 'platinum';
-      skinTone = 'fair';
-      break;
-
-    case 'rapunzel':
-      outfit = 'scholar-blazer';
-      hairStyle = 'cascading-waves';
-      hairColor = 'blonde';
-      skinTone = 'fair';
-      break;
-
-    case 'moana':
-      outfit = 'study-hoodie';
-      hairStyle = 'cascading-waves';
-      hairColor = 'black';
-      skinTone = 'warm-tan';
-      break;
-
-    case 'hermione-granger':
-      outfit = 'scholar-blazer';
-      hairStyle = 'cascading-waves';
-      hairColor = 'chestnut';
-      skinTone = 'fair';
-      break;
-
-    case 'wednesday-addams':
-      outfit = 'scholar-blazer';
-      hairStyle = 'cascading-waves';
-      hairColor = 'black';
-      skinTone = 'fair';
-      break;
-
-    case 'cozy-study-girl':
-      outfit = 'study-hoodie';
-      hairStyle = 'cozy-buns';
-      hairColor = 'chestnut';
-      skinTone = 'fair';
-      accessory = 'headphones';
-      break;
-
-    case 'late-night-study-boy':
-      outfit = 'study-hoodie';
-      hairStyle = 'study-tousle';
-      hairColor = 'black';
-      skinTone = 'fair';
-      accessory = 'headphones';
-      break;
-
-    case 'purring-window-cat':
-      outfit = 'study-hoodie';
-      hairStyle = 'cozy-buns';
-      hairColor = 'chestnut';
-      skinTone = 'fair';
-      break;
-
-    case 'loyal-fireplace-dog':
-      outfit = 'retro-arcade';
-      hairStyle = 'study-tousle';
-      hairColor = 'chestnut';
-      skinTone = 'fair';
-      break;
-
-    default:
-      if (charGender === 'girl') {
-        outfit = 'scholar-blazer';
-        hairStyle = 'cascading-waves';
-        hairColor = 'chestnut';
-      } else {
-        outfit = 'study-hoodie';
-        hairStyle = 'study-tousle';
-        hairColor = 'black';
-      }
-      break;
-  }
-
-  return {
-    gender: charGender,
-    outfit,
-    hairStyle,
-    hairColor,
-    skinTone,
-    accessory,
-    playerName: playerName || 'TRAINER',
-  };
-}

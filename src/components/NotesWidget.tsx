@@ -103,6 +103,7 @@ export const NotesWidget: React.FC<NotesWidgetProps> = ({
 
       {/* Textarea Monospace Editor */}
       <textarea
+        aria-label="Study notes"
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder="// Record study observations, formulas, and insights..."

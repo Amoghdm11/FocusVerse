@@ -1,0 +1,39 @@
+{
+  "ids": [
+    "bruce-wayne",
+    "tony-stark",
+    "miles-morales",
+    "gwen-stacy",
+    "naruto-uzumaki",
+    "gojo-satoru",
+    "levi-ackerman",
+    "l-lawliet",
+    "elsa",
+    "rapunzel",
+    "moana",
+    "hermione-granger",
+    "wednesday-addams",
+    "officer-k",
+    "neo",
+    "cozy-study-girl",
+    "late-night-study-boy",
+    "purring-window-cat",
+    "loyal-fireplace-dog"
+  ],
+  "checks": [
+    "assets decode",
+    "two articulated actions change geometry",
+    "390px no overflow",
+    "reduced motion",
+    "selector roundtrip",
+    "no page errors",
+    "all-20 focus continuity",
+    "automatic cycle",
+    "visibility cleanup",
+    "pause resume reset rest",
+    "notes tasks music",
+    "customization ownership",
+    "controlled-clock completion"
+  ],
+  "errors": []
+}

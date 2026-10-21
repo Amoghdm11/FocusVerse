@@ -1,3 +1,4 @@
+import { spiderDesignUrl } from '../utils/spidermanAssets';
 import React, { useState } from 'react';
 
 export interface PixelFaceAvatarProps {
@@ -16,7 +17,7 @@ export const PixelFaceAvatar: React.FC<PixelFaceAvatarProps> = ({
   const [hasError, setHasError] = useState(false);
 
   // Fallback to peter-parker or default avatar if image fails to load
-  const imgSrc = hasError ? '/avatars/peter-parker.png' : `/avatars/${characterId}.png`;
+  const imgSrc = characterId === 'peter-parker' || hasError ? spiderDesignUrl('down', 0, false, true) : `${import.meta.env.BASE_URL}avatars/${characterId}.png`;
 
   return (
     <div

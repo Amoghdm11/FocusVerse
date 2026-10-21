@@ -1,3 +1,4 @@
+import { spiderDesignUrl } from '../utils/spidermanAssets';
 import React, { useState } from 'react';
 
 export interface PixelCharacterSpriteProps {
@@ -30,7 +31,7 @@ export const PixelCharacterSprite: React.FC<PixelCharacterSpriteProps> = ({
   const [hasError, setHasError] = useState(false);
 
   // Fallback to peter-parker if character avatar is missing
-  const imgSrc = hasError ? '/avatars/peter-parker.png' : `/avatars/${characterId}.png`;
+  const imgSrc = characterId === 'peter-parker' || hasError ? spiderDesignUrl('down', 0, false, false) : `${import.meta.env.BASE_URL}avatars/${characterId}.png`;
 
   return (
     <div

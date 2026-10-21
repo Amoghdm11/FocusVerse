@@ -1,0 +1,271 @@
+{
+  "results": [
+    {
+      "id": "bruce-wayne",
+      "illustratedActor": false,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    },
+    {
+      "id": "cozy-study-girl",
+      "illustratedActor": true,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    },
+    {
+      "id": "elsa",
+      "illustratedActor": false,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    },
+    {
+      "id": "gojo-satoru",
+      "illustratedActor": true,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    },
+    {
+      "id": "gwen-stacy",
+      "illustratedActor": false,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    },
+    {
+      "id": "hermione-granger",
+      "illustratedActor": false,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    },
+    {
+      "id": "l-lawliet",
+      "illustratedActor": true,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    },
+    {
+      "id": "late-night-study-boy",
+      "illustratedActor": true,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    },
+    {
+      "id": "levi-ackerman",
+      "illustratedActor": true,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    },
+    {
+      "id": "loyal-fireplace-dog",
+      "illustratedActor": true,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    },
+    {
+      "id": "miles-morales",
+      "illustratedActor": false,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    },
+    {
+      "id": "moana",
+      "illustratedActor": false,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    },
+    {
+      "id": "naruto-uzumaki",
+      "illustratedActor": true,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    },
+    {
+      "id": "neo",
+      "illustratedActor": true,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    },
+    {
+      "id": "officer-k",
+      "illustratedActor": true,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    },
+    {
+      "id": "purring-window-cat",
+      "illustratedActor": true,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    },
+    {
+      "id": "rapunzel",
+      "illustratedActor": false,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    },
+    {
+      "id": "tony-stark",
+      "illustratedActor": false,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    },
+    {
+      "id": "wednesday-addams",
+      "illustratedActor": true,
+      "checks": [
+        "assets decode",
+        "music real player via Space",
+        "notes real dialog via Enter",
+        "notes persist across characters",
+        "tasks real dialog",
+        "390px / 1440px bounds and touch targets",
+        "no overflow",
+        "reduced motion"
+      ]
+    }
+  ],
+  "errors": []
+}

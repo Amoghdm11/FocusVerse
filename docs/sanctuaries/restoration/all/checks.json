@@ -1,0 +1,36 @@
+{
+  "ids": [
+    "bruce-wayne",
+    "miles-morales",
+    "gwen-stacy",
+    "naruto-uzumaki",
+    "gojo-satoru",
+    "levi-ackerman",
+    "l-lawliet",
+    "elsa",
+    "rapunzel",
+    "moana",
+    "hermione-granger",
+    "wednesday-addams",
+    "officer-k",
+    "neo",
+    "cozy-study-girl",
+    "late-night-study-boy",
+    "purring-window-cat",
+    "loyal-fireplace-dog"
+  ],
+  "passed": [
+    "desktop/mobile screenshots",
+    "both activities",
+    "real music notes tasks objects",
+    "shared notes across roster",
+    "keyboard notes",
+    "lamp toggle",
+    "animated actions",
+    "reduced motion",
+    "original room chrome",
+    "all 20 timer continuity",
+    "break pauses activities"
+  ],
+  "errors": []
+}

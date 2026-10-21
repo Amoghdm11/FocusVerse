@@ -1,0 +1,188 @@
+{
+  "mode": "built-in image_gen",
+  "note": "Prompts include rejected sprite attempts. Initial successful Batman/Tony environment and Naruto sprite briefs are included below.",
+  "prompts": [
+    {
+      "id": "miles-morales",
+      "kind": "room",
+      "prompt": "Detailed hand-painted 2D animated film background for a quiet study game. Landscape 3:2, fine linework, rich surface textures, atmospheric lighting, believable perspective. Setting: Brooklyn rooftop art studio, water towers, detailed skyline, colorful painted murals, spray cans, sneakers, cables. No people, characters, animals, text or user interface. Interactive objects clearly visible: boombox at left center (23% width, 55% height); sketch journal on small right-side table (80% width, 65% height); mural project board on right wall (81% width, 28% height). Leave central floor clear for separately composited character (x44-67%, y43-88%). Floor contact at 88% image height. Detailed surroundings with many relevant small objects, layered foreground corners, midground furniture and background architecture. No central desk. Polished illustration, no geometric vector mockup."
+    },
+    {
+      "id": "gwen-stacy",
+      "kind": "room",
+      "prompt": "Detailed hand-painted 2D animated film background for a quiet study game. Landscape 3:2, fine linework, rich surface textures, atmospheric lighting, believable perspective. Setting: Earth-65 warehouse rehearsal loft, huge arched windows, acoustic panels, drum kit off to right, amps, coiled leads, posters without text. No people, characters, animals, text or user interface. Interactive objects clearly visible: amplifier and headphones at left center (23% width, 55% height); sheet music notebook on small right-side table (80% width, 65% height); rehearsal planning board on right wall (81% width, 28% height). Leave central floor clear for separately composited character (x44-67%, y43-88%). Floor contact at 88% image height. Detailed surroundings with many relevant small objects, layered foreground corners, midground furniture and background architecture. No central desk. Polished illustration, no geometric vector mockup."
+    },
+    {
+      "id": "naruto-uzumaki",
+      "kind": "room",
+      "prompt": "Detailed hand-painted 2D animated film background for a quiet study game. Landscape 3:2, fine linework, rich surface textures, atmospheric lighting, believable perspective. Setting: Hidden Leaf training veranda, carved timber, village and Hokage mountain outside, scroll cubbies, kunai equipment, ramen bowl. No people, characters, animals, text or user interface. Interactive objects clearly visible: portable orange radio at left center (23% width, 55% height); unrolled sealing scroll on small right-side table (80% width, 65% height); shinobi mission board on right wall (81% width, 28% height). Leave central floor clear for separately composited character (x44-67%, y43-88%). Floor contact at 88% image height. Detailed surroundings with many relevant small objects, layered foreground corners, midground furniture and background architecture. No central desk. Polished illustration, no geometric vector mockup."
+    },
+    {
+      "id": "gojo-satoru",
+      "kind": "room",
+      "prompt": "Detailed hand-painted 2D animated film background for a quiet study game. Landscape 3:2, fine linework, rich surface textures, atmospheric lighting, believable perspective. Setting: Jujutsu High temple barrier chamber, traditional carved wood, shoji, purple blue infinity energy behind tall columns, talisman cabinets. No people, characters, animals, text or user interface. Interactive objects clearly visible: small wireless speaker at left center (23% width, 55% height); talisman journal on small right-side table (80% width, 65% height); barrier planning display on right wall (81% width, 28% height). Leave central floor clear for separately composited character (x44-67%, y43-88%). Floor contact at 88% image height. Detailed surroundings with many relevant small objects, layered foreground corners, midground furniture and background architecture. No central desk. Polished illustration, no geometric vector mockup."
+    },
+    {
+      "id": "levi-ackerman",
+      "kind": "room",
+      "prompt": "Detailed hand-painted 2D animated film background for a quiet study game. Landscape 3:2, fine linework, rich surface textures, atmospheric lighting, believable perspective. Setting: Scout HQ stone quarters, gothic courtyard windows, orderly ODM equipment rack, tea service, books and maps. No people, characters, animals, text or user interface. Interactive objects clearly visible: vintage field radio at left center (23% width, 55% height); expedition logbook on small right-side table (80% width, 65% height); Scout expedition map board on right wall (81% width, 28% height). Leave central floor clear for separately composited character (x44-67%, y43-88%). Floor contact at 88% image height. Detailed surroundings with many relevant small objects, layered foreground corners, midground furniture and background architecture. No central desk. Polished illustration, no geometric vector mockup."
+    },
+    {
+      "id": "l-lawliet",
+      "kind": "room",
+      "prompt": "Detailed hand-painted 2D animated film background for a quiet study game. Landscape 3:2, fine linework, rich surface textures, atmospheric lighting, believable perspective. Setting: Rainy high-rise detective task force suite, CRT surveillance monitors, evidence photos and strings, case files, tea cups and sweets. No people, characters, animals, text or user interface. Interactive objects clearly visible: surveillance audio console at left center (23% width, 55% height); case notebook on small right-side table (80% width, 65% height); deduction evidence board on right wall (81% width, 28% height). Leave central floor clear for separately composited character (x44-67%, y43-88%). Floor contact at 88% image height. Detailed surroundings with many relevant small objects, layered foreground corners, midground furniture and background architecture. No central desk. Polished illustration, no geometric vector mockup."
+    },
+    {
+      "id": "elsa",
+      "kind": "room",
+      "prompt": "Detailed hand-painted 2D animated film background for a quiet study game. Landscape 3:2, fine linework, rich surface textures, atmospheric lighting, believable perspective. Setting: North Mountain ice observatory, detailed faceted translucent ice arches, snow mountains and aurora, snowflake carvings, crystalline balustrades. No people, characters, animals, text or user interface. Interactive objects clearly visible: crystal music box at left center (23% width, 55% height); frost-bound journal on small right-side table (80% width, 65% height); etched ice planning tablet on right wall (81% width, 28% height). Leave central floor clear for separately composited character (x44-67%, y43-88%). Floor contact at 88% image height. Detailed surroundings with many relevant small objects, layered foreground corners, midground furniture and background architecture. No central desk. Polished illustration, no geometric vector mockup."
+    },
+    {
+      "id": "rapunzel",
+      "kind": "room",
+      "prompt": "Detailed hand-painted 2D animated film background for a quiet study game. Landscape 3:2, fine linework, rich surface textures, atmospheric lighting, believable perspective. Setting: Corona tower painting atelier, curved plaster walls painted with sun motifs and floral murals, arched window overlooking lantern valley, easel and paint jars. No people, characters, animals, text or user interface. Interactive objects clearly visible: wooden music box at left center (23% width, 55% height); painting journal on small right-side table (80% width, 65% height); easel with project sketches on right wall (81% width, 28% height). Leave central floor clear for separately composited character (x44-67%, y43-88%). Floor contact at 88% image height. Detailed surroundings with many relevant small objects, layered foreground corners, midground furniture and background architecture. No central desk. Polished illustration, no geometric vector mockup."
+    },
+    {
+      "id": "moana",
+      "kind": "room",
+      "prompt": "Detailed hand-painted 2D animated film background for a quiet study game. Landscape 3:2, fine linework, rich surface textures, atmospheric lighting, believable perspective. Setting: Wide Polynesian outrigger canoe at twilight, detailed woven sail, carved timber deck, navigation gear, rope coils, distant tropical island, stars and ocean. No people, characters, animals, text or user interface. Interactive objects clearly visible: shell chime instrument at left center (23% width, 55% height); wayfinder chart journal on small right-side table (80% width, 65% height); star navigation planning board on right wall (81% width, 28% height). Leave central floor clear for separately composited character (x44-67%, y43-88%). Floor contact at 88% image height. Detailed surroundings with many relevant small objects, layered foreground corners, midground furniture and background architecture. No central desk. Polished illustration, no geometric vector mockup."
+    },
+    {
+      "id": "hermione-granger",
+      "kind": "room",
+      "prompt": "Detailed hand-painted 2D animated film background for a quiet study game. Landscape 3:2, fine linework, rich surface textures, atmospheric lighting, believable perspective. Setting: Hogwarts restricted library, dense leather books, gothic stone arch windows, brass instruments, floating candles, quills and ink bottles. No people, characters, animals, text or user interface. Interactive objects clearly visible: enchanted brass gramophone at left center (23% width, 55% height); open annotated grimoire on small right-side table (80% width, 65% height); study timetable parchment board on right wall (81% width, 28% height). Leave central floor clear for separately composited character (x44-67%, y43-88%). Floor contact at 88% image height. Detailed surroundings with many relevant small objects, layered foreground corners, midground furniture and background architecture. No central desk. Polished illustration, no geometric vector mockup."
+    },
+    {
+      "id": "wednesday-addams",
+      "kind": "room",
+      "prompt": "Detailed hand-painted 2D animated film background for a quiet study game. Landscape 3:2, fine linework, rich surface textures, atmospheric lighting, believable perspective. Setting: Nevermore gothic dorm study, circular spiderweb window, dark wood, typewriter, cello on stand, black roses, raven perch, manuscripts. No people, characters, animals, text or user interface. Interactive objects clearly visible: antique gramophone at left center (23% width, 55% height); typewriter manuscript on small right-side table (80% width, 65% height); investigation pinboard on right wall (81% width, 28% height). Leave central floor clear for separately composited character (x44-67%, y43-88%). Floor contact at 88% image height. Detailed surroundings with many relevant small objects, layered foreground corners, midground furniture and background architecture. No central desk. Polished illustration, no geometric vector mockup."
+    },
+    {
+      "id": "officer-k",
+      "kind": "room",
+      "prompt": "Detailed hand-painted 2D animated film background for a quiet study game. Landscape 3:2, fine linework, rich surface textures, atmospheric lighting, believable perspective. Setting: Los Angeles 2049 spinner hangar, amber smog skyline, huge steel ribs, parked futuristic spinner, cables, worn industrial panels, baseline scanner. No people, characters, animals, text or user interface. Interactive objects clearly visible: baseline audio console at left center (23% width, 55% height); memory research file on small right-side table (80% width, 65% height); investigation planning terminal on right wall (81% width, 28% height). Leave central floor clear for separately composited character (x44-67%, y43-88%). Floor contact at 88% image height. Detailed surroundings with many relevant small objects, layered foreground corners, midground furniture and background architecture. No central desk. Polished illustration, no geometric vector mockup."
+    },
+    {
+      "id": "neo",
+      "kind": "room",
+      "prompt": "Detailed hand-painted 2D animated film background for a quiet study game. Landscape 3:2, fine linework, rich surface textures, atmospheric lighting, believable perspective. Setting: Nebuchadnezzar operator deck, dense CRT screens with green code marks, ribbed ship hull, cable bundles, telephone, keyboard, battered metal. No people, characters, animals, text or user interface. Interactive objects clearly visible: operator audio console at left center (23% width, 55% height); code research notebook on small right-side table (80% width, 65% height); operator planning terminal on right wall (81% width, 28% height). Leave central floor clear for separately composited character (x44-67%, y43-88%). Floor contact at 88% image height. Detailed surroundings with many relevant small objects, layered foreground corners, midground furniture and background architecture. No central desk. Polished illustration, no geometric vector mockup."
+    },
+    {
+      "id": "cozy-study-girl",
+      "kind": "room",
+      "prompt": "Detailed hand-painted 2D animated film background for a quiet study game. Landscape 3:2, fine linework, rich surface textures, atmospheric lighting, believable perspective. Setting: Rainy attic study, sloped timber beams, large rain window, lush plants, book stacks, quilted armchair, tea service, golden desk lamp. No people, characters, animals, text or user interface. Interactive objects clearly visible: vinyl record player at left center (23% width, 55% height); handwritten journal on small right-side table (80% width, 65% height); weekly planner board on right wall (81% width, 28% height). Leave central floor clear for separately composited character (x44-67%, y43-88%). Floor contact at 88% image height. Detailed surroundings with many relevant small objects, layered foreground corners, midground furniture and background architecture. No central desk. Polished illustration, no geometric vector mockup."
+    },
+    {
+      "id": "late-night-study-boy",
+      "kind": "room",
+      "prompt": "Detailed hand-painted 2D animated film background for a quiet study game. Landscape 3:2, fine linework, rich surface textures, atmospheric lighting, believable perspective. Setting: Tokyo dorm at night, neon elevated railway outside rain window, compact shelves, mechanical keyboard, electronics, mugs, futon and folded blanket. No people, characters, animals, text or user interface. Interactive objects clearly visible: headphone audio dock at left center (23% width, 55% height); coding notebook on small right-side table (80% width, 65% height); project planning board on right wall (81% width, 28% height). Leave central floor clear for separately composited character (x44-67%, y43-88%). Floor contact at 88% image height. Detailed surroundings with many relevant small objects, layered foreground corners, midground furniture and background architecture. No central desk. Polished illustration, no geometric vector mockup."
+    },
+    {
+      "id": "purring-window-cat",
+      "kind": "room",
+      "prompt": "Detailed hand-painted 2D animated film background for a quiet study game. Landscape 3:2, fine linework, rich surface textures, atmospheric lighting, believable perspective. Setting: Botanical greenhouse reading nook, detailed cascading foliage, fogged glass, golden sunlight, cushions, terracotta pots, potting bench and gardening tools. No people, characters, animals, text or user interface. Interactive objects clearly visible: small vintage radio at left center (23% width, 55% height); botanical field journal on small right-side table (80% width, 65% height); gardening planner board on right wall (81% width, 28% height). Leave central floor clear for separately composited character (x44-67%, y43-88%). Floor contact at 88% image height. Detailed surroundings with many relevant small objects, layered foreground corners, midground furniture and background architecture. No central desk. Polished illustration, no geometric vector mockup."
+    },
+    {
+      "id": "loyal-fireplace-dog",
+      "kind": "room",
+      "prompt": "Detailed hand-painted 2D animated film background for a quiet study game. Landscape 3:2, fine linework, rich surface textures, atmospheric lighting, believable perspective. Setting: Pine mountain cabin study, detailed stone hearth with glowing fire, snowy forest window, log walls, wool rugs, stacked firewood, books, brass kettle. No people, characters, animals, text or user interface. Interactive objects clearly visible: wooden tabletop radio at left center (23% width, 55% height); hearthside journal on small right-side table (80% width, 65% height); walking route planner board on right wall (81% width, 28% height). Leave central floor clear for separately composited character (x44-67%, y43-88%). Floor contact at 88% image height. Detailed surroundings with many relevant small objects, layered foreground corners, midground furniture and background architecture. No central desk. Polished illustration, no geometric vector mockup."
+    },
+    {
+      "id": "miles-morales",
+      "kind": "actor",
+      "prompt": "One transparent full-body game character sprite: Miles Morales Spider-Man. Faithful appearance: faithful black Spider-Man suit with red webbing on mask and shoulders, red spider chest emblem, white angular eye lenses, slim teenage athletic proportions; holding a spray can. Detailed hand-painted 2D animation illustration with fine clean linework and dimensional shading. Natural body proportions and recognizable costume and facial features. Calm study pose, front three-quarter view turned slightly left. Entire body, feet, hair, tools and cape inside image, centered on portrait canvas with small margin. Soft warm rim lighting and cool fill. Transparent background, no scenery, ground, text or other figures. No chibi, no generic geometric shapes, no photorealism."
+    },
+    {
+      "id": "gwen-stacy",
+      "kind": "actor",
+      "prompt": "One transparent full-body game character sprite: Spider-Gwen / Ghost-Spider. Faithful appearance: white hood with magenta web-pattern lining, white masked face with large pink-rimmed eye lenses, black and white leotard suit, teal ballet shoes; casually holding drumsticks. Detailed hand-painted 2D animation illustration with fine clean linework and dimensional shading. Natural body proportions and recognizable costume and facial features. Calm study pose, front three-quarter view turned slightly left. Entire body, feet, hair, tools and cape inside image, centered on portrait canvas with small margin. Soft warm rim lighting and cool fill. Transparent background, no scenery, ground, text or other figures. No chibi, no generic geometric shapes, no photorealism."
+    },
+    {
+      "id": "gojo-satoru",
+      "kind": "actor",
+      "prompt": "One transparent full-body game character sprite: Satoru Gojo. Faithful appearance: tall lean adult, tousled spiky white hair, black blindfold, dark high-collared fitted jacket and dark pants, black shoes; balancing a small blue cursed-energy sphere above hand. Detailed hand-painted 2D animation illustration with fine clean linework and dimensional shading. Natural body proportions and recognizable costume and facial features. Calm study pose, front three-quarter view turned slightly left. Entire body, feet, hair, tools and cape inside image, centered on portrait canvas with small margin. Soft warm rim lighting and cool fill. Transparent background, no scenery, ground, text or other figures. No chibi, no generic geometric shapes, no photorealism."
+    },
+    {
+      "id": "levi-ackerman",
+      "kind": "actor",
+      "prompt": "One transparent full-body game character sprite: Levi Ackerman. Faithful appearance: short slim adult man, grey eyes, straight black undercut with parted curtains, white cravat, tan Scout jacket with Wings of Freedom insignia, white trousers with dark harness straps, brown knee boots, green cloak; holding porcelain teacup. Detailed hand-painted 2D animation illustration with fine clean linework and dimensional shading. Natural body proportions and recognizable costume and facial features. Calm study pose, front three-quarter view turned slightly left. Entire body, feet, hair, tools and cape inside image, centered on portrait canvas with small margin. Soft warm rim lighting and cool fill. Transparent background, no scenery, ground, text or other figures. No chibi, no generic geometric shapes, no photorealism."
+    },
+    {
+      "id": "l-lawliet",
+      "kind": "actor",
+      "prompt": "One transparent full-body game character sprite: L Lawliet. Faithful appearance: pale slender young adult, messy spiky black hair, large dark eyes with dark circles, loose long-sleeved white shirt, blue jeans, barefoot; crouching with knees close to chest on a simple office chair, holding a sugar cube. Detailed hand-painted 2D animation illustration with fine clean linework and dimensional shading. Natural body proportions and recognizable costume and facial features. Calm study pose, front three-quarter view turned slightly left. Entire body, feet, hair, tools and cape inside image, centered on portrait canvas with small margin. Soft warm rim lighting and cool fill. Transparent background, no scenery, ground, text or other figures. No chibi, no generic geometric shapes, no photorealism."
+    },
+    {
+      "id": "elsa",
+      "kind": "actor",
+      "prompt": "One transparent full-body game character sprite: Elsa from Frozen. Faithful appearance: recognizable fair face, platinum blonde side braid over shoulder, turquoise off-shoulder shimmering gown, sheer sparkling ice cape, slender adult proportions; creating a small snowflake in raised hand. Detailed hand-painted 2D animation illustration with fine clean linework and dimensional shading. Natural body proportions and recognizable costume and facial features. Calm study pose, front three-quarter view turned slightly left. Entire body, feet, hair, tools and cape inside image, centered on portrait canvas with small margin. Soft warm rim lighting and cool fill. Transparent background, no scenery, ground, text or other figures. No chibi, no generic geometric shapes, no photorealism."
+    },
+    {
+      "id": "rapunzel",
+      "kind": "actor",
+      "prompt": "One transparent full-body game character sprite: Rapunzel from Tangled. Faithful appearance: green eyes, extremely long golden blonde hair flowing to floor and coiling near feet, purple and pink lace-up bodice dress with puff sleeves, barefoot; holding brush and small paint palette. Detailed hand-painted 2D animation illustration with fine clean linework and dimensional shading. Natural body proportions and recognizable costume and facial features. Calm study pose, front three-quarter view turned slightly left. Entire body, feet, hair, tools and cape inside image, centered on portrait canvas with small margin. Soft warm rim lighting and cool fill. Transparent background, no scenery, ground, text or other figures. No chibi, no generic geometric shapes, no photorealism."
+    },
+    {
+      "id": "moana",
+      "kind": "actor",
+      "prompt": "One transparent full-body game character sprite: Moana of Motunui. Faithful appearance: Polynesian teenage heroine, brown skin and eyes, long wavy dark hair, red patterned bandeau top, cream woven tapa skirt with sash and fringe, blue Heart of Te Fiti necklace, barefoot; holding carved paddle. Detailed hand-painted 2D animation illustration with fine clean linework and dimensional shading. Natural body proportions and recognizable costume and facial features. Calm study pose, front three-quarter view turned slightly left. Entire body, feet, hair, tools and cape inside image, centered on portrait canvas with small margin. Soft warm rim lighting and cool fill. Transparent background, no scenery, ground, text or other figures. No chibi, no generic geometric shapes, no photorealism."
+    },
+    {
+      "id": "hermione-granger",
+      "kind": "actor",
+      "prompt": "One transparent full-body game character sprite: Hermione Granger. Faithful appearance: bushy wavy brown hair, expressive brown eyes, white shirt, red gold Gryffindor tie, grey sweater, black school robe with crest, pleated skirt, dark tights and shoes; reading an open book with wand in other hand. Detailed hand-painted 2D animation illustration with fine clean linework and dimensional shading. Natural body proportions and recognizable costume and facial features. Calm study pose, front three-quarter view turned slightly left. Entire body, feet, hair, tools and cape inside image, centered on portrait canvas with small margin. Soft warm rim lighting and cool fill. Transparent background, no scenery, ground, text or other figures. No chibi, no generic geometric shapes, no photorealism."
+    },
+    {
+      "id": "wednesday-addams",
+      "kind": "actor",
+      "prompt": "One transparent full-body game character sprite: Wednesday Addams. Faithful appearance: pale oval face, straight black hair in two long braids with blunt bangs, dark eyes and deadpan expression, long-sleeved black dress with crisp white pointed collar and cuffs, black stockings and shoes; holding manuscript. Detailed hand-painted 2D animation illustration with fine clean linework and dimensional shading. Natural body proportions and recognizable costume and facial features. Calm study pose, front three-quarter view turned slightly left. Entire body, feet, hair, tools and cape inside image, centered on portrait canvas with small margin. Soft warm rim lighting and cool fill. Transparent background, no scenery, ground, text or other figures. No chibi, no generic geometric shapes, no photorealism."
+    },
+    {
+      "id": "officer-k",
+      "kind": "actor",
+      "prompt": "One transparent full-body game character sprite: Officer K from Blade Runner 2049. Faithful appearance: adult man with short light brown hair, stubble, serious face, long dark olive brown shearling-collared coat, dark shirt and trousers, heavy boots; inspecting a small carved wooden horse. Detailed hand-painted 2D animation illustration with fine clean linework and dimensional shading. Natural body proportions and recognizable costume and facial features. Calm study pose, front three-quarter view turned slightly left. Entire body, feet, hair, tools and cape inside image, centered on portrait canvas with small margin. Soft warm rim lighting and cool fill. Transparent background, no scenery, ground, text or other figures. No chibi, no generic geometric shapes, no photorealism."
+    },
+    {
+      "id": "neo",
+      "kind": "actor",
+      "prompt": "One transparent full-body game character sprite: Neo from The Matrix. Faithful appearance: slim adult man, short black slicked hair, narrow black sunglasses, long black high-collared coat, black trousers and boots; holding a subtly bent silver spoon. Detailed hand-painted 2D animation illustration with fine clean linework and dimensional shading. Natural body proportions and recognizable costume and facial features. Calm study pose, front three-quarter view turned slightly left. Entire body, feet, hair, tools and cape inside image, centered on portrait canvas with small margin. Soft warm rim lighting and cool fill. Transparent background, no scenery, ground, text or other figures. No chibi, no generic geometric shapes, no photorealism."
+    },
+    {
+      "id": "cozy-study-girl",
+      "kind": "actor",
+      "prompt": "One transparent full-body game character sprite: Cozy study girl, original character. Faithful appearance: original young adult woman, warm brown skin, long chestnut wavy hair, cream headphones, terracotta cardigan, cream shirt, blue jeans, soft slippers; holding journal and pencil. Detailed hand-painted 2D animation illustration with fine clean linework and dimensional shading. Natural body proportions and recognizable costume and facial features. Calm study pose, front three-quarter view turned slightly left. Entire body, feet, hair, tools and cape inside image, centered on portrait canvas with small margin. Soft warm rim lighting and cool fill. Transparent background, no scenery, ground, text or other figures. No chibi, no generic geometric shapes, no photorealism."
+    },
+    {
+      "id": "late-night-study-boy",
+      "kind": "actor",
+      "prompt": "One transparent full-body game character sprite: Late-night study boy, original character. Faithful appearance: original young adult man, light tan skin, tousled dark hair, navy hoodie over grey tee, charcoal trousers, canvas sneakers, headphones around neck; holding small laptop. Detailed hand-painted 2D animation illustration with fine clean linework and dimensional shading. Natural body proportions and recognizable costume and facial features. Calm study pose, front three-quarter view turned slightly left. Entire body, feet, hair, tools and cape inside image, centered on portrait canvas with small margin. Soft warm rim lighting and cool fill. Transparent background, no scenery, ground, text or other figures. No chibi, no generic geometric shapes, no photorealism."
+    },
+    {
+      "id": "purring-window-cat",
+      "kind": "actor",
+      "prompt": "One transparent full-body game character sprite: Orange tabby cat, original character. Faithful appearance: anatomically natural orange tabby cat, amber eyes, white chin and chest, distinct darker stripes, long curved tail, sitting relaxed with one front paw lifted; fine detailed fur, not humanoid. Detailed hand-painted 2D animation illustration with fine clean linework and dimensional shading. Natural body proportions and recognizable costume and facial features. Calm study pose, front three-quarter view turned slightly left. Entire body, feet, hair, tools and cape inside image, centered on portrait canvas with small margin. Soft warm rim lighting and cool fill. Transparent background, no scenery, ground, text or other figures. No chibi, no generic geometric shapes, no photorealism."
+    },
+    {
+      "id": "loyal-fireplace-dog",
+      "kind": "actor",
+      "prompt": "One transparent full-body game character sprite: Golden retriever, original character. Faithful appearance: anatomically natural golden retriever, warm golden fur, floppy ears, dark expressive eyes, black nose, burgundy collar with brass tag, sitting attentively with one front paw raised; detailed fur, not humanoid. Detailed hand-painted 2D animation illustration with fine clean linework and dimensional shading. Natural body proportions and recognizable costume and facial features. Calm study pose, front three-quarter view turned slightly left. Entire body, feet, hair, tools and cape inside image, centered on portrait canvas with small margin. Soft warm rim lighting and cool fill. Transparent background, no scenery, ground, text or other figures. No chibi, no generic geometric shapes, no photorealism."
+    }
+  ],
+  "initialSuccessfulBriefs": [
+    {
+      "id": "bruce-wayne",
+      "kind": "room",
+      "brief": "Detailed hand-painted cinematic Batcave study background; limestone cavern and reservoir, suspended steel command platform, sonar/audio console on left, detective evidence board upper right, grapnel mission station lower right, clear central standing floor. No characters or UI. Landscape 3:2."
+    },
+    {
+      "id": "tony-stark",
+      "kind": "room",
+      "brief": "Detailed hand-painted futuristic ocean-facing engineering workshop at night; glass walls, red/gold robot armor alcoves, robot tool arms, cyan screens and warm lighting; left audio console, lower-right blueprint notebook, upper-right holographic planning terminal. No characters or UI. Landscape 3:2."
+    },
+    {
+      "id": "naruto-uzumaki",
+      "kind": "actor",
+      "brief": "Transparent full-body Naruto Uzumaki; Shippuden orange/black suit, golden spiky hair, blue eyes, three whisker marks per cheek, Leaf forehead protector, open-toed sandals, studying a small scroll; faithful detailed anime illustration, fine linework, dimensional shading, natural proportions, calm three-quarter pose. Entire body visible, no scenery or text."
+    }
+  ]
+}

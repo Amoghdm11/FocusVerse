@@ -213,6 +213,27 @@ class PixelCanvas {
 
   // Applies 2px thick black arcade outline to non-empty silhouette, then fills background with #0E0B1C
   finalizeArcadeSprite(bgColor = '#0E0B1C', outlineColor = '#000000', outlineThickness = 2) {
+    // Selective, two-tone clusters along material boundaries. Keep eyes and
+    // dark linework intact; no random texture or smooth gradients.
+    const source = this.buf.slice();
+    const same = (x, y, i) => {
+      if (x < 0 || y < 0 || x >= this.w || y >= this.h) return false;
+      const j = (y * this.w + x) * 4;
+      return source[j + 3] > 200 && source[j] === source[i] && source[j + 1] === source[i + 1] && source[j + 2] === source[i + 2];
+    };
+    for (let y = 1; y < this.h - 1; y++) for (let x = 1; x < this.w - 1; x++) {
+      const i = (y * this.w + x) * 4;
+      const brightness = (source[i] + source[i + 1] + source[i + 2]) / 3;
+      if (source[i + 3] < 250 || brightness < 45 || brightness > 235) continue;
+      // Only large color fields receive modelling, never single-pixel features.
+      if (!same(x - 1, y, i) || !same(x + 1, y, i)) continue;
+      const lit = !same(x, y - 2, i) && same(x, y + 2, i);
+      const shade = !same(x + 2, y + 2, i) && same(x - 2, y - 2, i);
+      if (!lit && !shade) continue;
+      for (let k = 0; k < 3; k++) this.buf[i + k] = lit
+        ? Math.min(255, source[i + k] + [20, 16, 10][k])
+        : Math.max(0, source[i + k] - [27, 25, 17][k]);
+    }
     const isSolid = new Uint8Array(this.w * this.h);
     for (let y = 0; y < this.h; y++) {
       for (let x = 0; x < this.w; x++) {

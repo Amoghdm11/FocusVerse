@@ -1,0 +1,6 @@
+/* Reuse Peter's existing room chrome; only scene-specific hit regions belong here.
+   Percentages are derived from the shared 1000 × 660 room coordinate system. */
+.stark-notebook { left:56.3%; top:67.5%; width:6.2%; height:6%; }
+.stark-companion { left:51.5%; top:40.5%; width:7.5%; height:23%; }
+.stark-workshop .room-object { min-width:24px; min-height:24px; }
+.stark-workshop .room-object:focus-visible { outline:2px solid #5CE1E6; outline-offset:3px; }

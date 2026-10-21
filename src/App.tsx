@@ -29,7 +29,7 @@ export const App: React.FC = () => {
   const getInitialState = () => {
     const hash = window.location.hash.toLowerCase();
     let initialView: AppViewMode = 'HOME';
-    let initialCharId: string = 'peter-parker';
+    let initialCharId: string = localStorage.getItem('focusverse_selected_char') || 'peter-parker';
 
     const match = hash.match(/char=([a-z0-9-]+)/);
     if (match && match[1]) initialCharId = match[1];
@@ -83,6 +83,7 @@ export const App: React.FC = () => {
     }
   });
 
+  const [appearanceOwner, setAppearanceOwner] = useState(() => localStorage.getItem('focusverse_appearance_owner') || localStorage.getItem('focusverse_selected_char') || foundChar.id);
   const [customAppearance, setCustomAppearance] = useState<CustomAppearanceState | null>(() => {
     try {
       const saved = localStorage.getItem('focusverse_custom_appearance');
@@ -149,6 +150,8 @@ export const App: React.FC = () => {
     }
     if (appearance) {
       setCustomAppearance(appearance);
+      setAppearanceOwner(character.id);
+      localStorage.setItem('focusverse_appearance_owner', character.id);
       try {
         localStorage.setItem('focusverse_custom_appearance', JSON.stringify(appearance));
       } catch (_) {}
@@ -245,7 +248,7 @@ export const App: React.FC = () => {
           <WorkspacePage
             character={selectedCharacter}
             playerName={playerName}
-            customAppearance={customAppearance}
+            customAppearance={appearanceOwner === selectedCharacter.id ? customAppearance : null}
             onSelectAnotherCharacter={(char) => setSelectedCharacter(char)}
             onBackToRoster={() => setView('SELECT')}
             archetypeMode={archetypeMode}

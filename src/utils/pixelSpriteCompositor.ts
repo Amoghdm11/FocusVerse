@@ -391,7 +391,11 @@ export class PixelSpriteCompositor {
   // COMPOSITING PASSES
   // ==========================================================================
 
-  composite(state: CustomAppearanceState) {
+  composite(state: CustomAppearanceState, costume?: ImageData) {
+    if (costume && state.outfit === 'arachnid-suit' && state.accessory === 'hero-mask') {
+      this.buffer.set(costume.data);
+      return;
+    }
     this.clear();
 
     const skin = this.getSkinPalette(state.skinTone);
@@ -414,6 +418,8 @@ export class PixelSpriteCompositor {
     // 5. Outfit / Clothing (Layer 4)
     this.drawOutfit(state.gender, state.outfit);
 
+    this.drawTailoring(state.outfit);
+
     // 6. Front Hair & Fringe (Layer 5)
     this.drawFrontHair(state.gender, state.hairStyle, hair);
 
@@ -424,6 +430,48 @@ export class PixelSpriteCompositor {
 
     // 8. 1px Retro Contour Outline Pass (Layer 7)
     this.applyArcadeContour('#0A0816');
+  }
+
+  // Small clusters describe seams, folds and hardware at native resolution.
+  private drawTailoring(outfit: OutfitId) {
+    const soft = outfit === 'study-hoodie' || outfit === 'retro-arcade';
+    const edge = soft ? '#75839A' : '#64748B';
+    for (const x of [24, 36]) {
+      this.strokeLine(x, 67, x, 74, '#475569', 1);
+      this.strokeLine(x, 79, x + 3, 80, '#111B2D', 1);
+      this.strokeLine(x - 2, 86, x + 2, 86, edge, 1);
+      this.strokeLine(x - 2, 88, x + 2, 88, edge, 1);
+    }
+    if (outfit === 'study-hoodie') {
+      this.strokeLine(18, 40, 24, 44, '#615781', 1);
+      this.strokeLine(40, 44, 46, 40, '#615781', 1);
+      this.strokeLine(17, 49, 20, 52, '#443B68', 1);
+      this.strokeLine(44, 51, 47, 48, '#171830', 1);
+      this.fillRect(25, 53, 14, 5, '#25213F');
+      this.strokeLine(25, 53, 28, 55, '#756B91', 1);
+      this.strokeLine(38, 53, 35, 55, '#756B91', 1);
+      this.strokeLine(19, 60, 45, 60, '#50466E', 1);
+      for (const x of [14,16,46,48]) this.fillRect(x, 57, 1, 3, '#574D76');
+      this.fillRect(28, 48, 1, 2, '#B6A78E');
+      this.fillRect(36, 48, 1, 2, '#B6A78E');
+    } else if (outfit === 'scholar-blazer') {
+      this.strokeLine(25, 39, 22, 46, '#536278', 1);
+      this.strokeLine(22, 46, 29, 53, '#536278', 1);
+      this.strokeLine(39, 39, 42, 46, '#536278', 1);
+      this.strokeLine(42, 46, 36, 52, '#536278', 1);
+      this.fillRect(38, 47, 6, 1, '#A69B7E');
+      this.fillRect(21, 55, 6, 1, '#536278');
+      this.fillRect(38, 55, 6, 1, '#536278');
+    } else {
+      this.strokeLine(19, 43, 21, 48, edge, 1);
+      this.strokeLine(44, 43, 42, 48, edge, 1);
+      this.strokeLine(20, 57, 25, 59, '#111B2D', 1);
+      this.strokeLine(39, 59, 44, 57, '#111B2D', 1);
+      for (const x of [23, 39]) {
+        this.fillRect(x, 63, 3, 3, '#151F30');
+        this.fillRect(x, 63, 2, 1, '#9DA6AC');
+      }
+    }
   }
 
   private getSkinPalette(tone: SkinToneId) {

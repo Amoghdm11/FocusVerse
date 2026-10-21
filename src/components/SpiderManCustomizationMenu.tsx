@@ -114,7 +114,9 @@ export const SpiderManCustomizationMenu: React.FC<SpiderManCustomizationMenuProp
   // Sync if initialCharacter changes
   useEffect(() => {
     if (initialCharacter) {
-      handleSelectCharacter(initialCharacter, false);
+      const saved = localStorage.getItem('focusverse_custom_appearance');
+      const savedCharacter = localStorage.getItem('focusverse_appearance_owner') || localStorage.getItem('focusverse_selected_char');
+      if (!saved || savedCharacter !== initialCharacter.id) handleSelectCharacter(initialCharacter, false);
     }
   }, [initialCharacter]);
 

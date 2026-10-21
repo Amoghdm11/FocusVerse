@@ -1,0 +1,17 @@
+/* All sanctuary chrome is owned by SpiderStudyRoom.css. Only scene behavior lives here. */
+.sanctuary-player-avatar { display:flex; align-items:center; justify-content:center; gap:12px; font:10px monospace; color:#a5b6c4; margin-bottom:10px; }
+.character-sanctuary .room-activity-options { flex-wrap:wrap; }
+.character-sanctuary .room-activity-options button { max-width:240px; line-height:1.6; }
+.character-sanctuary .room-object { min-width:24px; min-height:24px; }
+.character-sanctuary .room-object:focus-visible { outline:2px solid #5CE1E6; outline-offset:3px; }
+.character-sanctuary .sanctuary-companion-hit { border-color:transparent; }
+.sanctuary-ambient { animation:sanctuary-drift 14s ease-in-out infinite alternate; pointer-events:none; }
+.ambient-rain { animation:sanctuary-rain 3s linear infinite; }
+.sanctuary-paused * { animation-play-state:paused!important; }
+@keyframes sanctuary-drift { to { transform:translate(6px,-12px); opacity:.15; } }
+@keyframes sanctuary-rain { to { transform:translate(-5px,18px); } }
+@media(max-width:760px) {
+ .character-sanctuary .room-activity-options button { flex:1 1 25%; font-size:9px; }
+ .character-sanctuary .queens-heading h2 { font-size:11px; }
+}
+@media(prefers-reduced-motion:reduce) { .character-sanctuary * { animation:none!important; transition:none!important; } }

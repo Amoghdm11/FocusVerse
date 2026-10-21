@@ -1,0 +1,50 @@
+import puppeteer from 'puppeteer-core';
+import assert from 'node:assert/strict';
+import { mkdirSync, writeFileSync } from 'node:fs';
+const dir='docs/sanctuaries/restoration';
+mkdirSync(dir,{recursive:true});
+const browser=await puppeteer.launch({executablePath:process.env.CHROME_PATH||'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
+const page=await browser.newPage();
+const errors=[];
+page.on('pageerror',e=>errors.push(e.message));
+try {
+ await page.setViewport({width:1440,height:1100});
+ await page.emulateMediaFeatures([{name:'prefers-reduced-motion',value:'reduce'}]);
+ await page.goto(`${process.env.BASE_URL||'http://127.0.0.1:5174'}/#timer?char=tony-stark`,{waitUntil:'networkidle0'});
+ await page.waitForSelector('.stark-workshop');
+ for(const width of [1440,390]) {
+  await page.setViewport({width,height:1100});
+  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'No horizontal overflow');
+  await page.mouse.move(0,0);
+  await (await page.$('.stark-workshop')).screenshot({path:`${dir}/tony-after-${width}.png`});
+  await page.$eval('.stark-notebook',e=>e.focus());await page.keyboard.press('Enter');
+  await page.waitForSelector('[aria-label="Study notebook"][open]');
+  if(width===1440)await page.type('[aria-label="Study notes"]','Restoration shared notes check.');
+  else assert((await page.$eval('[aria-label="Study notes"]',e=>e.value)).includes('Restoration shared notes check.'));
+  await page.keyboard.press('Escape');
+  await page.click('.object-board');await page.waitForSelector('[aria-label="Task board"][open]');await page.keyboard.press('Escape');
+  await page.$eval('.object-computer',e=>e.focus());await page.keyboard.press('Space');await page.waitForSelector('[aria-label="Computer music player"]',{visible:true});await page.keyboard.press('Escape');
+  await page.click('.object-lamp');assert.equal(await page.$eval('.object-lamp',e=>e.getAttribute('aria-pressed')),'false');await page.click('.object-lamp');
+ }
+ await page.setViewport({width:1440,height:1100});
+ await page.screenshot({path:`${dir}/workspace-desktop.png`,fullPage:true});
+ const tonyChrome = await page.$eval('.queens-heading',e => { const s=getComputedStyle(e); return [s.backgroundColor,s.borderBottomColor]; });
+ await page.click('.room-activity-options button::-p-text(Diagnostics)');
+ await page.waitForSelector('[data-activity="diagnostics"]');
+ await (await page.$('.stark-workshop')).screenshot({path:`${dir}/tony-diagnostics.png`});
+ const hands=()=>page.$eval('[data-stark-layer="hands"]',e=>e.innerHTML);
+ const reducedBefore=await hands();await new Promise(r=>setTimeout(r,550));assert.equal(await hands(),reducedBefore,'Reduced motion freezes articulated hands');
+ await page.emulateMediaFeatures([{name:'prefers-reduced-motion',value:'no-preference'}]);
+ const before=await hands();await new Promise(r=>setTimeout(r,300));assert.notEqual(await hands(),before,'Hands animate without moving the body');
+ await page.select('select','peter-parker');await page.waitForSelector('.spider-study-room:not(.stark-workshop)');
+ await page.emulateMediaFeatures([{name:'prefers-reduced-motion',value:'reduce'}]);
+ await page.mouse.move(0,0);
+ await page.evaluate(()=>document.activeElement instanceof HTMLElement && document.activeElement.blur());
+ assert.deepEqual(await page.$eval('.queens-heading',e => { const s=getComputedStyle(e); return [s.backgroundColor,s.borderBottomColor]; }),tonyChrome,'Tony uses Peter’s original room chrome');
+ await (await page.$('.spider-study-room')).screenshot({path:`${dir}/spider-after.png`});
+ await page.click('.object-notebook');await page.waitForSelector('[aria-label="Study notebook"][open]');assert((await page.$eval('[aria-label="Study notes"]',e=>e.value)).includes('Restoration shared notes check.'));await page.keyboard.press('Escape');
+ await page.click('.object-computer');await page.waitForSelector('[aria-label="Computer music player"]',{visible:true});await page.keyboard.press('Escape');
+ assert.deepEqual(errors,[]);
+ writeFileSync(`${dir}/checks.json`,JSON.stringify({passed:['desktop and mobile rendering','no horizontal overflow','music via Space','notes via Enter','tasks','lamp toggle','two activities','articulated animation','reduced motion','notes persist between Tony and Peter','Peter music and notes preserved'],errors},null,2));
+ console.log('PASS: sanctuary restoration rendering and feature integration');
+} finally {await browser.close();}

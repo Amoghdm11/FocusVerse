@@ -1,0 +1,16 @@
+{
+  "passed": [
+    "desktop and mobile rendering",
+    "no horizontal overflow",
+    "music via Space",
+    "notes via Enter",
+    "tasks",
+    "lamp toggle",
+    "two activities",
+    "articulated animation",
+    "reduced motion",
+    "notes persist between Tony and Peter",
+    "Peter music and notes preserved"
+  ],
+  "errors": []
+}

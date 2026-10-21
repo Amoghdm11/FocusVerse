@@ -14,12 +14,14 @@ export interface TodoItem {
 }
 
 interface TodoWidgetProps {
+  onTaskComplete?: () => void;
   onTaskAction?: () => void;
   accentColor?: string;
 }
 
 export const TodoWidget: React.FC<TodoWidgetProps> = ({
   onTaskAction,
+  onTaskComplete,
   accentColor = '#F5C242',
 }) => {
   const [tasks, setTasks] = useState<TodoItem[]>(() => {
@@ -38,6 +40,8 @@ export const TodoWidget: React.FC<TodoWidgetProps> = ({
   const [priority, setPriority] = useState<TaskPriority>('MED');
   const [filter, setFilter] = useState<'ALL' | 'ACTIVE' | 'DONE'>('ALL');
   const [sparkActive, setSparkActive] = useState(false);
+  const sparkFrame = useRef(0);
+  useEffect(() => () => cancelAnimationFrame(sparkFrame.current), []);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -72,6 +76,7 @@ export const TodoWidget: React.FC<TodoWidgetProps> = ({
     if (willBeCompleted) {
       audioEngine.playTaskComplete();
       triggerPixelSparks();
+      onTaskComplete?.();
       tutorDialogueService.triggerEvent('TASK_COMPLETE');
     } else {
       audioEngine.playClick();
@@ -96,6 +101,8 @@ export const TodoWidget: React.FC<TodoWidgetProps> = ({
 
   // Pixel Spark Animation Burst
   const triggerPixelSparks = () => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    cancelAnimationFrame(sparkFrame.current);
     setSparkActive(true);
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -115,7 +122,6 @@ export const TodoWidget: React.FC<TodoWidgetProps> = ({
       alpha: 1,
     }));
 
-    let animId: number;
     let frames = 0;
 
     const runSparks = () => {
@@ -134,7 +140,7 @@ export const TodoWidget: React.FC<TodoWidgetProps> = ({
       });
 
       if (frames < 35) {
-        animId = requestAnimationFrame(runSparks);
+        sparkFrame.current = requestAnimationFrame(runSparks);
       } else {
         ctx.clearRect(0, 0, w, h);
         setSparkActive(false);
@@ -282,6 +288,7 @@ export const TodoWidget: React.FC<TodoWidgetProps> = ({
               >
                 <div className="flex items-center gap-2 flex-1 min-w-0 mr-2">
                   <button
+                    aria-label={`${t.completed ? "Reopen" : "Complete"} task: ${t.text}`}
                     onClick={() => toggleTask(t.id)}
                     className="shrink-0 text-arcade-gold hover:text-white transition-colors"
                   >
@@ -291,6 +298,7 @@ export const TodoWidget: React.FC<TodoWidgetProps> = ({
                     className={`truncate cursor-pointer select-none ${
                       t.completed ? 'line-through text-gray-500' : ''
                     }`}
+                    aria-label={`${t.completed ? "Reopen" : "Complete"} task: ${t.text}`}
                     onClick={() => toggleTask(t.id)}
                   >
                     {t.text}

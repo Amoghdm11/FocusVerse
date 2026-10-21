@@ -1,0 +1,1019 @@
+{
+  "status": "INCOMPLETE \u2014 functionality verified; full visual acceptance not achieved",
+  "referenceInspection": {
+    "video": "Style.mp4 inspected at 5 seconds; 48-second number-search animation, not a sanctuary recording",
+    "spiderReference": "docs/study-room/desktop.png",
+    "before": "docs/sanctuaries/contact-0.jpg",
+    "afterDesktop": "docs/sanctuaries/upgrade/contact-1440.jpg",
+    "afterMobile": "docs/sanctuaries/upgrade/contact-390.jpg"
+  },
+  "architecture": {
+    "coordinates": "1000 \u00d7 660; images preserve aspect ratio; alpha-trimmed character height and floor anchors tuned per character",
+    "featureHandlers": {
+      "music": "WorkspacePage musicRequest \u2192 MusicCenter openRequest, identical to SpiderStudyRoom",
+      "notes": "WorkspacePage roomPanel=notes \u2192 RoomToolPanel \u2192 NotesWidget; focusverse_notes storage key unchanged",
+      "tasks": "WorkspacePage roomPanel=tasks \u2192 RoomToolPanel \u2192 TodoWidget; focusverse_tasks storage key unchanged"
+    },
+    "hotspots": "Native buttons outside the decorative SVG; stable scaled bounds; Enter/Space, focus outlines, click propagation stopped; object guide optional"
+  },
+  "assetProvenance": {
+    "method": "Built-in image_gen; no downloaded third-party artwork",
+    "runtime": "public/assets/sanctuaries/illustrated/*.webp",
+    "localSources": "docs/sanctuaries/source-art/*.png (ignored; original generator outputs also retained)",
+    "processing": "Alpha bounding-box trim for actors, aspect-preserving downsampling and WebP encoding; no costume repainting",
+    "rights": "Generated depictions do not grant ownership or a license to underlying fictional characters. No third-party asset redistribution license is asserted."
+  },
+  "unresolved": [
+    "Eight characters retain their existing simple vector sprites and do not meet the requested artwork/style consistency standard.",
+    "Explicit image-service safety rejections received for Batman, Miles, Gwen, Elsa, Rapunzel, Moana and Hermione. Tony sprite generation also failed without a diagnostic in the initial batch. Rejected character prompts were not retried.",
+    "Eleven illustrated sprites have subtle planted breathing only. Fully articulated character-specific action cycles remain unfinished. Existing activity selectors do not produce new raster poses.",
+    "Spider-Man retains the existing detailed scene and interactions; no replacement art was introduced.",
+    "The supplied sanctuary recording/reference attachment was not present in the workspace; comparison used the saved Spider-Man screenshot and existing sanctuary captures."
+  ],
+  "validation": {
+    "upgradeSuite": {
+      "results": [
+        {
+          "id": "bruce-wayne",
+          "illustratedActor": false,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        },
+        {
+          "id": "cozy-study-girl",
+          "illustratedActor": true,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        },
+        {
+          "id": "elsa",
+          "illustratedActor": false,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        },
+        {
+          "id": "gojo-satoru",
+          "illustratedActor": true,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        },
+        {
+          "id": "gwen-stacy",
+          "illustratedActor": false,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        },
+        {
+          "id": "hermione-granger",
+          "illustratedActor": false,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        },
+        {
+          "id": "l-lawliet",
+          "illustratedActor": true,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        },
+        {
+          "id": "late-night-study-boy",
+          "illustratedActor": true,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        },
+        {
+          "id": "levi-ackerman",
+          "illustratedActor": true,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        },
+        {
+          "id": "loyal-fireplace-dog",
+          "illustratedActor": true,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        },
+        {
+          "id": "miles-morales",
+          "illustratedActor": false,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        },
+        {
+          "id": "moana",
+          "illustratedActor": false,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        },
+        {
+          "id": "naruto-uzumaki",
+          "illustratedActor": true,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        },
+        {
+          "id": "neo",
+          "illustratedActor": true,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        },
+        {
+          "id": "officer-k",
+          "illustratedActor": true,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        },
+        {
+          "id": "purring-window-cat",
+          "illustratedActor": true,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        },
+        {
+          "id": "rapunzel",
+          "illustratedActor": false,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        },
+        {
+          "id": "tony-stark",
+          "illustratedActor": false,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        },
+        {
+          "id": "wednesday-addams",
+          "illustratedActor": true,
+          "checks": [
+            "assets decode",
+            "music real player via Space",
+            "notes real dialog via Enter",
+            "notes persist across characters",
+            "tasks real dialog",
+            "390px / 1440px bounds and touch targets",
+            "no overflow",
+            "reduced motion"
+          ]
+        }
+      ],
+      "errors": []
+    },
+    "existingSuite": "npm run test:sanctuaries passed all 19 scenes and all-20 timer switching; automatic cycle, hidden-tab cleanup, pause/resume/reset/rest, persistent notes, tasks/music, customization ownership, session completion",
+    "build": "npm run build passed; existing >500kB JavaScript chunk warning remains",
+    "visualReview": "Reviewed desktop and mobile contact sheets for all 19; adjusted Batman, Tony, Gwen and individual object bounds; unresolved sprite-style mismatch remains explicit"
+  },
+  "characters": [
+    {
+      "id": "bruce-wayne",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": false,
+      "artworkAcceptance": "FAIL \u2014 legacy simplified sprite retained",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "sonar audio console",
+          "x": 75,
+          "y": 190,
+          "width": 270,
+          "height": 190
+        },
+        {
+          "feature": "notes",
+          "label": "detective evidence notes board",
+          "x": 710,
+          "y": 95,
+          "width": 210,
+          "height": 190
+        },
+        {
+          "feature": "tasks",
+          "label": "grapnel mission terminal",
+          "x": 730,
+          "y": 360,
+          "width": 210,
+          "height": 150
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "existing articulated vector actions retained; replacement artwork pending",
+      "errors": []
+    },
+    {
+      "id": "cozy-study-girl",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": true,
+      "artworkAcceptance": "recognizable illustrated sprite reviewed; full action animation pending",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "vinyl record player",
+          "x": 120,
+          "y": 270,
+          "width": 200,
+          "height": 170
+        },
+        {
+          "feature": "notes",
+          "label": "handwritten journal",
+          "x": 760,
+          "y": 340,
+          "width": 220,
+          "height": 175
+        },
+        {
+          "feature": "tasks",
+          "label": "weekly planner board",
+          "x": 735,
+          "y": 85,
+          "width": 235,
+          "height": 200
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "subtle breathing and scene ambience; articulated actions pending",
+      "errors": []
+    },
+    {
+      "id": "elsa",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": false,
+      "artworkAcceptance": "FAIL \u2014 legacy simplified sprite retained",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "crystal music box",
+          "x": 150,
+          "y": 310,
+          "width": 190,
+          "height": 140
+        },
+        {
+          "feature": "notes",
+          "label": "frost-bound journal",
+          "x": 760,
+          "y": 360,
+          "width": 210,
+          "height": 150
+        },
+        {
+          "feature": "tasks",
+          "label": "etched ice planning tablet",
+          "x": 715,
+          "y": 85,
+          "width": 240,
+          "height": 215
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "existing articulated vector actions retained; replacement artwork pending",
+      "errors": []
+    },
+    {
+      "id": "gojo-satoru",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": true,
+      "artworkAcceptance": "recognizable illustrated sprite reviewed; full action animation pending",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "small wireless speaker",
+          "x": 130,
+          "y": 300,
+          "width": 170,
+          "height": 145
+        },
+        {
+          "feature": "notes",
+          "label": "talisman journal",
+          "x": 710,
+          "y": 360,
+          "width": 180,
+          "height": 140
+        },
+        {
+          "feature": "tasks",
+          "label": "barrier planning display",
+          "x": 710,
+          "y": 100,
+          "width": 210,
+          "height": 190
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "subtle breathing and scene ambience; articulated actions pending",
+      "errors": []
+    },
+    {
+      "id": "gwen-stacy",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": false,
+      "artworkAcceptance": "FAIL \u2014 legacy simplified sprite retained",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "amplifier and headphones",
+          "x": 65,
+          "y": 300,
+          "width": 160,
+          "height": 160
+        },
+        {
+          "feature": "notes",
+          "label": "sheet music notebook",
+          "x": 800,
+          "y": 395,
+          "width": 185,
+          "height": 135
+        },
+        {
+          "feature": "tasks",
+          "label": "rehearsal planning board",
+          "x": 765,
+          "y": 120,
+          "width": 210,
+          "height": 155
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "existing articulated vector actions retained; replacement artwork pending",
+      "errors": []
+    },
+    {
+      "id": "hermione-granger",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": false,
+      "artworkAcceptance": "FAIL \u2014 legacy simplified sprite retained",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "enchanted brass gramophone",
+          "x": 130,
+          "y": 290,
+          "width": 190,
+          "height": 175
+        },
+        {
+          "feature": "notes",
+          "label": "open annotated grimoire",
+          "x": 760,
+          "y": 365,
+          "width": 220,
+          "height": 155
+        },
+        {
+          "feature": "tasks",
+          "label": "study timetable parchment board",
+          "x": 725,
+          "y": 100,
+          "width": 240,
+          "height": 190
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "existing articulated vector actions retained; replacement artwork pending",
+      "errors": []
+    },
+    {
+      "id": "l-lawliet",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": true,
+      "artworkAcceptance": "recognizable illustrated sprite reviewed; full action animation pending",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "surveillance audio console",
+          "x": 110,
+          "y": 295,
+          "width": 220,
+          "height": 185
+        },
+        {
+          "feature": "notes",
+          "label": "case notebook",
+          "x": 750,
+          "y": 365,
+          "width": 225,
+          "height": 155
+        },
+        {
+          "feature": "tasks",
+          "label": "deduction evidence board",
+          "x": 740,
+          "y": 80,
+          "width": 235,
+          "height": 220
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "subtle breathing and scene ambience; articulated actions pending",
+      "errors": []
+    },
+    {
+      "id": "late-night-study-boy",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": true,
+      "artworkAcceptance": "recognizable illustrated sprite reviewed; full action animation pending",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "headphone audio dock",
+          "x": 130,
+          "y": 270,
+          "width": 200,
+          "height": 170
+        },
+        {
+          "feature": "notes",
+          "label": "coding notebook",
+          "x": 710,
+          "y": 360,
+          "width": 180,
+          "height": 140
+        },
+        {
+          "feature": "tasks",
+          "label": "project planning board",
+          "x": 710,
+          "y": 100,
+          "width": 210,
+          "height": 190
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "subtle breathing and scene ambience; articulated actions pending",
+      "errors": []
+    },
+    {
+      "id": "levi-ackerman",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": true,
+      "artworkAcceptance": "recognizable illustrated sprite reviewed; full action animation pending",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "vintage field radio",
+          "x": 100,
+          "y": 300,
+          "width": 200,
+          "height": 160
+        },
+        {
+          "feature": "notes",
+          "label": "expedition logbook",
+          "x": 785,
+          "y": 370,
+          "width": 190,
+          "height": 150
+        },
+        {
+          "feature": "tasks",
+          "label": "Scout expedition map board",
+          "x": 740,
+          "y": 90,
+          "width": 230,
+          "height": 210
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "subtle breathing and scene ambience; articulated actions pending",
+      "errors": []
+    },
+    {
+      "id": "loyal-fireplace-dog",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": true,
+      "artworkAcceptance": "recognizable illustrated sprite reviewed; full action animation pending",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "wooden tabletop radio",
+          "x": 130,
+          "y": 270,
+          "width": 200,
+          "height": 170
+        },
+        {
+          "feature": "notes",
+          "label": "hearthside journal",
+          "x": 710,
+          "y": 360,
+          "width": 180,
+          "height": 140
+        },
+        {
+          "feature": "tasks",
+          "label": "walking route planner board",
+          "x": 710,
+          "y": 100,
+          "width": 210,
+          "height": 190
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "subtle breathing and scene ambience; articulated actions pending",
+      "errors": []
+    },
+    {
+      "id": "miles-morales",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": false,
+      "artworkAcceptance": "FAIL \u2014 legacy simplified sprite retained",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "boombox",
+          "x": 120,
+          "y": 300,
+          "width": 200,
+          "height": 160
+        },
+        {
+          "feature": "notes",
+          "label": "sketch journal",
+          "x": 785,
+          "y": 370,
+          "width": 195,
+          "height": 140
+        },
+        {
+          "feature": "tasks",
+          "label": "mural project board",
+          "x": 735,
+          "y": 110,
+          "width": 235,
+          "height": 195
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "existing articulated vector actions retained; replacement artwork pending",
+      "errors": []
+    },
+    {
+      "id": "moana",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": false,
+      "artworkAcceptance": "FAIL \u2014 legacy simplified sprite retained",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "shell chime instrument",
+          "x": 110,
+          "y": 135,
+          "width": 200,
+          "height": 280
+        },
+        {
+          "feature": "notes",
+          "label": "wayfinder chart journal",
+          "x": 740,
+          "y": 370,
+          "width": 235,
+          "height": 150
+        },
+        {
+          "feature": "tasks",
+          "label": "star navigation planning board",
+          "x": 740,
+          "y": 90,
+          "width": 235,
+          "height": 220
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "existing articulated vector actions retained; replacement artwork pending",
+      "errors": []
+    },
+    {
+      "id": "naruto-uzumaki",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": true,
+      "artworkAcceptance": "recognizable illustrated sprite reviewed; full action animation pending",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "portable orange radio",
+          "x": 120,
+          "y": 280,
+          "width": 180,
+          "height": 145
+        },
+        {
+          "feature": "notes",
+          "label": "unrolled sealing scroll",
+          "x": 710,
+          "y": 360,
+          "width": 180,
+          "height": 140
+        },
+        {
+          "feature": "tasks",
+          "label": "shinobi mission board",
+          "x": 710,
+          "y": 100,
+          "width": 210,
+          "height": 190
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "subtle breathing and scene ambience; articulated actions pending",
+      "errors": []
+    },
+    {
+      "id": "neo",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": true,
+      "artworkAcceptance": "recognizable illustrated sprite reviewed; full action animation pending",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "operator audio console",
+          "x": 110,
+          "y": 285,
+          "width": 215,
+          "height": 180
+        },
+        {
+          "feature": "notes",
+          "label": "code research notebook",
+          "x": 765,
+          "y": 350,
+          "width": 215,
+          "height": 160
+        },
+        {
+          "feature": "tasks",
+          "label": "operator planning terminal",
+          "x": 745,
+          "y": 100,
+          "width": 235,
+          "height": 190
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "subtle breathing and scene ambience; articulated actions pending",
+      "errors": []
+    },
+    {
+      "id": "officer-k",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": true,
+      "artworkAcceptance": "recognizable illustrated sprite reviewed; full action animation pending",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "baseline audio console",
+          "x": 110,
+          "y": 275,
+          "width": 215,
+          "height": 195
+        },
+        {
+          "feature": "notes",
+          "label": "memory research file",
+          "x": 775,
+          "y": 360,
+          "width": 205,
+          "height": 160
+        },
+        {
+          "feature": "tasks",
+          "label": "investigation planning terminal",
+          "x": 775,
+          "y": 95,
+          "width": 205,
+          "height": 200
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "subtle breathing and scene ambience; articulated actions pending",
+      "errors": []
+    },
+    {
+      "id": "purring-window-cat",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": true,
+      "artworkAcceptance": "recognizable illustrated sprite reviewed; full action animation pending",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "small vintage radio",
+          "x": 130,
+          "y": 270,
+          "width": 200,
+          "height": 170
+        },
+        {
+          "feature": "notes",
+          "label": "botanical field journal",
+          "x": 710,
+          "y": 360,
+          "width": 180,
+          "height": 140
+        },
+        {
+          "feature": "tasks",
+          "label": "gardening planner board",
+          "x": 710,
+          "y": 100,
+          "width": 210,
+          "height": 190
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "subtle breathing and scene ambience; articulated actions pending",
+      "errors": []
+    },
+    {
+      "id": "rapunzel",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": false,
+      "artworkAcceptance": "FAIL \u2014 legacy simplified sprite retained",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "wooden music box",
+          "x": 115,
+          "y": 300,
+          "width": 200,
+          "height": 175
+        },
+        {
+          "feature": "notes",
+          "label": "painting journal",
+          "x": 750,
+          "y": 355,
+          "width": 225,
+          "height": 150
+        },
+        {
+          "feature": "tasks",
+          "label": "easel with project sketches",
+          "x": 680,
+          "y": 125,
+          "width": 230,
+          "height": 240
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "existing articulated vector actions retained; replacement artwork pending",
+      "errors": []
+    },
+    {
+      "id": "tony-stark",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": false,
+      "artworkAcceptance": "FAIL \u2014 legacy simplified sprite retained",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "audio mixing console",
+          "x": 60,
+          "y": 300,
+          "width": 260,
+          "height": 165
+        },
+        {
+          "feature": "notes",
+          "label": "engineering blueprint clipboard",
+          "x": 700,
+          "y": 485,
+          "width": 275,
+          "height": 140
+        },
+        {
+          "feature": "tasks",
+          "label": "holographic suit planning terminal",
+          "x": 800,
+          "y": 125,
+          "width": 185,
+          "height": 200
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "existing articulated vector actions retained; replacement artwork pending",
+      "errors": []
+    },
+    {
+      "id": "wednesday-addams",
+      "complete": false,
+      "newIllustratedEnvironment": true,
+      "newTransparentCharacter": true,
+      "artworkAcceptance": "recognizable illustrated sprite reviewed; full action animation pending",
+      "proportions": "aspect ratio preserved; per-character height and grounded floor anchor",
+      "objects": [
+        {
+          "feature": "music",
+          "label": "antique gramophone",
+          "x": 105,
+          "y": 290,
+          "width": 215,
+          "height": 175
+        },
+        {
+          "feature": "notes",
+          "label": "typewriter manuscript",
+          "x": 780,
+          "y": 350,
+          "width": 200,
+          "height": 155
+        },
+        {
+          "feature": "tasks",
+          "label": "investigation pinboard",
+          "x": 730,
+          "y": 100,
+          "width": 235,
+          "height": 200
+        }
+      ],
+      "featuresKeyboardResizePersistence": "PASS at 1440px and 390px",
+      "motion": "subtle breathing and scene ambience; articulated actions pending",
+      "errors": []
+    },
+    {
+      "id": "peter-parker",
+      "complete": false,
+      "status": "Existing scene preserved; all-20 switching regression passed; no new full visual acceptance claim"
+    }
+  ]
+}

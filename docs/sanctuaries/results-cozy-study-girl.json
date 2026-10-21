@@ -1,0 +1,17 @@
+{
+  "ids": [
+    "cozy-study-girl",
+    "late-night-study-boy",
+    "purring-window-cat",
+    "loyal-fireplace-dog"
+  ],
+  "checks": [
+    "assets decode",
+    "two articulated actions change geometry",
+    "390px no overflow",
+    "reduced motion",
+    "selector roundtrip",
+    "no page errors"
+  ],
+  "errors": []
+}

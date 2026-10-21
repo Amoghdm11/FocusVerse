@@ -33,3 +33,6 @@ test_interaction.cjs
 # Update zips & archives
 updates/
 *.zip
+
+# Generated source PNGs are retained locally; optimized WebP files ship.
+docs/sanctuaries/source-art/

@@ -8,7 +8,14 @@
     "start": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "prebuild": "node scripts/build-spiderman-design.js"
+    "prebuild": "node scripts/build-spiderman-design.js",
+    "test:sanctuaries": "node scripts/test-sanctuary-restoration.mjs && node scripts/test-sanctuary-roster.mjs",
+    "test:study-room": "node scripts/test-study-room.js",
+    "test:sanctuary-upgrade": "node scripts/test-sanctuary-upgrade.mjs",
+    "prepare:sanctuary-art": "python3 scripts/prepare-sanctuary-art.py",
+    "test:sanctuary-restoration": "node scripts/test-sanctuary-restoration.mjs",
+    "test:sanctuary-roster": "node scripts/test-sanctuary-roster.mjs",
+    "build:sanctuary-rooms": "node scripts/build-sanctuaries.mjs"
   },
   "dependencies": {
     "@types/three": "^0.186.0",

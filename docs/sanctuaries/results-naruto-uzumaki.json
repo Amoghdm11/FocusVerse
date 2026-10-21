@@ -1,0 +1,17 @@
+{
+  "ids": [
+    "naruto-uzumaki",
+    "gojo-satoru",
+    "levi-ackerman",
+    "l-lawliet"
+  ],
+  "checks": [
+    "assets decode",
+    "two articulated actions change geometry",
+    "390px no overflow",
+    "reduced motion",
+    "selector roundtrip",
+    "no page errors"
+  ],
+  "errors": []
+}

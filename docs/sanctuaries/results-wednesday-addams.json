@@ -1,0 +1,16 @@
+{
+  "ids": [
+    "wednesday-addams",
+    "officer-k",
+    "neo"
+  ],
+  "checks": [
+    "assets decode",
+    "two articulated actions change geometry",
+    "390px no overflow",
+    "reduced motion",
+    "selector roundtrip",
+    "no page errors"
+  ],
+  "errors": []
+}

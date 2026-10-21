@@ -1,0 +1,190 @@
+{
+  "bruce-wayne": {
+    "room": {
+      "src": "assets/sanctuaries/illustrated/bruce-wayne-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "cozy-study-girl": {
+    "actor": {
+      "src": "assets/sanctuaries/illustrated/cozy-study-girl-actor.webp",
+      "width": 681,
+      "height": 1024
+    },
+    "room": {
+      "src": "assets/sanctuaries/illustrated/cozy-study-girl-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "elsa": {
+    "room": {
+      "src": "assets/sanctuaries/illustrated/elsa-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "gojo-satoru": {
+    "actor": {
+      "src": "assets/sanctuaries/illustrated/gojo-satoru-actor.webp",
+      "width": 661,
+      "height": 1024
+    },
+    "room": {
+      "src": "assets/sanctuaries/illustrated/gojo-satoru-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "gwen-stacy": {
+    "room": {
+      "src": "assets/sanctuaries/illustrated/gwen-stacy-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "hermione-granger": {
+    "room": {
+      "src": "assets/sanctuaries/illustrated/hermione-granger-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "l-lawliet": {
+    "actor": {
+      "src": "assets/sanctuaries/illustrated/l-lawliet-actor.webp",
+      "width": 619,
+      "height": 1024
+    },
+    "room": {
+      "src": "assets/sanctuaries/illustrated/l-lawliet-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "late-night-study-boy": {
+    "actor": {
+      "src": "assets/sanctuaries/illustrated/late-night-study-boy-actor.webp",
+      "width": 622,
+      "height": 1024
+    },
+    "room": {
+      "src": "assets/sanctuaries/illustrated/late-night-study-boy-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "levi-ackerman": {
+    "actor": {
+      "src": "assets/sanctuaries/illustrated/levi-ackerman-actor.webp",
+      "width": 680,
+      "height": 1024
+    },
+    "room": {
+      "src": "assets/sanctuaries/illustrated/levi-ackerman-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "loyal-fireplace-dog": {
+    "actor": {
+      "src": "assets/sanctuaries/illustrated/loyal-fireplace-dog-actor.webp",
+      "width": 689,
+      "height": 1024
+    },
+    "room": {
+      "src": "assets/sanctuaries/illustrated/loyal-fireplace-dog-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "miles-morales": {
+    "room": {
+      "src": "assets/sanctuaries/illustrated/miles-morales-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "moana": {
+    "room": {
+      "src": "assets/sanctuaries/illustrated/moana-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "naruto-uzumaki": {
+    "actor": {
+      "src": "assets/sanctuaries/illustrated/naruto-uzumaki-actor.webp",
+      "width": 679,
+      "height": 1024
+    },
+    "room": {
+      "src": "assets/sanctuaries/illustrated/naruto-uzumaki-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "neo": {
+    "actor": {
+      "src": "assets/sanctuaries/illustrated/neo-actor.webp",
+      "width": 662,
+      "height": 1024
+    },
+    "room": {
+      "src": "assets/sanctuaries/illustrated/neo-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "officer-k": {
+    "actor": {
+      "src": "assets/sanctuaries/illustrated/officer-k-actor.webp",
+      "width": 687,
+      "height": 1024
+    },
+    "room": {
+      "src": "assets/sanctuaries/illustrated/officer-k-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "purring-window-cat": {
+    "actor": {
+      "src": "assets/sanctuaries/illustrated/purring-window-cat-actor.webp",
+      "width": 698,
+      "height": 1024
+    },
+    "room": {
+      "src": "assets/sanctuaries/illustrated/purring-window-cat-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "rapunzel": {
+    "room": {
+      "src": "assets/sanctuaries/illustrated/rapunzel-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "tony-stark": {
+    "room": {
+      "src": "assets/sanctuaries/illustrated/tony-stark-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "wednesday-addams": {
+    "actor": {
+      "src": "assets/sanctuaries/illustrated/wednesday-addams-actor.webp",
+      "width": 597,
+      "height": 1024
+    },
+    "room": {
+      "src": "assets/sanctuaries/illustrated/wednesday-addams-room.webp",
+      "width": 1536,
+      "height": 1024
+    }
+  }
+}

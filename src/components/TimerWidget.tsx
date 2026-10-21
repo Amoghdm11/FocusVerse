@@ -158,7 +158,7 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
       // Pause
       setIsRunning(false);
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-      onActionChange('IDLE');
+      onActionChange(timerType === 'POMODORO' && pomoPhase !== 'FOCUS' ? 'BREAK' : 'IDLE');
       tutorDialogueService.triggerEvent('SESSION_PAUSE', character?.id);
     } else {
       // Start
@@ -197,7 +197,7 @@ export const TimerWidget: React.FC<TimerWidgetProps> = ({
       setTimeLeftMs(dur * 1000);
       setTotalDurationMs(dur * 1000);
     }
-    onActionChange('IDLE');
+    onActionChange(timerType === 'POMODORO' && pomoPhase !== 'FOCUS' ? 'BREAK' : 'IDLE');
   };
 
   // Record Lap

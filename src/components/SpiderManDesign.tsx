@@ -44,6 +44,11 @@ export function SpiderManDesign({ direction = 'down', frame = 0, studying = fals
         <path d="M22 36L27 42L26 54H38L37 42L42 36V49L40 58H24L22 49Z" fill={p.blue}/>
         <path d="M24 54H40V58H24Z" fill={p.red}/>
         {!back && <path d="M27 26L30 34L29 46M37 26L34 34L35 46M23 30Q32 35 41 30M23 35Q32 40 41 35M27 42Q32 45 37 42" fill="none" stroke={p.web} strokeWidth=".5"/>}
+        <g fill="none" strokeWidth=".45">
+          <path d="M23 28L26 27M38 27L41 29M23 45L25 49M39 45L38 50" stroke={p.redLight}/>
+          <path d="M27 45L29 49L28 53M37 45L35 49L36 53" stroke={p.blueLight}/>
+          <path d="M28 51L32 52L36 51M24 56H29M35 56H40" stroke={p.redDark}/>
+        </g>
         <g transform="translate(32 36)"><SpiderEmblem back={back}/></g>
         <path d={studying ? 'M20 28L16 30L14 42L22 50L26 46L21 39L24 32Z' : `M20 28L16 30L13 44L12 ${58-stride}L17 ${60-stride}L20 45L24 32Z`} fill={p.red}/>
         <path d={studying ? 'M44 28L48 30L50 42L42 50L38 46L43 39L40 32Z' : `M44 28L48 30L51 44L52 ${58+stride}L47 ${60+stride}L44 45L40 32Z`} fill={p.red}/>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, Maximize2, Minimize2, ShieldCheck, Volume2, VolumeX, Music, Eye } from 'lucide-react';
 import { Character } from '../types/character';
 import { CHARACTERS } from '../data/characters';
@@ -7,8 +7,9 @@ import { PixelEmblem } from '../components/PixelEmblems';
 import { CustomAppearanceState } from '../utils/pixelSpriteCompositor';
 import { SpiderStudyRoom } from '../components/SpiderStudyRoom';
 import { RoomToolPanel } from '../components/RoomToolPanel';
-import { isSpiderManCostume } from '../utils/spidermanAssets';
-import { StudyEnvironment } from '../components/StudyEnvironment';
+import { FullBodyPixelSprite } from '../components/FullBodyPixelSprite';
+import { CharacterSanctuary } from '../components/CharacterSanctuary';
+import { StarkWorkshop } from '../components/StarkWorkshop';
 import { TimerWidget } from '../components/TimerWidget';
 import { TodoWidget } from '../components/TodoWidget';
 import { NotesWidget } from '../components/NotesWidget';
@@ -45,7 +46,7 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
   initialTask,
   hideHeader = false,
 }) => {
-  const spiderRoom = customAppearance ? isSpiderManCostume(customAppearance) : character.id === 'peter-parker';
+  const spiderRoom = character.id === 'peter-parker';
   const [roomPanel, setRoomPanel] = useState<'notes' | 'tasks' | null>(null);
   const [musicRequest, setMusicRequest] = useState(0);
   const [taskCompletion, setTaskCompletion] = useState(0);
@@ -55,6 +56,8 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
   const [showDimmerSlider, setShowDimmerSlider] = useState(false);
   const [currentAction, setCurrentAction] = useState<UserFocusAction>('IDLE');
   const [timerModeReadout, setTimerModeReadout] = useState('POMODORO');
+  const bubbleTimer = useRef<ReturnType<typeof setTimeout>>();
+  useEffect(() => { setCompanionBubble(null); return () => clearTimeout(bubbleTimer.current); }, [character.id]);
   const [companionBubble, setCompanionBubble] = useState<string | null>(null);
 
   // Compact Header Audio Controls
@@ -121,7 +124,8 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
     audioEngine.playClick();
     audioEngine.playVictoryJingle(character.synthNotes);
     setCompanionBubble(character.quote);
-    setTimeout(() => setCompanionBubble(null), 3800);
+    clearTimeout(bubbleTimer.current);
+    bubbleTimer.current = setTimeout(() => setCompanionBubble(null), 3800);
   };
 
   return (
@@ -342,7 +346,7 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
         )}
 
         {/* 12-Column Responsive Workspace Grid */}
-        <div className={`workspace-grid ${spiderRoom ? 'spider-workspace' : ''} ${zenMode ? 'workspace-zen' : ''}`}>
+        <div className={`workspace-grid spider-workspace ${zenMode ? 'workspace-zen' : ''}`}>
           {/* Left Column: Focus Study Timer + 2D In-Game Focus Companion Stage */}
           <div className={"workspace-timer space-y-4"}>
             <TimerWidget
@@ -354,40 +358,18 @@ export const WorkspacePage: React.FC<WorkspacePageProps> = ({
 
           </div>
           <div className="workspace-scene">
-            {spiderRoom ? <SpiderStudyRoom action={currentAction} completion={taskCompletion} onMusic={() => setMusicRequest(n => n + 1)} onNotes={() => setRoomPanel('notes')} onTasks={() => setRoomPanel('tasks')} /> : <StudyEnvironment character={character} appearance={customAppearance} studying={currentAction === 'FOCUSING'} onCompanionClick={handleCompanionClick} />}
-            <div className="scene-companion-note"><span className="text-arcade-cyan">{archetypeMode ? character.archetypeName.split('/')[0] : character.name.split('(')[0]}</span><p>{companionBubble || character.quote}</p></div>
+            {spiderRoom ? <SpiderStudyRoom action={currentAction} completion={taskCompletion} onMusic={() => setMusicRequest(n => n + 1)} onNotes={() => setRoomPanel('notes')} onTasks={() => setRoomPanel('tasks')} /> : character.id === 'tony-stark' ? <StarkWorkshop action={currentAction} onCompanionClick={handleCompanionClick} onMusic={() => setMusicRequest(n => n + 1)} onNotes={() => setRoomPanel('notes')} onTasks={() => setRoomPanel('tasks')} /> : <CharacterSanctuary key={character.id} character={character} action={currentAction} onCompanionClick={handleCompanionClick} onMusic={() => setMusicRequest(n => n + 1)} onNotes={() => setRoomPanel('notes')} onTasks={() => setRoomPanel('tasks')} />}
+            <div className="scene-companion-note">{customAppearance && <div className="sanctuary-player-avatar"><FullBodyPixelSprite appearance={customAppearance} size={72} animated={false} showPlatform={false}/><span>Your saved avatar</span></div>}<span className="text-arcade-cyan">{archetypeMode ? character.archetypeName.split('/')[0] : character.name.split('(')[0]}</span><p>{companionBubble || character.quote}</p></div>
             <TutorDialogueBanner activeCharacter={character} inline />
           </div>
 
-          {/* Center & Right Columns: Todo List, Scratchpad & Music Center (7 Cols, Hidden in Zen) */}
-          {!zenMode && !spiderRoom && (
-            <div className="workspace-tools space-y-4">
-              <div className="grid grid-cols-1 gap-4">
-                {/* To-Do List Widget */}
-                <div>
-                  <TodoWidget
-                    onTaskComplete={() => setTaskCompletion(n => n + 1)}
-                    accentColor={character.palette.accentGold}
-                  />
-                </div>
-
-                {/* Quick Notes Scratchpad Widget */}
-                <div>
-                  <NotesWidget accentColor={character.palette.accentSecondary} />
-                </div>
-              </div>
-
-              {/* Dedicated Large MUSIC & AMBIENCE CENTER */}
-
-            </div>
-          )}
         </div>
 
         {/* Global Floating Tutor Dialogue Banner */}
-        {spiderRoom && <>
+        <>
           <RoomToolPanel open={roomPanel === 'notes'} title="Study notebook" onClose={() => setRoomPanel(null)}><NotesWidget accentColor={character.palette.accentSecondary}/></RoomToolPanel>
           <RoomToolPanel open={roomPanel === 'tasks'} title="Task board" onClose={() => setRoomPanel(null)}><TodoWidget onTaskComplete={() => setTaskCompletion(n => n + 1)} accentColor={character.palette.accentGold}/></RoomToolPanel>
-        </>}
+        </>
         <MusicCenter initialAmbienceProfile={character.ambienceProfile} openRequest={musicRequest} soundscapeControls={<div className="room-soundscapes" aria-label="Room soundscapes">
           <strong>ROOM SOUNDS</strong>
           <label>Soundscape <select aria-label="Room soundscape" value={activeProfile} onChange={e => handleProfileSelect(e.target.value)}>{['rain','lofi','fire','space','wind','purr','matrix','sonar'].map(p => <option key={p} value={p}>{p}</option>)}</select></label>

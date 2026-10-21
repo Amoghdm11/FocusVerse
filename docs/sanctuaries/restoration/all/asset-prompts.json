@@ -1,0 +1,50 @@
+{
+  "forest-evening": {
+    "tool": "built-in imagegen",
+    "reference": "public/assets/room/queens-night.jpg",
+    "asset": "public/assets/room/forest-evening.jpg",
+    "prompt": "Create a landscape exterior background for the SAME illustrated 2D game as the supplied reference. Match its finely painted/pixel-inspired texture, crisp comic-inspired silhouettes, layered depth, restrained lighting and warm amber accents. Reference is STYLE ONLY. New subject: A lush wooded valley seen from a hillside at blue hour, a distant medieval academy's few warm windows among trees, layered rolling hills, foreground oak branches, muted moss greens, indigo dusk and amber fireflies. No modern buildings. For gothic library/tower windows and a greenhouse. Landscape 3:2. Environment only, no room, no window frames, no UI, no characters. NOT photorealistic, NOT glossy 3D, NOT simple flat vector shapes. Rich but quiet scenery at the same detail level as the reference."
+  },
+  "mountain-night": {
+    "tool": "built-in imagegen",
+    "reference": "public/assets/room/queens-night.jpg",
+    "asset": "public/assets/room/mountain-night.jpg",
+    "prompt": "Create a landscape exterior background for the SAME illustrated 2D game as the supplied reference. Match its finely painted/pixel-inspired texture, crisp comic-inspired silhouettes, layered depth, restrained lighting and warm amber accents. Reference is STYLE ONLY. New subject: Snow-covered alpine mountains with dark pines in the foreground, a narrow lake reflecting a small moon, softly painted green aurora over indigo sky, a few distant amber cabin windows. For an ice observatory and snowy cabin windows. Landscape 3:2. Environment only, no room, no window frames, no UI, no characters. NOT photorealistic, NOT glossy 3D, NOT simple flat vector shapes. Rich but quiet scenery at the same detail level as the reference."
+  },
+  "village-dusk": {
+    "tool": "built-in imagegen",
+    "reference": "public/assets/room/queens-night.jpg",
+    "asset": "public/assets/room/village-dusk.jpg",
+    "prompt": "Create a landscape exterior background for the SAME illustrated 2D game as the supplied reference. Match its finely painted/pixel-inspired texture, crisp comic-inspired silhouettes, layered depth, restrained lighting and warm amber accents. Reference is STYLE ONLY. New subject: A Japanese-inspired ninja village nestled below a forested mountain ridge at dusk. Layered warm tiled roofs and wooden buildings, glowing amber windows, trees and distant carved mountain faces subtly visible. Muted forest greens, indigo shadows, warm evening sky. No text. Landscape 3:2. Environment only, no room, no window frames, no UI, no characters. NOT photorealistic, NOT glossy 3D, NOT simple flat vector shapes. Rich but quiet scenery at the same detail level as the reference."
+  },
+  "ocean-night": {
+    "tool": "built-in imagegen",
+    "reference": "public/assets/room/queens-night.jpg",
+    "asset": "public/assets/room/ocean-night.jpg",
+    "prompt": "Create a landscape exterior background for the SAME illustrated 2D game as the supplied reference. Match its finely painted/pixel-inspired texture, crisp comic-inspired silhouettes, layered depth, restrained lighting and warm amber accents. Reference is STYLE ONLY. New subject: A wide tropical Pacific ocean at moonrise, distant volcanic island silhouettes on the far left horizon, softly illustrated turquoise surf, dark blue middle ocean, many small stars and one small moon upper right. No boats, no buildings, no foreground trees, no characters. Landscape 3:2. Environment only, no room, no window frames, no UI, no characters. NOT photorealistic, NOT glossy 3D, NOT simple flat vector shapes. Rich but quiet scenery at the same detail level as the reference."
+  },
+  "cavern-night": {
+    "tool": "built-in imagegen",
+    "reference": "public/assets/room/queens-night.jpg",
+    "asset": "public/assets/room/cavern-night.jpg",
+    "prompt": "New 3:2 exterior environment asset for the same illustrated game as the reference. Match the reference's comic-inspired silhouettes, finely painted pixel-inspired shading, night indigo and amber palette and atmospheric depth. Reference is STYLE ONLY. A vast dark limestone cavern with layered stalactites and faceted rock walls, a still underground reservoir below, faint distant blue shafts of moonlight, tiny amber utility lights along a far rock ledge. No consoles, no furniture, no characters. Leave the middle/lower center dark and quiet for separate foreground game artwork. Not photorealistic, no 3D, no flat-vector substitution."
+  },
+  "barrier-night": {
+    "tool": "built-in imagegen",
+    "reference": "public/assets/room/queens-night.jpg",
+    "asset": "public/assets/room/barrier-night.jpg",
+    "prompt": "New 3:2 exterior environment asset for the same illustrated game as the reference. Match the reference's comic-inspired silhouettes, finely painted pixel-inspired shading, night indigo and amber palette and atmospheric depth. Reference is STYLE ONLY. A quiet indigo star field above distant Japanese temple garden hills at night, small soft violet celestial rings and faint flowing atmospheric light, layered dark treetop silhouettes along the bottom quarter, small moon. Restrained magical atmosphere, no neon explosion. No temple columns, furniture, people or text. Not photorealistic, no 3D, no flat-vector substitution."
+  },
+  "tokyo-night": {
+    "tool": "built-in imagegen",
+    "reference": "public/assets/room/queens-night.jpg",
+    "asset": "public/assets/room/tokyo-night.jpg",
+    "prompt": "New wide 3:2 exterior illustration for the exact same game as reference. Match finely painted pixel-inspired texture, crisp comic silhouettes and layered night scenery. Reference STYLE ONLY. Tokyo rooftops at night, an elevated commuter train crossing the lower third, layered compact apartment blocks with scattered amber windows and small restrained teal/pink signs without readable lettering. Dense Japanese city, blue-purple clouds, no New York skyscrapers or American water towers. Seen from a quiet dorm window. No 3D rendering or photographic realism. Keep crisp hand-illustrated shadow planes and warm windows matching reference. No room framing or UI."
+  },
+  "future-la-night": {
+    "tool": "built-in imagegen",
+    "reference": "public/assets/room/queens-night.jpg",
+    "asset": "public/assets/room/future-la-night.jpg",
+    "prompt": "New wide 3:2 exterior illustration for the exact same game as reference. Match finely painted pixel-inspired texture, crisp comic silhouettes and layered night scenery. Reference STYLE ONLY. A distant retro-futuristic Los Angeles skyline in amber smog at night, layered brutalist towers and scattered small cyan windows, subtle geometric advertising light without readable text, atmospheric amber haze with dark indigo foreground silhouettes. Seen from a spinner hangar. No vehicles in foreground, no characters, no interior. No 3D rendering or photographic realism. Keep crisp hand-illustrated shadow planes and warm windows matching reference. No room framing or UI."
+  }
+}

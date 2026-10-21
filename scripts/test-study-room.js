@@ -46,13 +46,13 @@ try {
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   const roomBounds = await page.$eval('.queens-stage', node => {
     const { x, y, width, height } = node.getBoundingClientRect();
-    return { x, y, width, height };
+    return { x: x + scrollX, y: y + scrollY, width, height };
   });
   await click('[aria-label="Open computer music player"]');
   await page.waitForSelector('[aria-label="Computer music player"]', { visible:true });
   assert.deepEqual(await page.$eval('.queens-stage', node => {
     const { x, y, width, height } = node.getBoundingClientRect();
-    return { x, y, width, height };
+    return { x: x + scrollX, y: y + scrollY, width, height };
   }), roomBounds, 'Opening music must not shift or resize the room');
   await click('button::-p-text(Play soundscape)');
   await page.waitForFunction(() => window.__audioContexts.some(context => context.state === 'running'));
